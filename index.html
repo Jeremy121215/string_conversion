@@ -261,6 +261,16 @@
             transform: translateY(-2px);
         }
         
+        .btn-info {
+            background: linear-gradient(90deg, #2196f3, #0d47a1);
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: linear-gradient(90deg, #0d8bf2, #0a3d91);
+            transform: translateY(-2px);
+        }
+        
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -415,10 +425,19 @@
         }
         
         .size-badge {
-            background: rgba(108, 99, 255, 0.2);
             padding: 4px 8px;
             border-radius: 12px;
             font-size: 0.8rem;
+        }
+        
+        .ascii-badge {
+            background: rgba(108, 99, 255, 0.2);
+            color: #6c63ff;
+        }
+        
+        .unicode-badge {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
         }
         
         footer {
@@ -637,17 +656,91 @@
             font-size: 0.8rem;
             color: #f44336;
         }
+        
+        .encoding-mode-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .encoding-mode-selector {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .encoding-radio-group {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .encoding-radio {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .encoding-radio input[type="radio"] {
+            margin: 0;
+        }
+        
+        .encoding-info {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #a0a0c0;
+            border-left: 3px solid #6c63ff;
+        }
+        
+        .bits-info {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .bits-info span {
+            font-family: monospace;
+            color: #6c63ff;
+            font-weight: bold;
+        }
+        
+        .unicode-info {
+            background: rgba(33, 150, 243, 0.1);
+            border-left: 3px solid #2196f3;
+        }
+        
+        .ascii-info {
+            background: rgba(108, 99, 255, 0.1);
+            border-left: 3px solid #6c63ff;
+        }
+        
+        @media (max-width: 768px) {
+            .encoding-radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .mode-toggle-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1><i class="fas fa-code"></i> 图像编码/解码工具</h1>
-            <p class="subtitle">将文本编码为黑白图像，尺寸根据字符数动态调整，接近A4比例</p>
+            <p class="subtitle">将文本编码为黑白图像，支持ASCII和Unicode两种编码模式</p>
             <div class="stats">
                 <div class="stat-box">最大字符数: 1,372,000</div>
                 <div class="stat-box">最小尺寸: 100×142 像素</div>
-                <div class="stat-box">字符编码: 7位二进制 ASCII</div>
+                <div class="stat-box">支持编码: ASCII / Unicode</div>
             </div>
         </header>
         
@@ -656,28 +749,48 @@
             <div class="card">
                 <h2 class="card-title"><i class="fas fa-lock"></i> 编码文本到图像</h2>
                 
-                <div class="validation-info">
-                    <i class="fas fa-info-circle"></i> 
-                    仅支持 ASCII 字符 (0-127)。非ASCII字符将被特殊处理。
+                <!-- 编码模式选择 -->
+                <div class="encoding-mode-group">
+                    <div class="encoding-mode-selector">
+                        <div class="encoding-radio-group">
+                            <label class="encoding-radio">
+                                <input type="radio" name="encodingMode" id="asciiModeRadio" value="ascii" checked>
+                                <span>ASCII模式</span>
+                            </label>
+                            <label class="encoding-radio">
+                                <input type="radio" name="encodingMode" id="unicodeModeRadio" value="unicode">
+                                <span>全文模式 (Unicode)</span>
+                            </label>
+                        </div>
+                        <span id="encodingModeBadge" class="size-badge ascii-badge">ASCII 7位</span>
+                    </div>
+                    
+                    <div id="asciiModeInfo" class="encoding-info ascii-info">
+                        <i class="fas fa-info-circle"></i> ASCII模式：仅支持ASCII字符(0-127)，每个字符使用7位二进制编码
+                    </div>
+                    
+                    <div id="unicodeModeInfo" class="encoding-info unicode-info" style="display: none;">
+                        <i class="fas fa-info-circle"></i> 全文模式：支持所有Unicode字符，每个字符使用21位二进制编码（最大码点0x10FFFF）
+                    </div>
                 </div>
                 
-                <!-- ASCII处理模式切换 -->
-                <div class="mode-toggle-group">
+                <!-- ASCII处理模式切换（仅ASCII模式显示） -->
+                <div id="asciiHandlingGroup" class="mode-toggle-group">
                     <div class="mode-toggle">
-                        <input type="radio" id="strictMode" name="asciiMode" class="mode-checkbox" checked>
+                        <input type="radio" id="strictMode" name="asciiHandling" class="mode-checkbox" checked>
                         <label for="strictMode" class="mode-switch"></label>
                         <label for="strictMode" class="mode-label">严格模式</label>
                         <span class="strict-mode-badge">发现非ASCII字符时阻止编码</span>
                     </div>
                     <div class="mode-toggle">
-                        <input type="radio" id="ignoreMode" name="asciiMode" class="mode-checkbox">
+                        <input type="radio" id="ignoreMode" name="asciiHandling" class="mode-checkbox">
                         <label for="ignoreMode" class="mode-switch"></label>
                         <label for="ignoreMode" class="mode-label">忽略模式</label>
                         <span class="ignore-mode-badge">将非ASCII字符替换为NULL(0)</span>
                     </div>
                 </div>
                 
-                <!-- 非ASCII字符显示面板 -->
+                <!-- 非ASCII字符显示面板（仅ASCII模式显示） -->
                 <div id="nonAsciiPanel" class="non-ascii-panel">
                     <h4><i class="fas fa-exclamation-triangle"></i> 发现非ASCII字符:</h4>
                     <div id="nonAsciiList" class="non-ascii-list">
@@ -688,13 +801,14 @@
                     </div>
                 </div>
                 
+                <!-- 图像尺寸控制 -->
                 <div class="toggle-container">
                     <label class="toggle-label">
                         <input type="checkbox" id="autoSizeToggle" class="toggle-checkbox" checked>
                         <span class="toggle-switch"></span>
                         <span>自动调整图像尺寸</span>
                     </label>
-                    <span id="toggleStatus" class="size-badge">已启用</span>
+                    <span id="toggleStatus" class="size-badge ascii-badge">已启用</span>
                 </div>
                 
                 <div id="dimensionControls" class="dimension-controls" style="display: none;">
@@ -715,10 +829,16 @@
                     </button>
                 </div>
                 
-                <textarea id="inputText" placeholder="请输入要编码的文本（最多1,372,000个ASCII字符）..."></textarea>
+                <!-- 文本输入 -->
+                <textarea id="inputText" placeholder="请输入要编码的文本..."></textarea>
                 
+                <!-- 字符计数和位信息 -->
                 <div class="char-count" id="charCount">字符数: 0 / 1,372,000 (0像素)</div>
+                <div id="bitsInfo" class="bits-info" style="display: none;">
+                    <i class="fas fa-microchip"></i> 总位数: <span id="totalBits">0</span> 位 | 每个字符: <span id="bitsPerChar">7</span> 位
+                </div>
                 
+                <!-- 按钮组 -->
                 <div class="button-group">
                     <button id="encodeBtn" class="btn btn-primary">
                         <i class="fas fa-cogs"></i> 编码为图像
@@ -731,6 +851,7 @@
                     </button>
                 </div>
                 
+                <!-- 图像输出 -->
                 <div class="image-container">
                     <div id="imageOutput" class="canvas-wrapper">
                         <div class="image-placeholder">
@@ -743,6 +864,7 @@
                     <div class="image-info">
                         <div id="imageDimensions">图像尺寸: 未生成</div>
                         <div id="imageSize">文件大小: 未生成</div>
+                        <div id="encodingModeIndicator">编码模式: ASCII</div>
                     </div>
                     
                     <button id="downloadBtn" class="btn btn-success" disabled>
@@ -757,7 +879,26 @@
                 
                 <div class="validation-info">
                     <i class="fas fa-info-circle"></i> 
-                    请上传之前编码生成的图像。支持动态尺寸和固定尺寸图像。
+                    请上传之前编码生成的图像。支持ASCII和Unicode两种编码模式的图像。
+                </div>
+                
+                <!-- 解码模式选择 -->
+                <div class="encoding-mode-group" style="margin-top: 15px;">
+                    <div class="encoding-mode-selector">
+                        <div class="encoding-radio-group">
+                            <label class="encoding-radio">
+                                <input type="radio" name="decodeMode" id="decodeAsciiMode" value="ascii" checked>
+                                <span>ASCII解码</span>
+                            </label>
+                            <label class="encoding-radio">
+                                <input type="radio" name="decodeMode" id="decodeUnicodeMode" value="unicode">
+                                <span>Unicode解码</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="encoding-info">
+                        <i class="fas fa-lightbulb"></i> 提示：如果解码结果异常，请尝试切换解码模式
+                    </div>
                 </div>
                 
                 <div class="file-input-wrapper">
@@ -792,14 +933,31 @@
             
             <!-- 算法说明 -->
             <div class="card info-box">
-                <h3><i class="fas fa-calculator"></i> ASCII字符处理说明</h3>
+                <h3><i class="fas fa-calculator"></i> 编码模式说明</h3>
                 <ul>
-                    <li><strong>严格模式</strong>: 发现非ASCII字符(>127)时阻止编码，要求用户修改输入</li>
-                    <li><strong>忽略模式</strong>: 将非ASCII字符自动替换为NULL字符(ASCII 0，二进制: 0000000)</li>
-                    <li>NULL字符在解码时将被显示为空格或不可见字符</li>
-                    <li>非ASCII字符包括: 中文、日文、韩文、表情符号等所有超出ASCII范围的字符</li>
+                    <li><strong>ASCII模式</strong>：
+                        <ul>
+                            <li>仅支持ASCII字符(0-127)</li>
+                            <li>每个字符使用7位二进制编码</li>
+                            <li>提供严格模式和忽略模式处理非ASCII字符</li>
+                        </ul>
+                    </li>
+                    <li><strong>全文模式 (Unicode)</strong>：
+                        <ul>
+                            <li>支持所有Unicode字符（包括中文、日文、表情符号等）</li>
+                            <li>每个字符使用21位二进制编码（支持最大码点0x10FFFF）</li>
+                            <li>自动处理所有字符，无需特殊设置</li>
+                        </ul>
+                    </li>
+                    <li><strong>图像尺寸计算</strong>：
+                        <ul>
+                            <li>ASCII模式：总像素 = 字符数 × 7</li>
+                            <li>Unicode模式：总像素 = 字符数 × 21</li>
+                            <li>根据总像素自动计算接近A4比例(1:1.414)的图像尺寸</li>
+                        </ul>
+                    </li>
                 </ul>
-                <p>示例: 文本"Hello你好"在忽略模式下，"你好"将被替换为两个NULL字符</p>
+                <p>示例: 10个中文字符在Unicode模式下需要 10×21=210像素 → 图像尺寸约为 12×17 像素</p>
             </div>
         </div>
         
@@ -810,7 +968,7 @@
         </div>
         
         <footer>
-            <p>自适应二进制图像编码/解码工具 | 每个字符7位二进制 | 尺寸根据字符数动态调整</p>
+            <p>图像编码/解码工具 | 支持ASCII和Unicode编码 | 尺寸根据字符数动态调整</p>
             <p>© 2023 编码工具 | 最多处理 1,372,000 个字符</p>
         </footer>
     </div>
@@ -822,7 +980,7 @@
     </div>
 
     <script>
-        // DOM元素
+        // ============== DOM元素 ==============
         const inputText = document.getElementById('inputText');
         const charCount = document.getElementById('charCount');
         const encodeBtn = document.getElementById('encodeBtn');
@@ -847,43 +1005,115 @@
         const toggleStatus = document.getElementById('toggleStatus');
         const imageDimensions = document.getElementById('imageDimensions');
         const imageSize = document.getElementById('imageSize');
+        const encodingModeIndicator = document.getElementById('encodingModeIndicator');
+        
+        // 编码模式相关元素
+        const asciiModeRadio = document.getElementById('asciiModeRadio');
+        const unicodeModeRadio = document.getElementById('unicodeModeRadio');
+        const encodingModeBadge = document.getElementById('encodingModeBadge');
+        const asciiModeInfo = document.getElementById('asciiModeInfo');
+        const unicodeModeInfo = document.getElementById('unicodeModeInfo');
+        
+        // ASCII处理相关元素
+        const asciiHandlingGroup = document.getElementById('asciiHandlingGroup');
         const strictModeRadio = document.getElementById('strictMode');
         const ignoreModeRadio = document.getElementById('ignoreMode');
         const nonAsciiPanel = document.getElementById('nonAsciiPanel');
         const nonAsciiList = document.getElementById('nonAsciiList');
         const showNonAsciiBtn = document.getElementById('showNonAsciiBtn');
         
-        // 常量定义
-        const MAX_CHARS = 1372000; // 最大字符数（1372000*7=9604000像素）
+        // 解码模式相关元素
+        const decodeAsciiMode = document.getElementById('decodeAsciiMode');
+        const decodeUnicodeMode = document.getElementById('decodeUnicodeMode');
+        
+        // 位信息相关元素
+        const bitsInfo = document.getElementById('bitsInfo');
+        const totalBits = document.getElementById('totalBits');
+        const bitsPerChar = document.getElementById('bitsPerChar');
+        
+        // ============== 常量定义 ==============
+        const MAX_CHARS = 1372000; // 最大字符数（基于7位编码计算）
         const MIN_WIDTH = 100;
         const MIN_HEIGHT = 142;
         const MAX_WIDTH = 2000;
         const MAX_HEIGHT = 2828;
         const ASPECT_RATIO = 1.414; // A4比例
         
-        // 当前图像尺寸和设置
+        // 编码配置
+        const ENCODING_CONFIG = {
+            ascii: {
+                bitsPerChar: 7,
+                maxCodePoint: 127,
+                description: "ASCII 7位",
+                badgeClass: "ascii-badge",
+                badgeText: "ASCII 7位",
+                infoClass: "ascii-info"
+            },
+            unicode: {
+                bitsPerChar: 21,
+                maxCodePoint: 0x10FFFF, // Unicode最大码点
+                description: "Unicode 21位",
+                badgeClass: "unicode-badge",
+                badgeText: "Unicode 21位",
+                infoClass: "unicode-info"
+            }
+        };
+        
+        // ============== 状态变量 ==============
         let currentWidth = 980;
         let currentHeight = 1400;
         let autoSizeEnabled = true;
-        let asciiMode = 'strict'; // 'strict' 或 'ignore'
+        let encodingMode = 'ascii'; // 'ascii' 或 'unicode'
+        let asciiHandlingMode = 'strict'; // 'strict' 或 'ignore'
+        let decodeMode = 'ascii'; // 解码模式
         let nonAsciiChars = [];
         
-        // 初始化
+        // ============== 初始化 ==============
         document.addEventListener('DOMContentLoaded', function() {
-            updateCharCount();
-            setupEventListeners();
-            updateAspectRatio();
+            initializePage();
         });
         
-        // 设置事件监听器
+        function initializePage() {
+            setupEventListeners();
+            updateCharCount();
+            updateAspectRatio();
+            updateEncodingModeUI();
+            updateBitsInfo();
+            
+            // 显示欢迎信息
+            setTimeout(() => {
+                showNotification('欢迎使用图像编码/解码工具！支持ASCII和Unicode两种编码模式。', 'info');
+            }, 1000);
+        }
+        
+        // ============== 事件监听器设置 ==============
         function setupEventListeners() {
             // 输入文本变化
             inputText.addEventListener('input', updateCharCount);
             
-            // ASCII模式切换
+            // 编码模式切换
+            asciiModeRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    encodingMode = 'ascii';
+                    updateEncodingModeUI();
+                    updateCharCount();
+                    showNotification('已切换到ASCII模式（7位/字符）', 'info');
+                }
+            });
+            
+            unicodeModeRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    encodingMode = 'unicode';
+                    updateEncodingModeUI();
+                    updateCharCount();
+                    showNotification('已切换到全文模式（Unicode，21位/字符）', 'info');
+                }
+            });
+            
+            // ASCII处理模式切换
             strictModeRadio.addEventListener('change', function() {
                 if (this.checked) {
-                    asciiMode = 'strict';
+                    asciiHandlingMode = 'strict';
                     updateCharCount();
                     showNotification('已切换到严格模式：发现非ASCII字符时将阻止编码', 'info');
                 }
@@ -891,9 +1121,24 @@
             
             ignoreModeRadio.addEventListener('change', function() {
                 if (this.checked) {
-                    asciiMode = 'ignore';
+                    asciiHandlingMode = 'ignore';
                     updateCharCount();
                     showNotification('已切换到忽略模式：非ASCII字符将被替换为NULL', 'warning');
+                }
+            });
+            
+            // 解码模式切换
+            decodeAsciiMode.addEventListener('change', function() {
+                if (this.checked) {
+                    decodeMode = 'ascii';
+                    showNotification('解码模式：ASCII（7位/字符）', 'info');
+                }
+            });
+            
+            decodeUnicodeMode.addEventListener('change', function() {
+                if (this.checked) {
+                    decodeMode = 'unicode';
+                    showNotification('解码模式：Unicode（21位/字符）', 'info');
                 }
             });
             
@@ -909,8 +1154,6 @@
                 autoSizeEnabled = this.checked;
                 dimensionControls.style.display = autoSizeEnabled ? 'none' : 'flex';
                 toggleStatus.textContent = autoSizeEnabled ? '已启用' : '已禁用';
-                toggleStatus.style.background = autoSizeEnabled ? 
-                    'rgba(108, 99, 255, 0.2)' : 'rgba(255, 152, 0, 0.2)';
                 
                 if (!autoSizeEnabled) {
                     updateCharCount();
@@ -984,18 +1227,43 @@
             
             // 复制文本按钮
             copyTextBtn.addEventListener('click', copyDecodedText);
+            
+            // 设置键盘快捷键
+            setupKeyboardShortcuts();
         }
         
-        // 更新字符计数
+        // ============== 编码模式UI更新 ==============
+        function updateEncodingModeUI() {
+            const config = ENCODING_CONFIG[encodingMode];
+            
+            // 更新徽章
+            encodingModeBadge.textContent = config.badgeText;
+            encodingModeBadge.className = `size-badge ${config.badgeClass}`;
+            
+            // 更新信息显示
+            asciiModeInfo.style.display = encodingMode === 'ascii' ? 'block' : 'none';
+            unicodeModeInfo.style.display = encodingMode === 'unicode' ? 'block' : 'none';
+            
+            // 更新ASCII处理组显示
+            asciiHandlingGroup.style.display = encodingMode === 'ascii' ? 'flex' : 'none';
+            nonAsciiPanel.style.display = 'none';
+            showNonAsciiBtn.style.display = 'none';
+            
+            // 更新编码模式指示器
+            encodingModeIndicator.textContent = `编码模式: ${encodingMode === 'ascii' ? 'ASCII' : 'Unicode'}`;
+            
+            // 更新每个字符位数
+            bitsPerChar.textContent = config.bitsPerChar;
+        }
+        
+        // ============== 字符计数更新 ==============
         function updateCharCount() {
             const text = inputText.value;
             const count = text.length;
-            const pixelsNeeded = count * 7;
+            const config = ENCODING_CONFIG[encodingMode];
+            const pixelsNeeded = count * config.bitsPerChar;
             
-            // 查找非ASCII字符
-            nonAsciiChars = findNonAsciiChars(text);
-            
-            // 如果启用自动尺寸，计算所需尺寸
+            // 显示字符计数
             if (autoSizeEnabled && count > 0) {
                 calculateAutoDimensions(pixelsNeeded);
                 charCount.textContent = `字符数: ${count.toLocaleString()} / ${MAX_CHARS.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
@@ -1004,21 +1272,30 @@
                 charCount.textContent = `字符数: ${count.toLocaleString()} / ${MAX_CHARS.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
             }
             
-            // 显示非ASCII字符信息
-            if (nonAsciiChars.length > 0) {
-                if (asciiMode === 'strict') {
-                    charCount.classList.add('error');
-                    encodeBtn.disabled = true;
-                    charCount.textContent += ` (发现${nonAsciiChars.length}个非ASCII字符)`;
-                    showNonAsciiBtn.style.display = 'flex';
+            // ASCII模式：检查非ASCII字符
+            if (encodingMode === 'ascii') {
+                nonAsciiChars = findNonAsciiChars(text);
+                
+                if (nonAsciiChars.length > 0) {
+                    if (asciiHandlingMode === 'strict') {
+                        charCount.classList.add('error');
+                        encodeBtn.disabled = true;
+                        charCount.textContent += ` (发现${nonAsciiChars.length}个非ASCII字符)`;
+                        showNonAsciiBtn.style.display = 'flex';
+                    } else {
+                        charCount.classList.add('warning');
+                        encodeBtn.disabled = false;
+                        charCount.textContent += ` (${nonAsciiChars.length}个非ASCII字符将被替换)`;
+                        showNonAsciiBtn.style.display = 'flex';
+                    }
                 } else {
-                    // 忽略模式
-                    charCount.classList.add('warning');
+                    charCount.classList.remove('error', 'warning');
                     encodeBtn.disabled = false;
-                    charCount.textContent += ` (${nonAsciiChars.length}个非ASCII字符将被替换)`;
-                    showNonAsciiBtn.style.display = 'flex';
+                    showNonAsciiBtn.style.display = 'none';
+                    nonAsciiPanel.classList.remove('show');
                 }
             } else {
+                // Unicode模式：不检查非ASCII字符
                 charCount.classList.remove('error', 'warning');
                 encodeBtn.disabled = false;
                 showNonAsciiBtn.style.display = 'none';
@@ -1034,17 +1311,32 @@
             
             // 如果手动设置尺寸，检查像素容量
             if (!autoSizeEnabled && count > 0) {
-                const maxCharsForSize = Math.floor((currentWidth * currentHeight) / 7);
+                const maxCharsForSize = Math.floor((currentWidth * currentHeight) / config.bitsPerChar);
                 if (count > maxCharsForSize) {
                     charCount.classList.add('warning');
                     charCount.textContent += ` (警告: 当前尺寸最多容纳 ${maxCharsForSize.toLocaleString()} 字符)`;
                 }
             }
+            
+            // 更新位信息
+            updateBitsInfo();
         }
         
-        // 显示非ASCII字符详情
+        // ============== 位信息更新 ==============
+        function updateBitsInfo() {
+            const text = inputText.value;
+            const config = ENCODING_CONFIG[encodingMode];
+            const total = text.length * config.bitsPerChar;
+            
+            totalBits.textContent = total.toLocaleString();
+            bitsPerChar.textContent = config.bitsPerChar;
+            
+            // 显示位信息
+            bitsInfo.style.display = text.length > 0 ? 'block' : 'none';
+        }
+        
+        // ============== 显示非ASCII字符详情 ==============
         function showNonAsciiDetails() {
-            // 更新非ASCII字符列表
             nonAsciiList.innerHTML = '';
             
             // 只显示前20个，避免列表过长
@@ -1077,7 +1369,7 @@
             nonAsciiPanel.classList.add('show');
         }
         
-        // 计算自动尺寸
+        // ============== 计算自动尺寸 ==============
         function calculateAutoDimensions(pixelsNeeded) {
             if (pixelsNeeded <= 0) {
                 currentWidth = MIN_WIDTH;
@@ -1097,7 +1389,6 @@
             // 调整高度确保能容纳所有像素
             const totalPixels = width * height;
             if (totalPixels < pixelsNeeded) {
-                // 如果像素不足，增加高度
                 height = Math.ceil(pixelsNeeded / width);
             }
             
@@ -1110,11 +1401,11 @@
                 width = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
             }
             
-            currentWidth = width;
-            currentHeight = height;
+            currentWidth = Math.floor(width);
+            currentHeight = Math.floor(height);
         }
         
-        // 更新宽高比显示
+        // ============== 更新宽高比显示 ==============
         function updateAspectRatio() {
             const width = parseInt(imageWidthInput.value) || MIN_WIDTH;
             const height = parseInt(imageHeightInput.value) || MIN_HEIGHT;
@@ -1122,7 +1413,7 @@
             aspectRatioInput.value = `1:${ratio}`;
         }
         
-        // 查找非ASCII字符
+        // ============== 查找非ASCII字符 ==============
         function findNonAsciiChars(text) {
             const nonAscii = [];
             for (let i = 0; i < text.length; i++) {
@@ -1138,14 +1429,14 @@
             return nonAscii;
         }
         
-        // HTML转义函数，防止XSS攻击
+        // ============== HTML转义函数 ==============
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
         
-        // 编码文本为图像
+        // ============== 编码文本为图像 ==============
         function encodeTextToImage() {
             const text = inputText.value;
             
@@ -1160,14 +1451,15 @@
                 return;
             }
             
-            // 检查非ASCII字符
-            nonAsciiChars = findNonAsciiChars(text);
-            
-            if (asciiMode === 'strict' && nonAsciiChars.length > 0) {
-                // 严格模式：显示非ASCII字符详情
-                showNonAsciiDetails();
-                showNotification(`发现${nonAsciiChars.length}个非ASCII字符，请切换到"忽略模式"或修改文本`, 'error');
-                return;
+            // ASCII模式：检查非ASCII字符
+            if (encodingMode === 'ascii') {
+                nonAsciiChars = findNonAsciiChars(text);
+                
+                if (asciiHandlingMode === 'strict' && nonAsciiChars.length > 0) {
+                    showNonAsciiDetails();
+                    showNotification(`发现${nonAsciiChars.length}个非ASCII字符，请切换到"忽略模式"或修改文本`, 'error');
+                    return;
+                }
             }
             
             // 显示加载指示器
@@ -1176,12 +1468,13 @@
             // 使用setTimeout避免阻塞UI
             setTimeout(() => {
                 try {
-                    // 如果自动尺寸，根据字符数计算尺寸
+                    // 计算图像尺寸
+                    const config = ENCODING_CONFIG[encodingMode];
+                    const pixelsNeeded = text.length * config.bitsPerChar;
+                    
                     if (autoSizeEnabled) {
-                        const pixelsNeeded = text.length * 7;
                         calculateAutoDimensions(pixelsNeeded);
                     } else {
-                        // 使用手动设置的尺寸
                         currentWidth = parseInt(imageWidthInput.value) || MIN_WIDTH;
                         currentHeight = parseInt(imageHeightInput.value) || MIN_HEIGHT;
                     }
@@ -1190,8 +1483,8 @@
                     encodedCanvas.width = currentWidth;
                     encodedCanvas.height = currentHeight;
                     
-                    // 将文本转换为二进制字符串（根据模式处理非ASCII字符）
-                    const binaryString = textToBinary(text, asciiMode === 'ignore');
+                    // 将文本转换为二进制字符串
+                    const binaryString = textToBinary(text);
                     
                     // 创建图像
                     createBinaryImage(binaryString);
@@ -1205,10 +1498,10 @@
                     // 启用下载按钮
                     downloadBtn.disabled = false;
                     
-                    // 显示编码成功信息，包含非ASCII字符处理情况
+                    // 显示编码成功信息
                     let successMessage = `编码成功！将${text.length.toLocaleString()}个字符编码为${binaryString.length.toLocaleString()}位二进制数据，图像尺寸 ${currentWidth}×${currentHeight}`;
                     
-                    if (nonAsciiChars.length > 0 && asciiMode === 'ignore') {
+                    if (encodingMode === 'ascii' && nonAsciiChars.length > 0 && asciiHandlingMode === 'ignore') {
                         successMessage += ` (${nonAsciiChars.length}个非ASCII字符已被替换为NULL)`;
                     }
                     
@@ -1222,28 +1515,45 @@
             }, 100);
         }
         
-        // 将文本转换为二进制字符串
-        function textToBinary(text, ignoreNonAscii = false) {
+        // ============== 将文本转换为二进制字符串 ==============
+        function textToBinary(text) {
             let binaryString = '';
+            const config = ENCODING_CONFIG[encodingMode];
             
-            // 将每个字符转换为7位二进制
+            // 将每个字符转换为二进制
             for (let i = 0; i < text.length; i++) {
-                const charCode = text.charCodeAt(i);
+                const charCode = text.codePointAt(i);
                 
-                // 处理非ASCII字符
-                if (charCode > 127) {
-                    if (ignoreNonAscii) {
-                        // 忽略模式：将非ASCII字符替换为NULL(0)
-                        const binary = '0000000'; // NULL字符的二进制表示
-                        binaryString += binary;
+                // 处理代理对（UTF-16代理对）
+                if (charCode >= 0xD800 && charCode <= 0xDFFF) {
+                    // 跳过代理对的低代理项
+                    continue;
+                }
+                
+                // ASCII模式处理
+                if (encodingMode === 'ascii') {
+                    if (charCode > 127) {
+                        if (asciiHandlingMode === 'ignore') {
+                            // 忽略模式：将非ASCII字符替换为NULL(0)
+                            const binary = '0'.padStart(config.bitsPerChar, '0');
+                            binaryString += binary;
+                        } else {
+                            // 严格模式：应该在上一步已经被阻止
+                            throw new Error(`字符 "${text[i]}" (位置 ${i}) 不是有效的ASCII字符`);
+                        }
                     } else {
-                        // 严格模式：应该在上一步已经被阻止，这里作为安全备份
-                        throw new Error(`字符 "${text[i]}" (位置 ${i}) 不是有效的ASCII字符`);
+                        // 正常ASCII字符
+                        const binary = charCode.toString(2).padStart(config.bitsPerChar, '0');
+                        binaryString += binary;
                     }
                 } else {
-                    // 正常ASCII字符
-                    // 转换为7位二进制，不足7位前面补0
-                    const binary = charCode.toString(2).padStart(7, '0');
+                    // Unicode模式：使用21位编码
+                    // 确保码点在有效范围内
+                    if (charCode > config.maxCodePoint) {
+                        throw new Error(`字符码点 ${charCode} 超出Unicode范围 (最大: ${config.maxCodePoint})`);
+                    }
+                    
+                    const binary = charCode.toString(2).padStart(config.bitsPerChar, '0');
                     binaryString += binary;
                 }
             }
@@ -1251,19 +1561,17 @@
             // 计算总像素数
             const totalPixels = currentWidth * currentHeight;
             
-            // 如果二进制字符串长度不足总像素数，用0填充（NULL）
+            // 填充或截断二进制字符串
             if (binaryString.length < totalPixels) {
                 binaryString = binaryString.padEnd(totalPixels, '0');
-            }
-            // 如果超过总像素数，截断（理论上不会发生，因为字符数有限制）
-            else if (binaryString.length > totalPixels) {
+            } else if (binaryString.length > totalPixels) {
                 binaryString = binaryString.substring(0, totalPixels);
             }
             
             return binaryString;
         }
         
-        // 创建二进制图像
+        // ============== 创建二进制图像 ==============
         function createBinaryImage(binaryString) {
             const ctx = encodedCanvas.getContext('2d');
             const imageData = ctx.createImageData(currentWidth, currentHeight);
@@ -1282,19 +1590,17 @@
                 const bit = binaryString[i];
                 const pixelIndex = i * 4;
                 
-                // 如果是1，则设置为黑色
                 if (bit === '1') {
                     data[pixelIndex] = 0;     // R
                     data[pixelIndex+1] = 0;   // G
                     data[pixelIndex+2] = 0;   // B
-                    // A保持255不变
                 }
             }
             
             ctx.putImageData(imageData, 0, 0);
         }
         
-        // 显示编码后的图像
+        // ============== 显示编码后的图像 ==============
         function displayEncodedImage() {
             const imageOutput = document.getElementById('imageOutput');
             const placeholder = imageOutput.querySelector('.image-placeholder');
@@ -1304,13 +1610,13 @@
             placeholder.style.display = 'none';
             canvas.style.display = 'block';
             
-            // 创建图像预览（缩放以适应容器）
+            // 创建图像预览
             const previewCanvas = document.createElement('canvas');
             const previewCtx = previewCanvas.getContext('2d');
             
-            // 设置预览尺寸（保持宽高比）
+            // 设置预览尺寸
             const maxWidth = imageOutput.clientWidth - 30;
-            const scale = Math.min(maxWidth / currentWidth, 1); // 限制最大缩放为1
+            const scale = Math.min(maxWidth / currentWidth, 1);
             const previewWidth = currentWidth * scale;
             const previewHeight = currentHeight * scale;
             
@@ -1325,34 +1631,35 @@
             imageOutput.appendChild(previewCanvas);
             canvas.style.display = 'none';
             
-            // 如果已经存在预览canvas，则移除
+            // 移除旧的预览canvas
             const existingPreview = imageOutput.querySelector('canvas:not(#encodedCanvas)');
             if (existingPreview && existingPreview !== previewCanvas) {
                 existingPreview.remove();
             }
         }
         
-        // 更新图像信息
+        // ============== 更新图像信息 ==============
         function updateImageInfo() {
             imageDimensions.textContent = `图像尺寸: ${currentWidth}×${currentHeight} 像素`;
             
-            // 估计文件大小 (非常粗略的估计)
+            // 估计文件大小
             const estimatedSizeKB = Math.round((currentWidth * currentHeight * 0.1) / 1024);
             imageSize.textContent = `文件大小: ~${estimatedSizeKB} KB`;
+            
+            // 更新编码模式指示器
+            encodingModeIndicator.textContent = `编码模式: ${encodingMode === 'ascii' ? 'ASCII' : 'Unicode'}`;
         }
         
-        // 隐藏画布
+        // ============== 隐藏画布 ==============
         function hideCanvas() {
             const imageOutput = document.getElementById('imageOutput');
             const placeholder = imageOutput.querySelector('.image-placeholder');
             const canvas = document.getElementById('encodedCanvas');
             const previewCanvas = imageOutput.querySelector('canvas:not(#encodedCanvas)');
             
-            // 显示占位符，隐藏画布
             placeholder.style.display = 'flex';
             canvas.style.display = 'none';
             
-            // 移除预览canvas
             if (previewCanvas) {
                 previewCanvas.remove();
             }
@@ -1362,20 +1669,23 @@
             imageSize.textContent = '文件大小: 未生成';
         }
         
-        // 下载图像
+        // ============== 下载图像 ==============
         function downloadImage() {
             const link = document.createElement('a');
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             
-            // 在文件名中添加模式信息
-            const modeSuffix = asciiMode === 'strict' ? 'strict' : 'ignore';
-            link.download = `binary-encoded-${modeSuffix}-${currentWidth}x${currentHeight}-${timestamp}.png`;
+            // 在文件名中添加编码模式信息
+            const modeSuffix = encodingMode === 'ascii' ? 
+                (asciiHandlingMode === 'strict' ? 'ascii-strict' : 'ascii-ignore') : 
+                'unicode';
+            
+            link.download = `encoded-${modeSuffix}-${currentWidth}x${currentHeight}-${timestamp}.png`;
             link.href = encodedCanvas.toDataURL('image/png');
             link.click();
             showNotification('图像下载成功！', 'success');
         }
         
-        // 解码图像为文本
+        // ============== 解码图像为文本 ==============
         function decodeImageToText() {
             const file = imageInput.files[0];
             if (!file) {
@@ -1383,7 +1693,6 @@
                 return;
             }
             
-            // 显示加载指示器
             showLoading(true);
             
             const reader = new FileReader();
@@ -1392,20 +1701,20 @@
                 const img = new Image();
                 img.onload = function() {
                     try {
-                        // 创建临时canvas处理图像
+                        // 创建临时canvas
                         const tempCanvas = document.createElement('canvas');
                         tempCanvas.width = img.width;
                         tempCanvas.height = img.height;
                         const tempCtx = tempCanvas.getContext('2d');
                         
-                        // 绘制图像到canvas
+                        // 绘制图像
                         tempCtx.drawImage(img, 0, 0);
                         
                         // 获取像素数据
                         const imageData = tempCtx.getImageData(0, 0, img.width, img.height);
                         const data = imageData.data;
                         
-                        // 从像素数据提取二进制字符串
+                        // 提取二进制字符串
                         const binaryString = extractBinaryFromImage(data, img.width, img.height);
                         
                         // 将二进制字符串转换为文本
@@ -1415,7 +1724,7 @@
                         decodedText.textContent = text;
                         copyTextBtn.disabled = false;
                         
-                        // 检查解码结果中是否有NULL字符
+                        // 检查解码结果
                         const nullCharCount = (text.match(/\x00/g) || []).length;
                         let successMessage = `解码成功！从 ${img.width}×${img.height} 图像中解码出 ${text.length} 个字符`;
                         
@@ -1448,20 +1757,18 @@
             reader.readAsDataURL(file);
         }
         
-        // 从图像数据提取二进制字符串
+        // ============== 从图像数据提取二进制字符串 ==============
         function extractBinaryFromImage(data, width, height) {
             let binaryString = '';
             const totalPixels = width * height;
             
-            // 遍历所有像素（每个像素4个值：R,G,B,A）
             for (let i = 0; i < totalPixels && i * 4 < data.length; i++) {
                 const pixelIndex = i * 4;
                 const r = data[pixelIndex];
                 const g = data[pixelIndex + 1];
                 const b = data[pixelIndex + 2];
                 
-                // 如果RGB值都小于128，认为是黑色(1)，否则为白色(0)
-                // 使用阈值判断，避免图像压缩带来的误差
+                // 阈值判断
                 const isBlack = (r < 128 && g < 128 && b < 128);
                 binaryString += isBlack ? '1' : '0';
             }
@@ -1469,20 +1776,32 @@
             return binaryString;
         }
         
-        // 将二进制字符串转换为文本
+        // ============== 将二进制字符串转换为文本 ==============
         function binaryToText(binaryString) {
             let text = '';
+            const config = ENCODING_CONFIG[decodeMode];
+            const bitsPerChar = config.bitsPerChar;
             
-            // 每7位一组转换为字符
-            for (let i = 0; i < binaryString.length; i += 7) {
-                if (i + 7 > binaryString.length) break;
+            // 每bitsPerChar位一组转换为字符
+            for (let i = 0; i < binaryString.length; i += bitsPerChar) {
+                if (i + bitsPerChar > binaryString.length) break;
                 
-                const binaryChunk = binaryString.substring(i, i + 7);
+                const binaryChunk = binaryString.substring(i, i + bitsPerChar);
                 const charCode = parseInt(binaryChunk, 2);
                 
-                // 将字符添加到结果中
-                // NULL字符(0)在JavaScript字符串中显示为特殊字符，我们保留它
-                text += String.fromCharCode(charCode);
+                // 根据解码模式创建字符
+                if (decodeMode === 'unicode') {
+                    // Unicode模式：使用fromCodePoint处理所有码点
+                    if (charCode <= 0x10FFFF) {
+                        text += String.fromCodePoint(charCode);
+                    } else {
+                        // 无效码点，添加替换字符
+                        text += '�';
+                    }
+                } else {
+                    // ASCII模式：使用fromCharCode
+                    text += String.fromCharCode(charCode);
+                }
             }
             
             // 移除末尾的NULL字符
@@ -1493,17 +1812,16 @@
             return text;
         }
         
-        // 复制解码文本
+        // ============== 复制解码文本 ==============
         function copyDecodedText() {
             const text = decodedText.textContent;
             
-            // 使用Clipboard API
             navigator.clipboard.writeText(text).then(() => {
                 showNotification('文本已复制到剪贴板', 'success');
             }).catch(err => {
                 console.error('复制失败:', err);
                 
-                // 降级方案：使用textarea
+                // 降级方案
                 const textArea = document.createElement('textarea');
                 textArea.value = text;
                 document.body.appendChild(textArea);
@@ -1521,7 +1839,7 @@
             });
         }
         
-        // 显示/隐藏加载指示器
+        // ============== 显示/隐藏加载指示器 ==============
         function showLoading(show) {
             if (show) {
                 loadingIndicator.classList.add('active');
@@ -1534,14 +1852,12 @@
             }
         }
         
-        // 显示通知
+        // ============== 显示通知 ==============
         function showNotification(message, type = 'info') {
-            // 设置通知内容和样式
             notificationMessage.textContent = message;
             notification.className = 'notification';
             notification.classList.add(type);
             
-            // 设置图标
             let iconClass = 'fas fa-info-circle';
             if (type === 'success') iconClass = 'fas fa-check-circle';
             else if (type === 'error') iconClass = 'fas fa-exclamation-circle';
@@ -1549,81 +1865,14 @@
             
             notificationIcon.className = iconClass;
             
-            // 显示通知
             notification.classList.add('show');
             
-            // 3秒后自动隐藏
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
         }
         
-        // 示例文本
-        window.addEventListener('load', function() {
-            // 添加示例文本按钮
-            const exampleBtn = document.createElement('button');
-            exampleBtn.className = 'btn btn-secondary';
-            exampleBtn.innerHTML = '<i class="fas fa-magic"></i> 加载示例文本';
-            exampleBtn.style.marginTop = '10px';
-            exampleBtn.onclick = loadExampleText;
-            
-            document.querySelector('.button-group').appendChild(exampleBtn);
-        });
-        
-                function loadExampleText() {
-            const exampleText = `Image encoder with ASCII handling
-
-Features:
-1. Supports up to 1,372,000 characters
-2. ASCII Strict Mode: Blocks encoding if non-ASCII characters found
-3. ASCII Ignore Mode: Replaces non-ASCII characters with NULL
-4. Automatically calculate image dimensions
-
-包含非ASCII字符的示例: Hello 你好 World! 🚀
-
-Coding example:
-10000 characters * 7 digits = 70000 pixels = The image size is approximately 223 * 315 pixels
-
-Try switching between "Strict Mode" and "Ignore Mode" to see how non-ASCII characters are handled.`;
-            
-            inputText.value = exampleText;
-            updateCharCount();
-            showNotification('示例文本已加载（包含非ASCII字符）', 'info');
-        }
-        
-        // 初始化页面
-        document.addEventListener('DOMContentLoaded', function() {
-            initializePage();
-        });
-        
-        function initializePage() {
-            // 设置默认模式
-            strictModeRadio.checked = true;
-            asciiMode = 'strict';
-            
-            // 隐藏非ASCII面板
-            nonAsciiPanel.classList.remove('show');
-            showNonAsciiBtn.style.display = 'none';
-            
-            // 更新字符计数
-            updateCharCount();
-            
-            // 设置宽高比
-            updateAspectRatio();
-            
-            // 添加键盘快捷键
-            setupKeyboardShortcuts();
-            
-            // 设置示例文本按钮
-            setupExampleButton();
-            
-            // 显示欢迎信息
-            setTimeout(() => {
-                showNotification('欢迎使用图像编码/解码工具！选择处理模式后开始编码。', 'info');
-            }, 1000);
-        }
-        
-        // 设置键盘快捷键
+        // ============== 键盘快捷键 ==============
         function setupKeyboardShortcuts() {
             document.addEventListener('keydown', function(e) {
                 // Ctrl+Enter 编码
@@ -1634,12 +1883,6 @@ Try switching between "Strict Mode" and "Ignore Mode" to see how non-ASCII chara
                     }
                 }
                 
-                // Ctrl+E 切换到编码区域
-                if (e.ctrlKey && e.key === 'e') {
-                    inputText.focus();
-                    e.preventDefault();
-                }
-                
                 // Ctrl+D 解码
                 if (e.ctrlKey && e.key === 'd') {
                     if (!decodeBtn.disabled) {
@@ -1648,55 +1891,67 @@ Try switching between "Strict Mode" and "Ignore Mode" to see how non-ASCII chara
                     }
                 }
                 
-                // Ctrl+S 切换严格模式
-                if (e.ctrlKey && e.key === 's') {
-                    strictModeRadio.click();
-                    showNotification('已切换到严格模式', 'info');
+                // Ctrl+A 切换到ASCII模式
+                if (e.ctrlKey && e.key === 'a') {
+                    asciiModeRadio.click();
                     e.preventDefault();
                 }
                 
-                // Ctrl+I 切换忽略模式
-                if (e.ctrlKey && e.key === 'i') {
-                    ignoreModeRadio.click();
-                    showNotification('已切换到忽略模式', 'warning');
+                // Ctrl+U 切换到Unicode模式
+                if (e.ctrlKey && e.key === 'u') {
+                    unicodeModeRadio.click();
                     e.preventDefault();
                 }
             });
         }
         
-        // 设置示例文本按钮
-        function setupExampleButton() {
+        // ============== 示例文本 ==============
+        window.addEventListener('load', function() {
+            // 添加示例文本按钮
             const exampleBtn = document.createElement('button');
-            exampleBtn.id = 'exampleBtn';
-            exampleBtn.className = 'btn btn-secondary';
+            exampleBtn.className = 'btn btn-info';
             exampleBtn.innerHTML = '<i class="fas fa-magic"></i> 加载示例文本';
             exampleBtn.style.marginTop = '10px';
             exampleBtn.onclick = loadExampleText;
             
             const buttonGroup = document.querySelector('.button-group');
-            if (buttonGroup && !document.getElementById('exampleBtn')) {
+            if (buttonGroup) {
                 buttonGroup.appendChild(exampleBtn);
             }
+        });
+        
+        function loadExampleText() {
+            const exampleText = `图像编码/解码工具 - 示例文本
+
+支持两种编码模式：
+
+1. ASCII模式：
+   - 仅支持ASCII字符(0-127)
+   - 每个字符7位二进制
+   - 可切换严格/忽略模式处理非ASCII字符
+
+2. 全文模式 (Unicode)：
+   - 支持所有字符：中文、日文、表情符号等
+   - 每个字符21位二进制
+   - 自动处理，无需特殊设置
+
+示例字符测试：
+ASCII: Hello World! 123
+中文: 你好，世界！🌍
+混合: ASCII + 中文 + 😊 Emoji
+
+计算示例：
+10个ASCII字符 = 10×7 = 70像素
+10个中文字符 = 10×21 = 210像素
+
+请尝试切换不同编码模式查看效果！`;
+            
+            inputText.value = exampleText;
+            updateCharCount();
+            showNotification('示例文本已加载！尝试切换ASCII/Unicode模式查看差异。', 'info');
         }
         
-        // 性能优化：防抖函数，用于处理频繁的输入事件
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-        
-        // 应用防抖到输入事件
-        const debouncedUpdateCharCount = debounce(updateCharCount, 300);
-        inputText.addEventListener('input', debouncedUpdateCharCount);
-        
-        // 导出工具函数（用于调试）
+        // ============== 导出工具函数（用于调试） ==============
         window.ImageEncoderTools = {
             encodeTextToImage,
             decodeImageToText,
@@ -1706,118 +1961,36 @@ Try switching between "Strict Mode" and "Ignore Mode" to see how non-ASCII chara
             binaryToText,
             getCurrentSettings: function() {
                 return {
-                    asciiMode,
+                    encodingMode,
+                    asciiHandlingMode,
+                    decodeMode,
                     autoSizeEnabled,
                     currentWidth,
                     currentHeight,
                     maxChars: MAX_CHARS,
-                    nonAsciiChars
+                    nonAsciiChars,
+                    encodingConfig: ENCODING_CONFIG
                 };
-            }
+            },
+            version: '3.0.0',
+            author: '图像编码工具',
+            buildDate: new Date().toISOString().split('T')[0]
         };
         
-        // 错误处理增强
-        window.addEventListener('error', function(e) {
-            console.error('全局错误:', e.error);
-            showNotification(`发生错误: ${e.message}`, 'error');
-        });
-        
-        // 页面卸载前的确认
-        window.addEventListener('beforeunload', function(e) {
-            if (inputText.value.length > 1000) {
-                e.preventDefault();
-                e.returnValue = '您有未保存的文本内容，确定要离开吗？';
-                return e.returnValue;
-            }
-        });
-        
-        // 页面可见性变化处理
-        document.addEventListener('visibilitychange', function() {
-            if (document.visibilityState === 'visible') {
-                // 页面重新获得焦点时，重新计算字符计数
-                updateCharCount();
-            }
-        });
-        
-        // 复制按钮悬停提示
-        copyTextBtn.addEventListener('mouseenter', function() {
-            if (!this.disabled && decodedText.textContent !== '解码后的文本将在这里显示') {
-                this.title = '点击复制解码文本';
-            }
-        });
-        
-        // 下载按钮悬停提示
-        downloadBtn.addEventListener('mouseenter', function() {
-            if (!this.disabled) {
-                this.title = `下载 ${currentWidth}×${currentHeight} 像素的图像`;
-            }
-        });
-        
-        // 非ASCII字符面板关闭功能
-        nonAsciiPanel.addEventListener('click', function(e) {
-            if (e.target === this || e.target.classList.contains('fas')) {
-                this.classList.remove('show');
-            }
-        });
-        
-        // 添加右键菜单支持
-        inputText.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            showNotification('您可以使用Ctrl+S/I切换模式，Ctrl+Enter快速编码', 'info');
-        });
-        
-        // 添加触摸设备支持
-        if ('ontouchstart' in window) {
-            // 触摸设备优化
-            document.querySelectorAll('button').forEach(btn => {
-                btn.style.minHeight = '44px';
-                btn.style.minWidth = '44px';
-            });
-            
-            textarea.style.fontSize = '16px'; // 防止iOS缩放
-        }
-        
-        // 控制台欢迎信息
-        console.log('%c🔐 图像编码/解码工具 %c已加载完成！', 
+        // ============== 控制台欢迎信息 ==============
+        console.log('%c🔐 图像编码/解码工具 v3.0.0 %c已加载完成！', 
             'color: #6c63ff; font-size: 16px; font-weight: bold;', 
             'color: #4caf50; font-size: 14px;');
-        console.log('%c📋 快捷键:', 'color: #ff9800; font-weight: bold;');
+        console.log('%c📋 功能特性:', 'color: #2196f3; font-weight: bold;');
+        console.log('- 支持ASCII模式（7位/字符）和全文模式（Unicode，21位/字符）');
+        console.log('- 自动调整图像尺寸，接近A4比例');
+        console.log('- 严格/忽略两种ASCII字符处理模式');
+        console.log('- 支持所有Unicode字符（包括中文、表情符号等）');
+        console.log('%c⌨️ 快捷键:', 'color: #ff9800; font-weight: bold;');
         console.log('Ctrl+Enter: 编码文本');
         console.log('Ctrl+D: 解码图像');
-        console.log('Ctrl+S: 严格模式');
-        console.log('Ctrl+I: 忽略模式');
-        console.log('Ctrl+E: 聚焦编码区域');
-        
-        // 最终初始化确认
-        console.log('初始化完成，工具已准备就绪！');
-        
-        // 导出工具版本信息
-        window.ImageEncoderTools.version = '2.0.0';
-        window.ImageEncoderTools.author = '图像编码工具';
-        window.ImageEncoderTools.buildDate = new Date().toISOString().split('T')[0];
-        
-        // 页面完全加载后的最终设置
-        window.addEventListener('load', function() {
-            // 确保所有元素都已加载
-            setTimeout(() => {
-                updateCharCount();
-                showNotification('工具初始化完成！', 'success');
-                
-                // 添加使用提示
-                const tips = [
-                    '💡 提示：使用Ctrl+Enter快速编码文本',
-                    '💡 提示：非ASCII字符在忽略模式下会被替换为NULL',
-                    '💡 提示：图像尺寸会根据字符数自动调整',
-                    '💡 提示：您可以使用键盘快捷键提高效率'
-                ];
-                
-                // 随机显示一个提示
-                const randomTip = tips[Math.floor(Math.random() * tips.length)];
-                setTimeout(() => {
-                    showNotification(randomTip, 'info');
-                }, 2000);
-            }, 500);
-        });
+        console.log('Ctrl+A: ASCII模式');
+        console.log('Ctrl+U: Unicode模式');
     </script>
 </body>
 </html>
