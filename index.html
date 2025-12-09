@@ -14,14 +14,14 @@
         }
         
         body {
-            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: #e0e0e0;
             min-height: 100vh;
-            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
         
         .container {
@@ -30,24 +30,14 @@
             text-align: center;
         }
         
-        /* 头部样式 */
         header {
-            margin-bottom: 50px;
-            padding: 30px;
-            background: rgba(15, 25, 35, 0.8);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(64, 164, 223, 0.3);
+            margin-bottom: 60px;
         }
         
         .logo {
-            margin-bottom: 20px;
-        }
-        
-        .logo-icon {
             font-size: 4rem;
-            color: #40a4df;
-            margin-bottom: 15px;
+            color: #6c63ff;
+            margin-bottom: 20px;
             animation: float 3s ease-in-out infinite;
         }
         
@@ -57,9 +47,9 @@
         }
         
         h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #40a4df, #2af598);
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #6c63ff, #ff6b9d);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -67,356 +57,193 @@
         
         .subtitle {
             font-size: 1.3rem;
-            color: #b0d4e0;
-            margin-bottom: 10px;
-            max-width: 800px;
-            margin: 0 auto;
+            color: #a0a0c0;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
         }
         
-        .warning {
-            background: rgba(255, 152, 0, 0.1);
-            border: 1px solid rgba(255, 152, 0, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 0.95rem;
-            color: #ffcc80;
-        }
-        
-        /* 工具网格布局 */
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
         
-        @media (max-width: 1200px) {
-            .tools-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* 工具卡片样式 */
         .tool-card {
-            background: rgba(20, 30, 40, 0.8);
-            border-radius: 15px;
-            padding: 30px;
-            text-align: left;
-            border: 1px solid rgba(64, 164, 223, 0.3);
+            background: rgba(30, 30, 60, 0.8);
+            border-radius: 20px;
+            padding: 40px 30px;
+            border: 2px solid rgba(100, 100, 200, 0.3);
             transition: all 0.3s ease;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6c63ff, #ff6b9d);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .tool-card:hover::before {
+            transform: scaleX(1);
         }
         
         .tool-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(64, 164, 223, 0.2);
-            border-color: #40a4df;
-        }
-        
-        .tool-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(64, 164, 223, 0.5);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(108, 99, 255, 0.3);
+            border-color: #6c63ff;
         }
         
         .tool-icon {
-            font-size: 2.5rem;
-            width: 60px;
-            height: 60px;
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
         }
         
         .text-tool .tool-icon {
-            background: linear-gradient(135deg, #6c63ff, #3a3a7a);
-            color: white;
+            color: #6c63ff;
         }
         
         .file-tool .tool-icon {
-            background: linear-gradient(135deg, #2af598, #009efd);
-            color: white;
+            color: #ff6b9d;
         }
         
         .tool-title {
-            font-size: 1.8rem;
-            color: #ffffff;
-            flex: 1;
-        }
-        
-        .tool-badge {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        
-        .text-tool .tool-badge {
-            color: #6c63ff;
-            border: 1px solid #6c63ff;
-        }
-        
-        .file-tool .tool-badge {
-            color: #2af598;
-            border: 1px solid #2af598;
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: white;
         }
         
         .tool-description {
-            color: #b0d4e0;
+            color: #b0b0d0;
             margin-bottom: 25px;
             line-height: 1.6;
-            flex: 1;
+            font-size: 1.1rem;
         }
         
-        /* 特性列表 */
-        .features-list {
+        .tool-features {
             list-style: none;
             margin-bottom: 30px;
-            flex: 1;
+            text-align: left;
         }
         
-        .features-list li {
-            padding: 10px 0;
-            color: #a0c0d0;
+        .tool-features li {
+            padding: 8px 0;
+            color: #a0a0c0;
             display: flex;
             align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 10px;
         }
         
-        .features-list li:last-child {
-            border-bottom: none;
+        .tool-features i {
+            color: #4caf50;
         }
         
-        .features-list i {
-            font-size: 1.2rem;
-        }
-        
-        .text-tool .features-list i {
-            color: #6c63ff;
-        }
-        
-        .file-tool .features-list i {
-            color: #2af598;
-        }
-        
-        /* 技术规格 */
-        .specs {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 25px;
-            font-size: 0.9rem;
-        }
-        
-        .spec-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .spec-item:last-child {
-            border-bottom: none;
-        }
-        
-        .spec-label {
-            color: #a0c0d0;
-        }
-        
-        .spec-value {
-            color: #ffffff;
-            font-weight: 600;
-        }
-        
-        .file-tool .spec-value {
-            color: #2af598;
-        }
-        
-        /* 按钮样式 */
         .launch-btn {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            padding: 15px 25px;
-            background: linear-gradient(90deg, #40a4df, #2af598);
+            padding: 15px 30px;
+            background: linear-gradient(90deg, #6c63ff, #3a3a7a);
             color: white;
             text-decoration: none;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 1.1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.2rem;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            text-align: center;
-        }
-        
-        .text-tool .launch-btn {
-            background: linear-gradient(90deg, #6c63ff, #3a3a7a);
+            width: 100%;
         }
         
         .file-tool .launch-btn {
-            background: linear-gradient(90deg, #2af598, #009efd);
+            background: linear-gradient(90deg, #ff6b9d, #c44569);
         }
         
         .launch-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
         
-        .launch-btn i {
-            font-size: 1.2rem;
+        .new-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(90deg, #ff6b9d, #c44569);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
         }
         
-        /* 页脚 */
-        .footer {
-            margin-top: 40px;
-            padding: 25px;
-            background: rgba(15, 25, 35, 0.8);
-            border-radius: 15px;
-            width: 100%;
-            border-top: 1px solid rgba(64, 164, 223, 0.2);
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
-        .repo-info {
-            color: #a0c0d0;
-            margin-bottom: 20px;
+        .warning-note {
+            background: rgba(255, 107, 157, 0.1);
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            color: #ffb8d0;
             font-size: 0.95rem;
         }
         
-        .github-link {
+        footer {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(100, 100, 200, 0.2);
+            color: #8888aa;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        
+        .repo-link {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            color: #40a4df;
+            color: #6c63ff;
             text-decoration: none;
+            margin-top: 15px;
             padding: 10px 20px;
             border-radius: 8px;
-            background: rgba(64, 164, 223, 0.1);
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-        
-        .github-link:hover {
-            background: rgba(64, 164, 223, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        /* 内存警告弹窗 */
-        .memory-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .memory-modal.active {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: linear-gradient(135deg, #1a2a3a, #0f2027);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 600px;
-            width: 90%;
-            border: 2px solid #40a4df;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        }
-        
-        .modal-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(64, 164, 223, 0.5);
-        }
-        
-        .modal-icon {
-            font-size: 2.5rem;
-            color: #ff9800;
-        }
-        
-        .modal-title {
-            font-size: 1.8rem;
-            color: #ffffff;
-        }
-        
-        .modal-body {
-            color: #b0d4e0;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-        }
-        
-        .modal-btn {
-            padding: 12px 25px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
+            background: rgba(108, 99, 255, 0.1);
             transition: all 0.3s;
         }
         
-        .modal-btn.cancel {
-            background: rgba(255, 255, 255, 0.1);
-            color: #a0c0d0;
-        }
-        
-        .modal-btn.cancel:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .modal-btn.continue {
-            background: linear-gradient(90deg, #40a4df, #2af598);
-            color: white;
-        }
-        
-        .modal-btn.continue:hover {
+        .repo-link:hover {
+            background: rgba(108, 99, 255, 0.2);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(64, 164, 223, 0.3);
         }
         
         @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
             .tools-grid {
                 grid-template-columns: 1fr;
             }
             
-            h1 {
-                font-size: 2.2rem;
-            }
-            
             .tool-card {
-                padding: 20px;
-            }
-            
-            .tool-title {
-                font-size: 1.5rem;
-            }
-            
-            .modal-content {
-                padding: 20px;
+                padding: 30px 20px;
             }
         }
     </style>
@@ -425,210 +252,89 @@
     <div class="container">
         <header>
             <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-exchange-alt"></i>
-                </div>
-                <h1>文件转换工具集</h1>
-                <p class="subtitle">
-                    高级文件编码/解码解决方案 - 支持文本和任意文件类型的图像转换
-                </p>
-                <div class="warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <strong>注意：</strong>文件转换功能需要较大内存，建议在性能较好的设备上使用大文件
-                </div>
+                <i class="fas fa-exchange-alt"></i>
             </div>
+            <h1>文件转换工具集</h1>
+            <p class="subtitle">
+                将文本和文件转换为图像，实现安全的存储和传输
+            </p>
         </header>
         
         <div class="tools-grid">
             <!-- 文本工具 -->
-            <div class="tool-card text-tool">
-                <div class="tool-header">
-                    <div class="tool-icon">
-                        <i class="fas fa-font"></i>
-                    </div>
-                    <h2 class="tool-title">文本↔图像编码器</h2>
-                    <span class="tool-badge">稳定版</span>
+            <div class="tool-card text-tool" onclick="window.location.href='text.html'">
+                <div class="tool-icon">
+                    <i class="fas fa-font"></i>
                 </div>
-                
+                <h2 class="tool-title">文本↔图像编码器</h2>
                 <p class="tool-description">
-                    将纯文本编码为黑白图像，或从图像中解码还原文本。专为文本设计的高效编码方案。
+                    将纯文本编码为黑白图像，或从图像解码还原文本。支持ASCII和Unicode两种编码模式。
                 </p>
-                
-                <ul class="features-list">
-                    <li><i class="fas fa-check"></i> 双模式：ASCII(7位)和全文Unicode(21位)</li>
-                    <li><i class="fas fa-check"></i> 智能尺寸调整，保持A4比例</li>
-                    <li><i class="fas fa-check"></i> 严格/忽略两种非ASCII处理模式</li>
-                    <li><i class="fas fa-check"></i> 实时字符计数和验证</li>
-                    <li><i class="fas fa-check"></i> 支持最大1,372,000字符</li>
+                <ul class="tool-features">
+                    <li><i class="fas fa-check"></i> 双编码模式：ASCII & Unicode</li>
+                    <li><i class="fas fa-check"></i> 自动尺寸调整</li>
+                    <li><i class="fas fa-check"></i> 实时字符验证</li>
+                    <li><i class="fas fa-check"></i> 支持大文本处理</li>
                 </ul>
-                
-                <div class="specs">
-                    <div class="spec-item">
-                        <span class="spec-label">最大文件大小：</span>
-                        <span class="spec-value">~1.3MB 文本</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">内存需求：</span>
-                        <span class="spec-value">低</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">输出格式：</span>
-                        <span class="spec-value">PNG 图像</span>
-                    </div>
-                </div>
-                
                 <a href="text.html" class="launch-btn">
-                    <i class="fas fa-play-circle"></i> 启动文本工具
+                    <i class="fas fa-rocket"></i> 启动文本工具
                 </a>
             </div>
             
             <!-- 文件工具 -->
-            <div class="tool-card file-tool">
-                <div class="tool-header">
-                    <div class="tool-icon">
-                        <i class="fas fa-file"></i>
-                    </div>
-                    <h2 class="tool-title">文件↔图像转换器</h2>
-                    <span class="tool-badge">新功能</span>
+            <div class="tool-card file-tool" onclick="window.location.href='file.html'">
+                <div class="new-badge">新功能</div>
+                <div class="tool-icon">
+                    <i class="fas fa-file"></i>
                 </div>
-                
+                <h2 class="tool-title">文件↔图像转换器</h2>
                 <p class="tool-description">
-                    将任意类型文件（PDF、DOC、ZIP等）转换为彩色图像，并完整保存文件名和内容。支持大文件处理。
+                    将任意类型文件转换为彩色图像，完整保存文件名和内容。支持大文件处理。
                 </p>
-                
-                <ul class="features-list">
-                    <li><i class="fas fa-star"></i> 支持所有文件类型和扩展名</li>
-                    <li><i class="fas fa-star"></i> 彩色图像编码（24位/像素）</li>
-                    <li><i class="fas fa-star"></i> 完整保存原始文件名和后缀</li>
-                    <li><i class="fas fa-star"></i> 可配置的最大像素限制</li>
-                    <li><i class="fas fa-star"></i> 内存使用预警系统</li>
-                </ul>
-                
-                <div class="specs">
-                    <div class="spec-item">
-                        <span class="spec-label">最大文件大小：</span>
-                        <span class="spec-value">可配置（最高 ~100MB）</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">内存需求：</span>
-                        <span class="spec-value">高（依赖文件大小）</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">输出格式：</span>
-                        <span class="spec-value">PNG 彩色图像</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">编码方式：</span>
-                        <span class="spec-value">Unicode + RGB 彩色</span>
-                    </div>
+                <div class="warning-note">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>注意：</strong>此功能需要较大内存，建议在性能较好的设备上使用
                 </div>
-                
-                <button onclick="showMemoryWarning()" class="launch-btn">
+                <ul class="tool-features">
+                    <li><i class="fas fa-star"></i> 支持所有文件类型</li>
+                    <li><i class="fas fa-star"></i> 彩色图像编码</li>
+                    <li><i class="fas fa-star"></i> 保存完整文件名</li>
+                    <li><i class="fas fa-star"></i> 大文件优化处理</li>
+                </ul>
+                <a href="file.html" class="launch-btn">
                     <i class="fas fa-bolt"></i> 启动文件工具
-                </button>
+                </a>
             </div>
         </div>
         
-        <div class="footer">
-            <div class="repo-info">
-                <p>项目地址：<strong>https://jeremy121215.github.io/string_conversion/</strong></p>
-                <p>文本工具：<code>/text.html</code> | 文件工具：<code>/file.html</code></p>
-            </div>
-            <a href="https://github.com/jeremy121215" class="github-link" target="_blank">
-                <i class="fab fa-github"></i> GitHub 主页
+        <footer>
+            <p>项目地址：https://jeremy121215.github.io/string_conversion/</p>
+            <a href="https://github.com/jeremy121215" class="repo-link" target="_blank">
+                <i class="fab fa-github"></i> 访问 GitHub 仓库
             </a>
-        </div>
-    </div>
-    
-    <!-- 内存警告弹窗 -->
-    <div id="memoryModal" class="memory-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-icon">
-                    <i class="fas fa-memory"></i>
-                </div>
-                <h3 class="modal-title">内存使用警告</h3>
-            </div>
-            
-            <div class="modal-body">
-                <p><strong>文件转换工具需要较大内存：</strong></p>
-                <ul style="margin: 15px 0 15px 20px;">
-                    <li>使用RGB彩色编码（24位/像素）</li>
-                    <li>完整保存文件名和文件内容</li>
-                    <li>支持任意文件类型和大小</li>
-                    <li>大文件可能需要大量内存</li>
-                </ul>
-                <p>建议：</p>
-                <ol style="margin: 15px 0 15px 20px;">
-                    <li>确保设备有足够可用内存</li>
-                    <li>大文件处理可能需要较长时间</li>
-                    <li>转换过程中请勿关闭页面</li>
-                </ol>
-                <p style="color: #ff9800; margin-top: 15px;">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <strong>注意：</strong>最大支持约100MB文件（约4000×4000像素）
-                </p>
-            </div>
-            
-            <div class="modal-actions">
-                <button onclick="closeMemoryWarning()" class="modal-btn cancel">
-                    取消
-                </button>
-                <button onclick="openFileTool()" class="modal-btn continue">
-                    继续使用
-                </button>
-            </div>
-        </div>
+        </footer>
     </div>
     
     <script>
-        // 内存警告弹窗控制
-        function showMemoryWarning() {
-            document.getElementById('memoryModal').classList.add('active');
-        }
-        
-        function closeMemoryWarning() {
-            document.getElementById('memoryModal').classList.remove('active');
-        }
-        
-        function openFileTool() {
-            closeMemoryWarning();
-            // 这里可以跳转到 file.html 或打开文件工具
-            // 由于file.html还不存在，先提示
-            alert('文件转换工具正在开发中...\n\n功能特性：\n1. 支持任意文件类型\n2. 彩色图像编码\n3. 保存完整文件名\n4. 可配置最大像素\n\n请等待后续更新！');
-            // window.location.href = 'file.html'; // 当file.html创建后启用
-        }
-        
-        // 添加卡片悬停效果
+        // 添加卡片点击效果
         document.querySelectorAll('.tool-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-5px)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.launch-btn')) {
+                    const link = this.querySelector('.launch-btn');
+                    if (link && link.href) {
+                        window.location.href = link.href;
+                    }
+                }
             });
         });
         
-        // 页面加载动画
-        document.addEventListener('DOMContentLoaded', function() {
-            document.body.style.opacity = '0';
-            document.body.style.transition = 'opacity 0.5s';
-            
-            setTimeout(() => {
-                document.body.style.opacity = '1';
-            }, 100);
-            
-            // 控制台欢迎信息
-            console.log('%c📁 文件转换工具集 %c已加载', 
-                'color: #40a4df; font-size: 16px; font-weight: bold;', 
-                'color: #2af598; font-size: 14px;');
-            console.log('%c🔧 可用工具：', 'color: #ff9800; font-weight: bold;');
-            console.log('1. 文本↔图像编码器 (text.html)');
-            console.log('2. 文件↔图像转换器 (开发中)');
-            console.log('%c⚠️ 注意：', 'color: #ff5252; font-weight: bold;');
-            console.log('文件转换工具需要较大内存，建议在性能较好的设备上使用');
-        });
+        // 控制台欢迎信息
+        console.log('%c🚀 文件转换工具集 %c已加载', 
+            'color: #6c63ff; font-size: 18px; font-weight: bold;', 
+            'color: #ff6b9d; font-size: 16px;');
+        console.log('%c📁 可用工具：', 'color: #40a4df; font-weight: bold;');
+        console.log('1. 文本↔图像编码器 (text.html)');
+        console.log('2. 文件↔图像转换器 (file.html)');
     </script>
 </body>
 </html>
