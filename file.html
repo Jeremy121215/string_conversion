@@ -276,10 +276,15 @@
             padding: 15px;
             margin-bottom: 20px;
             text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
         }
         
         canvas {
             max-width: 100%;
+            max-height: 400px;
             border: 1px solid #3a3a7a;
             border-radius: 4px;
             background-color: white;
@@ -295,7 +300,6 @@
             color: #8888aa;
             border: 2px dashed #3a3a7a;
             border-radius: 8px;
-            margin-bottom: 20px;
         }
         
         .image-placeholder i {
@@ -557,6 +561,7 @@
             overflow-y: auto;
             white-space: pre-wrap;
             word-break: break-all;
+            display: none;
         }
         
         .preview-header {
@@ -640,13 +645,13 @@
                     </div>
                 </div>
                 
-                <!-- 文本预览 -->
-                <div id="textPreviewContainer" class="preview-text" style="display: none;">
+                <!-- 字节预览 -->
+                <div id="bytesPreviewContainer" class="preview-text">
                     <div class="preview-header">
-                        <span>文件内容Base64预览（前500字符）：</span>
-                        <span id="textPreviewLength">0 字符</span>
+                        <span>文件字节预览（前1000字节）：</span>
+                        <span id="bytesPreviewLength">0 字节</span>
                     </div>
-                    <div id="textPreview"></div>
+                    <div id="bytesPreview"></div>
                 </div>
                 
                 <!-- 自动尺寸切换 -->
@@ -700,7 +705,7 @@
                         <i class="fas fa-image"></i>
                         <p>编码后的图像将在这里显示</p>
                     </div>
-                    <canvas id="encodedCanvas" style="display:none;"></canvas>
+                    <canvas id="encodedCanvas"></canvas>
                 </div>
                 
                 <div class="image-info">
@@ -709,7 +714,7 @@
                     <div id="encodingModeIndicator">编码模式: Unicode</div>
                 </div>
                 
-                <button id="downloadBtn" class="btn btn-success" disabled>
+                <button id="downloadBtn" class="btn btn-success" disabled style="margin-top: 10px;">
                     <i class="fas fa-download"></i> 下载图像
                 </button>
             </div>
@@ -757,7 +762,7 @@
                         <i class="fas fa-image"></i>
                         <p>上传的图像将在这里预览</p>
                     </div>
-                    <canvas id="decodedCanvas" style="display:none;"></canvas>
+                    <canvas id="decodedCanvas"></canvas>
                 </div>
                 
                 <!-- 按钮组 -->
@@ -770,17 +775,17 @@
                     </button>
                 </div>
                 
-                <!-- 解码文本预览 -->
-                <div id="decodedTextContainer" class="preview-text" style="display: none;">
+                <!-- 字节预览 -->
+                <div id="decodedBytesContainer" class="preview-text">
                     <div class="preview-header">
-                        <span>解码数据Base64预览：</span>
-                        <span id="decodedTextLength">0 字符</span>
+                        <span>解码字节预览（前1000字节）：</span>
+                        <span id="decodedBytesLength">0 字节</span>
                     </div>
-                    <div id="decodedTextPreview"></div>
+                    <div id="decodedBytesPreview"></div>
                 </div>
                 
                 <!-- 下载按钮 -->
-                <button id="downloadFileBtn" class="btn btn-success" disabled style="margin-top: 20px; width: 100%;">
+                <button id="downloadFileBtn" class="btn btn-success" disabled style="margin-top: 10px;">
                     <i class="fas fa-download"></i> 下载解码文件
                 </button>
             </div>
@@ -795,13 +800,13 @@
                             <li>文件名长度：4字节（32位）整数</li>
                             <li>文件名：原文件名（Unicode编码）</li>
                             <li>文件数据长度：4字节（32位）整数</li>
-                            <li>文件数据：文件内容的Base64编码</li>
+                            <li>文件数据：原始二进制字节数据</li>
                         </ul>
                     </li>
                     <li><strong>编码过程</strong>：
                         <ul>
-                            <li>1. 将文件内容转换为Base64字符串</li>
-                            <li>2. 构建完整数据：头部 + 文件名长度 + 文件名 + 数据长度 + Base64数据</li>
+                            <li>1. 读取文件的原始二进制数据</li>
+                            <li>2. 构建完整数据：头部 + 文件名长度 + 文件名 + 数据长度 + 原始数据</li>
                             <li>3. 每个字符转换为21位二进制（Unicode编码）</li>
                             <li>4. 每个二进制位对应一个像素（0=白色，1=黑色）</li>
                         </ul>
@@ -811,7 +816,7 @@
                             <li>1. 从图像中读取黑白像素，转换为二进制位</li>
                             <li>2. 每21位转换为一个Unicode字符</li>
                             <li>3. 识别头部标识，提取文件名和文件数据</li>
-                            <li>4. 将Base64数据转换回原始文件</li>
+                            <li>4. 将二进制数据转换回原始文件</li>
                         </ul>
                     </li>
                     <li><strong>技术参数</strong>：
@@ -820,6 +825,7 @@
                             <li>每个像素：1位（黑白）</li>
                             <li>支持最大Unicode码点：0x10FFFF</li>
                             <li>图像宽高比：接近A4比例（1:1.414）</li>
+                            <li>直接使用原始二进制数据，无Base64转换</li>
                         </ul>
                     </li>
                 </ul>
@@ -833,7 +839,7 @@
         </div>
         
         <footer>
-            <p>文件↔图像转换器（黑白Unicode编码） | 支持任意文件类型 | 每个字符21位 | 黑白像素编码</p>
+            <p>文件↔图像转换器（黑白Unicode编码） | 支持任意文件类型 | 每个字符21位 | 黑白像素编码 | 直接二进制处理</p>
             <p>© 2023 文件图像转换工具 | 基于Unicode编码标准</p>
         </footer>
     </div>
@@ -854,14 +860,15 @@
         const fileType = document.getElementById('fileType');
         const fileHeader = document.getElementById('fileHeader');
         
-        const textPreviewContainer = document.getElementById('textPreviewContainer');
-        const textPreview = document.getElementById('textPreview');
-        const textPreviewLength = document.getElementById('textPreviewLength');
+        const bytesPreviewContainer = document.getElementById('bytesPreviewContainer');
+        const bytesPreview = document.getElementById('bytesPreview');
+        const bytesPreviewLength = document.getElementById('bytesPreviewLength');
         
         const charCount = document.getElementById('charCount');
         const encodeBtn = document.getElementById('encodeBtn');
         const clearInputBtn = document.getElementById('clearInputBtn');
         const encodedCanvas = document.getElementById('encodedCanvas');
+        const imageOutput = document.getElementById('imageOutput');
         const downloadBtn = document.getElementById('downloadBtn');
         const imageInput = document.getElementById('imageInput');
         const decodeBtn = document.getElementById('decodeBtn');
@@ -895,9 +902,9 @@
         
         const decodedImagePlaceholder = document.getElementById('decodedImagePlaceholder');
         const decodedCanvas = document.getElementById('decodedCanvas');
-        const decodedTextContainer = document.getElementById('decodedTextContainer');
-        const decodedTextPreview = document.getElementById('decodedTextPreview');
-        const decodedTextLength = document.getElementById('decodedTextLength');
+        const decodedBytesContainer = document.getElementById('decodedBytesContainer');
+        const decodedBytesPreview = document.getElementById('decodedBytesPreview');
+        const decodedBytesLength = document.getElementById('decodedBytesLength');
         
         // ============== 常量定义 ==============
         const HEADER_MARKER = 'FIMG|'; // 头部标识
@@ -912,8 +919,6 @@
         // ============== 状态变量 ==============
         let currentFile = null;
         let fileData = null;
-        let base64Data = null;
-        let encodedImageData = null;
         let autoSizeEnabled = true;
         let currentWidth = 980;
         let currentHeight = 1400;
@@ -927,6 +932,10 @@
         function initializePage() {
             setupEventListeners();
             updateAspectRatio();
+            
+            // 初始化canvas样式
+            encodedCanvas.style.display = 'none';
+            decodedCanvas.style.display = 'none';
             
             // 显示欢迎信息
             setTimeout(() => {
@@ -981,6 +990,7 @@
                 autoSizeEnabled = this.checked;
                 dimensionControls.style.display = autoSizeEnabled ? 'none' : 'flex';
                 toggleStatus.textContent = autoSizeEnabled ? '已启用' : '已禁用';
+                updateFileInfo();
             });
             
             // 手动尺寸输入
@@ -990,6 +1000,7 @@
                     const height = Math.round(width * ASPECT_RATIO);
                     imageHeightInput.value = height;
                     updateAspectRatio();
+                    updateFileInfo();
                 }
             });
             
@@ -999,6 +1010,7 @@
                     const width = Math.round(height / ASPECT_RATIO);
                     imageWidthInput.value = width;
                     updateAspectRatio();
+                    updateFileInfo();
                 }
             });
             
@@ -1012,6 +1024,7 @@
                     imageWidthInput.value = currentWidth;
                     imageHeightInput.value = currentHeight;
                     updateAspectRatio();
+                    updateFileInfo();
                     showNotification(`图像尺寸已设置为 ${currentWidth}×${currentHeight} 像素`, 'info');
                 }
             });
@@ -1021,15 +1034,7 @@
             
             // 清空输入按钮
             clearInputBtn.addEventListener('click', () => {
-                currentFile = null;
-                fileData = null;
-                base64Data = null;
-                fileInput.value = '';
-                fileInfo.style.display = 'none';
-                textPreviewContainer.style.display = 'none';
-                hideCanvas();
-                encodeBtn.disabled = true;
-                downloadBtn.disabled = true;
+                clearEncoder();
                 showNotification('输入已清空', 'info');
             });
             
@@ -1041,14 +1046,7 @@
             
             // 清空输出按钮
             clearOutputBtn.addEventListener('click', () => {
-                decodedFileInfo = null;
-                imageInput.value = '';
-                decodeInfo.style.display = 'none';
-                decodedTextContainer.style.display = 'none';
-                decodedImagePlaceholder.style.display = 'flex';
-                decodedCanvas.style.display = 'none';
-                decodeBtn.disabled = true;
-                downloadFileBtn.disabled = true;
+                clearDecoder();
                 showNotification('输出已清空', 'info');
             });
             
@@ -1057,6 +1055,35 @@
             
             // 设置键盘快捷键
             setupKeyboardShortcuts();
+        }
+        
+        // ============== 清空编码器 ==============
+        function clearEncoder() {
+            currentFile = null;
+            fileData = null;
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+            bytesPreviewContainer.style.display = 'none';
+            imageOutput.style.display = 'flex';
+            encodedCanvas.style.display = 'none';
+            encodeBtn.disabled = true;
+            downloadBtn.disabled = true;
+            bitsInfo.style.display = 'none';
+            charCount.textContent = '总字符数: 0 (0像素)';
+            imageDimensions.textContent = '图像尺寸: 未生成';
+            imageSize.textContent = '文件大小: 未生成';
+        }
+        
+        // ============== 清空解码器 ==============
+        function clearDecoder() {
+            decodedFileInfo = null;
+            imageInput.value = '';
+            decodeInfo.style.display = 'none';
+            decodedBytesContainer.style.display = 'none';
+            decodedImagePlaceholder.style.display = 'flex';
+            decodedCanvas.style.display = 'none';
+            decodeBtn.disabled = true;
+            downloadFileBtn.disabled = true;
         }
         
         // ============== 文件选择处理 ==============
@@ -1077,34 +1104,11 @@
             reader.onload = function(e) {
                 fileData = e.target.result;
                 
-                // 将文件内容转换为Base64
-                const bytes = new Uint8Array(fileData);
-                base64Data = arrayBufferToBase64(bytes);
+                // 显示字节预览
+                showBytesPreview(new Uint8Array(fileData));
                 
-                // 显示文本预览
-                textPreviewContainer.style.display = 'block';
-                textPreviewLength.textContent = `${base64Data.length} 字符`;
-                
-                // 只显示前500个字符作为预览
-                const previewText = base64Data.length > 500 
-                    ? base64Data.substring(0, 500) + '...' 
-                    : base64Data;
-                textPreview.textContent = previewText;
-                
-                // 计算并显示字符数
-                const totalChars = calculateTotalChars(file.name, base64Data);
-                const pixelsNeeded = totalChars * BITS_PER_CHAR;
-                
-                if (autoSizeEnabled) {
-                    calculateAutoDimensions(pixelsNeeded);
-                    charCount.textContent = `总字符数: ${totalChars.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
-                    charCount.textContent += ` | 图像尺寸: ${currentWidth}×${currentHeight}`;
-                } else {
-                    charCount.textContent = `总字符数: ${totalChars.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
-                }
-                
-                // 更新位信息
-                updateBitsInfo(totalChars);
+                // 更新文件信息
+                updateFileInfo();
                 
                 // 启用编码按钮
                 encodeBtn.disabled = false;
@@ -1119,10 +1123,56 @@
             showNotification(`已选择文件：${file.name}`, 'success');
         }
         
+        // ============== 显示字节预览 ==============
+        function showBytesPreview(bytes) {
+            bytesPreviewContainer.style.display = 'block';
+            const previewCount = Math.min(bytes.length, 1000);
+            bytesPreviewLength.textContent = `${previewCount} 字节 / 总共 ${bytes.length} 字节`;
+            
+            let previewText = '';
+            for (let i = 0; i < previewCount; i++) {
+                const byte = bytes[i];
+                previewText += byte.toString(16).padStart(2, '0').toUpperCase() + ' ';
+                if ((i + 1) % 16 === 0) previewText += '\n';
+            }
+            
+            bytesPreview.textContent = previewText;
+        }
+        
+        // ============== 更新文件信息 ==============
+        function updateFileInfo() {
+            if (!currentFile || !fileData) return;
+            
+            const bytes = new Uint8Array(fileData);
+            const totalChars = calculateTotalChars(currentFile.name, bytes);
+            const pixelsNeeded = totalChars * BITS_PER_CHAR;
+            
+            if (autoSizeEnabled) {
+                calculateAutoDimensions(pixelsNeeded);
+                charCount.textContent = `总字符数: ${totalChars.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
+                charCount.textContent += ` | 图像尺寸: ${currentWidth}×${currentHeight}`;
+            } else {
+                currentWidth = parseInt(imageWidthInput.value) || MIN_WIDTH;
+                currentHeight = parseInt(imageHeightInput.value) || MIN_HEIGHT;
+                const maxPixels = currentWidth * currentHeight;
+                const maxChars = Math.floor(maxPixels / BITS_PER_CHAR);
+                
+                charCount.textContent = `总字符数: ${totalChars.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
+                if (pixelsNeeded > maxPixels) {
+                    charCount.classList.add('warning');
+                    charCount.textContent += ` (警告: 需要 ${maxChars.toLocaleString()} 字符以内)`;
+                } else {
+                    charCount.classList.remove('warning');
+                }
+            }
+            
+            // 更新位信息
+            updateBitsInfo(totalChars);
+        }
+        
         // ============== 计算总字符数 ==============
-        function calculateTotalChars(filename, base64Data) {
-            // 数据格式：头部(5) + 文件名长度(4字节=2字符) + 文件名 + 数据长度(4字节=2字符) + Base64数据
-            // 注意：每个32位整数在Unicode编码中占用2个字符（21位×2=42位 > 32位）
+        function calculateTotalChars(filename, bytes) {
+            // 数据格式：头部(5) + 文件名长度(2字符) + 文件名 + 数据长度(2字符) + 文件数据
             
             // 头部标识
             let total = HEADER_MARKER.length;
@@ -1136,8 +1186,8 @@
             // 数据长度（32位整数，需要2个Unicode字符）
             total += 2;
             
-            // Base64数据
-            total += base64Data.length;
+            // 文件数据（每个字节转换为一个字符）
+            total += bytes.length;
             
             return total;
         }
@@ -1151,27 +1201,6 @@
             
             // 显示位信息
             bitsInfo.style.display = totalChars > 0 ? 'block' : 'none';
-        }
-        
-        // ============== Base64转换函数 ==============
-        function arrayBufferToBase64(buffer) {
-            let binary = '';
-            const bytes = new Uint8Array(buffer);
-            const len = bytes.byteLength;
-            for (let i = 0; i < len; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            return btoa(binary);
-        }
-        
-        function base64ToArrayBuffer(base64) {
-            const binaryString = atob(base64);
-            const len = binaryString.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            return bytes.buffer;
         }
         
         // ============== Unicode编码函数 ==============
@@ -1279,7 +1308,7 @@
         
         // ============== 编码文件为图像 ==============
         function encodeFileToImage() {
-            if (!currentFile || !fileData || !base64Data) {
+            if (!currentFile || !fileData) {
                 showNotification('请先选择文件', 'error');
                 return;
             }
@@ -1290,8 +1319,10 @@
             // 使用setTimeout避免阻塞UI
             setTimeout(() => {
                 try {
+                    const bytes = new Uint8Array(fileData);
+                    
                     // 构建完整数据
-                    const fullData = buildFileData(currentFile.name, base64Data);
+                    const fullData = buildFileData(currentFile.name, bytes);
                     
                     // 计算图像尺寸
                     const totalChars = fullData.length;
@@ -1304,12 +1335,23 @@
                         currentHeight = parseInt(imageHeightInput.value) || MIN_HEIGHT;
                     }
                     
+                    // 检查是否能容纳所有数据
+                    const totalPixels = currentWidth * currentHeight;
+                    if (pixelsNeeded > totalPixels) {
+                        throw new Error(`图像太小，无法容纳所有数据。需要至少 ${Math.ceil(pixelsNeeded / currentWidth)} 像素高度。`);
+                    }
+                    
                     // 设置画布尺寸
                     encodedCanvas.width = currentWidth;
                     encodedCanvas.height = currentHeight;
                     
                     // 将完整数据转换为二进制
                     const binaryArray = encodeUnicodeToBinary(fullData);
+                    
+                    // 填充剩余的像素为白色
+                    while (binaryArray.length < totalPixels) {
+                        binaryArray.push(0);
+                    }
                     
                     // 创建黑白图像
                     createBinaryImage(binaryArray);
@@ -1336,8 +1378,8 @@
         }
         
         // ============== 构建文件数据 ==============
-        function buildFileData(filename, base64Data) {
-            // 数据格式：头部标识 + 文件名长度 + 文件名 + 数据长度 + Base64数据
+        function buildFileData(filename, bytes) {
+            // 数据格式：头部标识 + 文件名长度 + 文件名 + 数据长度 + 文件数据
             
             // 头部标识
             let data = HEADER_MARKER;
@@ -1351,12 +1393,14 @@
             data += filename;
             
             // 数据长度（32位整数）
-            const dataLength = base64Data.length;
+            const dataLength = bytes.length;
             const dataLengthBinary = encode32BitInteger(dataLength);
             data += dataLengthBinary;
             
-            // Base64数据
-            data += base64Data;
+            // 文件数据（每个字节作为一个字符）
+            for (let i = 0; i < bytes.length; i++) {
+                data += String.fromCharCode(bytes[i]);
+            }
             
             return data;
         }
@@ -1412,56 +1456,9 @@
         
         // ============== 显示编码后的图像 ==============
         function displayEncodedImage() {
-            const imageOutput = document.getElementById('imageOutput');
-            const canvas = document.getElementById('encodedCanvas');
-            
-            // 隐藏占位符，显示画布
+            // 隐藏占位符，显示canvas
             imageOutput.style.display = 'none';
-            canvas.style.display = 'block';
-            
-            // 创建图像预览
-            const previewCanvas = document.createElement('canvas');
-            const previewCtx = previewCanvas.getContext('2d');
-            
-            // 设置预览尺寸
-            const maxWidth = imageOutput.parentElement.clientWidth - 30;
-            const scale = Math.min(maxWidth / currentWidth, 1);
-            const previewWidth = currentWidth * scale;
-            const previewHeight = currentHeight * scale;
-            
-            previewCanvas.width = previewWidth;
-            previewCanvas.height = previewHeight;
-            
-            // 绘制缩放后的图像
-            previewCtx.drawImage(encodedCanvas, 0, 0, currentWidth, currentHeight, 
-                                0, 0, previewWidth, previewHeight);
-            
-            // 添加到容器中
-            imageOutput.parentElement.appendChild(previewCanvas);
-            
-            // 移除旧的预览canvas
-            const existingPreview = imageOutput.parentElement.querySelector('canvas:not(#encodedCanvas)');
-            if (existingPreview && existingPreview !== previewCanvas) {
-                existingPreview.remove();
-            }
-        }
-        
-        // ============== 隐藏画布 ==============
-        function hideCanvas() {
-            const imageOutput = document.getElementById('imageOutput');
-            const canvas = document.getElementById('encodedCanvas');
-            const previewCanvas = imageOutput.parentElement.querySelector('canvas:not(#encodedCanvas)');
-            
-            imageOutput.style.display = 'flex';
-            canvas.style.display = 'none';
-            
-            if (previewCanvas) {
-                previewCanvas.remove();
-            }
-            
-            // 重置图像信息
-            imageDimensions.textContent = '图像尺寸: 未生成';
-            imageSize.textContent = '文件大小: 未生成';
+            encodedCanvas.style.display = 'block';
         }
         
         // ============== 更新图像信息 ==============
@@ -1570,13 +1567,10 @@
                         detectedHeader.textContent = HEADER_MARKER;
                         decodeInfo.style.display = 'block';
                         
-                        // 显示解码文本预览
-                        decodedTextContainer.style.display = 'block';
-                        decodedTextLength.textContent = `${fileInfo.base64Data.length} 字符`;
-                        const previewText = fileInfo.base64Data.length > 500 
-                            ? fileInfo.base64Data.substring(0, 500) + '...' 
-                            : fileInfo.base64Data;
-                        decodedTextPreview.textContent = previewText;
+                        // 显示解码字节预览
+                        decodedBytesContainer.style.display = 'block';
+                        decodedBytesLength.textContent = `${fileInfo.data.length} 字节`;
+                        showBytesPreviewForDecoded(fileInfo.data);
                         
                         // 启用下载文件按钮
                         downloadFileBtn.disabled = false;
@@ -1604,6 +1598,18 @@
             };
             
             reader.readAsDataURL(file);
+        }
+        
+        // ============== 显示解码字节预览 ==============
+        function showBytesPreviewForDecoded(bytes) {
+            const previewCount = Math.min(bytes.length, 1000);
+            let previewText = '';
+            for (let i = 0; i < previewCount; i++) {
+                const byte = bytes[i];
+                previewText += byte.toString(16).padStart(2, '0').toUpperCase() + ' ';
+                if ((i + 1) % 16 === 0) previewText += '\n';
+            }
+            decodedBytesPreview.textContent = previewText;
         }
         
         // ============== 从图像数据提取二进制数组 ==============
@@ -1651,18 +1657,19 @@
             const dataLength = decode32BitInteger(dataLengthStr);
             index += 2;
             
-            // 读取Base64数据
+            // 读取文件数据
             if (index + dataLength > text.length) return null;
-            const base64Data = text.substring(index, index + dataLength);
             
-            // 计算原始数据大小（Base64解码后）
-            const originalSize = Math.floor(base64Data.length * 3 / 4);
+            // 将字符转换回字节
+            const bytes = new Uint8Array(dataLength);
+            for (let i = 0; i < dataLength; i++) {
+                bytes[i] = text.charCodeAt(index + i);
+            }
             
             return {
                 filename: filename,
-                base64Data: base64Data,
-                data: base64ToArrayBuffer(base64Data),
-                size: originalSize
+                data: bytes,
+                size: dataLength
             };
         }
         
@@ -1768,7 +1775,7 @@
         console.log('- Unicode编码，每个字符21位二进制');
         console.log('- 每个像素1位（0=白色，1=黑色）');
         console.log('- 自动保存文件名和文件内容');
-        console.log('- 无验证，直接提取和恢复文件');
+        console.log('- 直接使用原始二进制数据，无Base64转换');
         console.log('%c⌨️ 快捷键:', 'color: #ff9800; font-weight: bold;');
         console.log('Ctrl+E: 编码文件');
         console.log('Ctrl+D: 解码图像');
