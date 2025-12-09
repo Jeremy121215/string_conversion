@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>二进制图像编码/解码工具</title>
+    <title>图像编码/解码工具</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -22,7 +22,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
@@ -73,7 +73,7 @@
             margin-bottom: 40px;
         }
         
-        @media (max-width: 900px) {
+        @media (max-width: 1000px) {
             .main-content {
                 grid-template-columns: 1fr;
             }
@@ -147,6 +147,57 @@
         .validation-info i {
             color: #6c63ff;
             margin-right: 8px;
+        }
+        
+        .dimension-controls {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .dimension-controls label {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .dimension-controls span {
+            font-size: 0.9rem;
+            color: #a0a0c0;
+        }
+        
+        .dimension-controls input {
+            padding: 8px 12px;
+            background: rgba(10, 10, 20, 0.8);
+            border: 1px solid #3a3a7a;
+            border-radius: 4px;
+            color: #e0e0e0;
+        }
+        
+        .dimension-controls input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .dimension-controls button {
+            padding: 8px 16px;
+            background: rgba(60, 60, 100, 0.8);
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .dimension-controls button:hover {
+            background: rgba(80, 80, 140, 0.8);
         }
         
         .button-group {
@@ -343,6 +394,23 @@
             color: #6c63ff;
         }
         
+        .image-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #a0a0c0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .size-badge {
+            background: rgba(108, 99, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
         footer {
             text-align: center;
             margin-top: 40px;
@@ -385,16 +453,63 @@
         .notification.info {
             border-left: 4px solid #2196f3;
         }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: rgba(60, 60, 100, 0.8);
+            border-radius: 13px;
+            margin-right: 10px;
+            transition: background 0.3s;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 11px;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-checkbox:checked + .toggle-switch {
+            background: #6c63ff;
+        }
+        
+        .toggle-checkbox:checked + .toggle-switch::after {
+            transform: translateX(24px);
+        }
+        
+        .toggle-checkbox {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-code"></i> 二进制图像编码/解码工具</h1>
-            <p class="subtitle">将文本编码为黑白图像，或将图像解码为原始文本</p>
+            <h1><i class="fas fa-code"></i> 图像编码/解码工具</h1>
+            <p class="subtitle">将文本编码为黑白图像，尺寸根据字符数动态调整，接近A4比例</p>
             <div class="stats">
-                <div class="stat-box">最大字符数: 196,000</div>
-                <div class="stat-box">图像尺寸: 980 × 1400 像素</div>
+                <div class="stat-box">最大字符数: 1,372,000</div>
+                <div class="stat-box">最小尺寸: 100×142 像素</div>
                 <div class="stat-box">字符编码: 7位二进制 ASCII</div>
             </div>
         </header>
@@ -406,12 +521,39 @@
                 
                 <div class="validation-info">
                     <i class="fas fa-info-circle"></i> 
-                    仅支持 ASCII 字符 (0-127)。每个字符将被转换为7位二进制，剩余位用0填充。
+                    仅支持 ASCII 字符 (0-127)。
                 </div>
                 
-                <textarea id="inputText" placeholder="请输入要编码的文本（最多196,000个ASCII字符）..."></textarea>
+                <div class="toggle-container">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="autoSizeToggle" class="toggle-checkbox" checked>
+                        <span class="toggle-switch"></span>
+                        <span>自动调整图像尺寸</span>
+                    </label>
+                    <span id="toggleStatus" class="size-badge">已启用</span>
+                </div>
                 
-                <div class="char-count" id="charCount">字符数: 0 / 196000</div>
+                <div id="dimensionControls" class="dimension-controls" style="display: none;">
+                    <label>
+                        <span>图像宽度:</span>
+                        <input type="number" id="imageWidth" min="100" max="2000" value="980">
+                    </label>
+                    <label>
+                        <span>图像高度:</span>
+                        <input type="number" id="imageHeight" min="142" max="2800" value="1400">
+                    </label>
+                    <label>
+                        <span>宽高比:</span>
+                        <input type="text" id="aspectRatio" value="1:1.43" disabled>
+                    </label>
+                    <button id="calculateDimensionsBtn">
+                        <i class="fas fa-calculator"></i> 计算尺寸
+                    </button>
+                </div>
+                
+                <textarea id="inputText" placeholder="请输入要编码的文本（最多1,372,000个ASCII字符）..."></textarea>
+                
+                <div class="char-count" id="charCount">字符数: 0 / 1,372,000 (0像素)</div>
                 
                 <div class="button-group">
                     <button id="encodeBtn" class="btn btn-primary">
@@ -428,7 +570,12 @@
                             <i class="fas fa-image"></i>
                             <p>编码后的图像将在这里显示</p>
                         </div>
-                        <canvas id="encodedCanvas" width="980" height="1400" style="display:none;"></canvas>
+                        <canvas id="encodedCanvas" style="display:none;"></canvas>
+                    </div>
+                    
+                    <div class="image-info">
+                        <div id="imageDimensions">图像尺寸: 未生成</div>
+                        <div id="imageSize">文件大小: 未生成</div>
                     </div>
                     
                     <button id="downloadBtn" class="btn btn-success" disabled>
@@ -443,7 +590,7 @@
                 
                 <div class="validation-info">
                     <i class="fas fa-info-circle"></i> 
-                    请上传之前编码生成的图像（980×1400像素）。图像将被解码为原始文本。
+                    请上传之前编码生成的图像。支持动态尺寸和固定尺寸图像。
                 </div>
                 
                 <div class="file-input-wrapper">
@@ -478,16 +625,13 @@
             
             <!-- 算法说明 -->
             <div class="card info-box">
-                <h3><i class="fas fa-calculator"></i> 编码算法说明</h3>
+                <h3><i class="fas fa-calculator"></i> 自适应尺寸算法说明</h3>
                 <ul>
-                    <li>每个ASCII字符(0-127)转换为7位二进制表示（如 'A' → 1000001）</li>
-                    <li>所有二进制位连接成一个长二进制字符串</li>
-                    <li>如果二进制字符串长度不是1,372,000（980×1400），用0（NULL）填充到该长度</li>
-                    <li>每个二进制位对应一个像素：0 → 白色(255,255,255)，1 → 黑色(0,0,0)</li>
-                    <li>像素按行优先顺序填充：从左到右，从上到下</li>
-                    <li>解码时按相同规则反向处理，忽略末尾的NULL字符</li>
+                    <li>所需像素数 = 字符数 × 7（每位对应一个像素）</li>
+                    <li>图像尺寸根据所需像素数动态计算，保持接近A4比例(1:1.414)</li>
+                    <li>最小尺寸：100×142像素，最大尺寸：2000×2828像素</li>
                 </ul>
-                <p>示例: 文本 "Hi" → 'H'(72=1001000) + 'i'(105=1101001) = "10010001101001..."</p>
+                <p>示例: 100个字符 → 700像素 → 图像尺寸约为 22×31 像素</p>
             </div>
         </div>
         
@@ -498,8 +642,8 @@
         </div>
         
         <footer>
-            <p>二进制图像编码/解码工具 | 每个字符7位二进制 | 图像尺寸: 980 × 1400 像素</p>
-            <p>© 2023 编码工具 | 最多处理 196,000 个字符 (1,372,000 像素)</p>
+            <p>自适应二进制图像编码/解码工具 | 每个字符7位二进制 | 尺寸根据字符数动态调整</p>
+            <p>© 2023 编码工具 | 最多处理 1,372,000 个字符</p>
         </footer>
     </div>
     
@@ -526,23 +670,86 @@
         const notification = document.getElementById('notification');
         const notificationIcon = document.getElementById('notificationIcon');
         const notificationMessage = document.getElementById('notificationMessage');
+        const autoSizeToggle = document.getElementById('autoSizeToggle');
+        const dimensionControls = document.getElementById('dimensionControls');
+        const imageWidthInput = document.getElementById('imageWidth');
+        const imageHeightInput = document.getElementById('imageHeight');
+        const aspectRatioInput = document.getElementById('aspectRatio');
+        const calculateDimensionsBtn = document.getElementById('calculateDimensionsBtn');
+        const toggleStatus = document.getElementById('toggleStatus');
+        const imageDimensions = document.getElementById('imageDimensions');
+        const imageSize = document.getElementById('imageSize');
         
         // 常量定义
-        const MAX_CHARS = 196000; // 980*1400/7 = 196000个字符
-        const CANVAS_WIDTH = 980;
-        const CANVAS_HEIGHT = 1400;
-        const TOTAL_PIXELS = CANVAS_WIDTH * CANVAS_HEIGHT; // 1,372,000像素
+        const MAX_CHARS = 1372000; // 最大字符数（1372000*7=9604000像素）
+        const MIN_WIDTH = 100;
+        const MIN_HEIGHT = 142;
+        const MAX_WIDTH = 2000;
+        const MAX_HEIGHT = 2828;
+        const ASPECT_RATIO = 1.414; // A4比例
+        
+        // 当前图像尺寸
+        let currentWidth = 980;
+        let currentHeight = 1400;
+        let autoSizeEnabled = true;
         
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
             updateCharCount();
             setupEventListeners();
+            updateAspectRatio();
         });
         
         // 设置事件监听器
         function setupEventListeners() {
             // 输入文本变化
             inputText.addEventListener('input', updateCharCount);
+            
+            // 自动尺寸切换
+            autoSizeToggle.addEventListener('change', function() {
+                autoSizeEnabled = this.checked;
+                dimensionControls.style.display = autoSizeEnabled ? 'none' : 'flex';
+                toggleStatus.textContent = autoSizeEnabled ? '已启用' : '已禁用';
+                toggleStatus.style.background = autoSizeEnabled ? 
+                    'rgba(108, 99, 255, 0.2)' : 'rgba(255, 152, 0, 0.2)';
+                
+                if (!autoSizeEnabled) {
+                    updateCharCount();
+                }
+            });
+            
+            // 手动尺寸输入
+            imageWidthInput.addEventListener('input', function() {
+                if (!autoSizeEnabled) {
+                    const width = parseInt(this.value) || MIN_WIDTH;
+                    const height = Math.round(width * ASPECT_RATIO);
+                    imageHeightInput.value = height;
+                    updateAspectRatio();
+                }
+            });
+            
+            imageHeightInput.addEventListener('input', function() {
+                if (!autoSizeEnabled) {
+                    const height = parseInt(this.value) || MIN_HEIGHT;
+                    const width = Math.round(height / ASPECT_RATIO);
+                    imageWidthInput.value = width;
+                    updateAspectRatio();
+                }
+            });
+            
+            // 计算尺寸按钮
+            calculateDimensionsBtn.addEventListener('click', function() {
+                if (!autoSizeEnabled) {
+                    const width = parseInt(imageWidthInput.value) || MIN_WIDTH;
+                    const height = parseInt(imageHeightInput.value) || MIN_HEIGHT;
+                    currentWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
+                    currentHeight = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, height));
+                    imageWidthInput.value = currentWidth;
+                    imageHeightInput.value = currentHeight;
+                    updateAspectRatio();
+                    showNotification(`图像尺寸已设置为 ${currentWidth}×${currentHeight} 像素`, 'info');
+                }
+            });
             
             // 编码按钮
             encodeBtn.addEventListener('click', encodeTextToImage);
@@ -584,8 +791,16 @@
         function updateCharCount() {
             const text = inputText.value;
             const count = text.length;
+            const pixelsNeeded = count * 7;
             
-            charCount.textContent = `字符数: ${count.toLocaleString()} / ${MAX_CHARS.toLocaleString()}`;
+            // 如果启用自动尺寸，计算所需尺寸
+            if (autoSizeEnabled && count > 0) {
+                calculateAutoDimensions(pixelsNeeded);
+                charCount.textContent = `字符数: ${count.toLocaleString()} / ${MAX_CHARS.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
+                charCount.textContent += ` | 图像尺寸: ${currentWidth}×${currentHeight}`;
+            } else {
+                charCount.textContent = `字符数: ${count.toLocaleString()} / ${MAX_CHARS.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
+            }
             
             // 检查是否超过限制
             if (count > MAX_CHARS) {
@@ -607,6 +822,60 @@
                 encodeBtn.disabled = true;
                 charCount.textContent += ` (发现${nonAsciiChars.length}个非ASCII字符)`;
             }
+            
+            // 如果手动设置尺寸，检查像素容量
+            if (!autoSizeEnabled && count > 0) {
+                const maxCharsForSize = Math.floor((currentWidth * currentHeight) / 7);
+                if (count > maxCharsForSize) {
+                    charCount.classList.add('warning');
+                    charCount.textContent += ` (警告: 当前尺寸最多容纳 ${maxCharsForSize.toLocaleString()} 字符)`;
+                }
+            }
+        }
+        
+        // 计算自动尺寸
+        function calculateAutoDimensions(pixelsNeeded) {
+            if (pixelsNeeded <= 0) {
+                currentWidth = MIN_WIDTH;
+                currentHeight = MIN_HEIGHT;
+                return;
+            }
+            
+            // 根据A4比例计算宽度：width = sqrt(pixels / aspectRatio)
+            let width = Math.sqrt(pixelsNeeded / ASPECT_RATIO);
+            
+            // 确保在最小和最大范围内
+            width = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
+            
+            // 计算高度，保持A4比例
+            let height = Math.round(width * ASPECT_RATIO);
+            
+            // 调整高度确保能容纳所有像素
+            const totalPixels = width * height;
+            if (totalPixels < pixelsNeeded) {
+                // 如果像素不足，增加高度
+                height = Math.ceil(pixelsNeeded / width);
+            }
+            
+            // 确保高度也在范围内
+            height = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, height));
+            
+            // 再次检查宽度是否需要调整
+            if (width * height < pixelsNeeded) {
+                width = Math.ceil(pixelsNeeded / height);
+                width = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
+            }
+            
+            currentWidth = width;
+            currentHeight = height;
+        }
+        
+        // 更新宽高比显示
+        function updateAspectRatio() {
+            const width = parseInt(imageWidthInput.value) || MIN_WIDTH;
+            const height = parseInt(imageHeightInput.value) || MIN_HEIGHT;
+            const ratio = (height / width).toFixed(3);
+            aspectRatioInput.value = `1:${ratio}`;
         }
         
         // 查找非ASCII字符
@@ -635,7 +904,7 @@
             }
             
             if (text.length > MAX_CHARS) {
-                showNotification(`文本过长，最多支持${MAX_CHARS}个字符`, 'error');
+                showNotification(`文本过长，最多支持${MAX_CHARS.toLocaleString()}个字符`, 'error');
                 return;
             }
             
@@ -651,6 +920,20 @@
             // 使用setTimeout避免阻塞UI
             setTimeout(() => {
                 try {
+                    // 如果自动尺寸，根据字符数计算尺寸
+                    if (autoSizeEnabled) {
+                        const pixelsNeeded = text.length * 7;
+                        calculateAutoDimensions(pixelsNeeded);
+                    } else {
+                        // 使用手动设置的尺寸
+                        currentWidth = parseInt(imageWidthInput.value) || MIN_WIDTH;
+                        currentHeight = parseInt(imageHeightInput.value) || MIN_HEIGHT;
+                    }
+                    
+                    // 设置画布尺寸
+                    encodedCanvas.width = currentWidth;
+                    encodedCanvas.height = currentHeight;
+                    
                     // 将文本转换为二进制字符串
                     const binaryString = textToBinary(text);
                     
@@ -660,10 +943,13 @@
                     // 显示图像
                     displayEncodedImage();
                     
+                    // 更新图像信息
+                    updateImageInfo();
+                    
                     // 启用下载按钮
                     downloadBtn.disabled = false;
                     
-                    showNotification(`编码成功！将${text.length}个字符编码为${binaryString.length}位二进制数据`, 'success');
+                    showNotification(`编码成功！将${text.length.toLocaleString()}个字符编码为${binaryString.length.toLocaleString()}位二进制数据，图像尺寸 ${currentWidth}×${currentHeight}`, 'success');
                 } catch (error) {
                     console.error('编码错误:', error);
                     showNotification('编码过程中发生错误: ' + error.message, 'error');
@@ -689,13 +975,16 @@
                 binaryString += binary;
             }
             
-            // 如果二进制字符串长度不足TOTAL_PIXELS，用0填充（NULL）
-            if (binaryString.length < TOTAL_PIXELS) {
-                binaryString = binaryString.padEnd(TOTAL_PIXELS, '0');
+            // 计算总像素数
+            const totalPixels = currentWidth * currentHeight;
+            
+            // 如果二进制字符串长度不足总像素数，用0填充（NULL）
+            if (binaryString.length < totalPixels) {
+                binaryString = binaryString.padEnd(totalPixels, '0');
             }
-            // 如果超过TOTAL_PIXELS，截断（理论上不会发生，因为字符数有限制）
-            else if (binaryString.length > TOTAL_PIXELS) {
-                binaryString = binaryString.substring(0, TOTAL_PIXELS);
+            // 如果超过总像素数，截断（理论上不会发生，因为字符数有限制）
+            else if (binaryString.length > totalPixels) {
+                binaryString = binaryString.substring(0, totalPixels);
             }
             
             return binaryString;
@@ -704,7 +993,7 @@
         // 创建二进制图像
         function createBinaryImage(binaryString) {
             const ctx = encodedCanvas.getContext('2d');
-            const imageData = ctx.createImageData(CANVAS_WIDTH, CANVAS_HEIGHT);
+            const imageData = ctx.createImageData(currentWidth, currentHeight);
             const data = imageData.data;
             
             // 用白色填充整个画布
@@ -716,7 +1005,7 @@
             }
             
             // 根据二进制字符串设置像素颜色
-            for (let i = 0; i < binaryString.length && i < TOTAL_PIXELS; i++) {
+            for (let i = 0; i < binaryString.length && i < currentWidth * currentHeight; i++) {
                 const bit = binaryString[i];
                 const pixelIndex = i * 4;
                 
@@ -748,15 +1037,16 @@
             
             // 设置预览尺寸（保持宽高比）
             const maxWidth = imageOutput.clientWidth - 30;
-            const scale = maxWidth / CANVAS_WIDTH;
-            const previewHeight = CANVAS_HEIGHT * scale;
+            const scale = Math.min(maxWidth / currentWidth, 1); // 限制最大缩放为1
+            const previewWidth = currentWidth * scale;
+            const previewHeight = currentHeight * scale;
             
-            previewCanvas.width = maxWidth;
+            previewCanvas.width = previewWidth;
             previewCanvas.height = previewHeight;
             
             // 绘制缩放后的图像
-            previewCtx.drawImage(encodedCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, 
-                                0, 0, maxWidth, previewHeight);
+            previewCtx.drawImage(encodedCanvas, 0, 0, currentWidth, currentHeight, 
+                                0, 0, previewWidth, previewHeight);
             
             // 替换原来的canvas
             imageOutput.appendChild(previewCanvas);
@@ -767,6 +1057,15 @@
             if (existingPreview && existingPreview !== previewCanvas) {
                 existingPreview.remove();
             }
+        }
+        
+        // 更新图像信息
+        function updateImageInfo() {
+            imageDimensions.textContent = `图像尺寸: ${currentWidth}×${currentHeight} 像素`;
+            
+            // 估计文件大小 (非常粗略的估计)
+            const estimatedSizeKB = Math.round((currentWidth * currentHeight * 0.1) / 1024);
+            imageSize.textContent = `文件大小: ~${estimatedSizeKB} KB`;
         }
         
         // 隐藏画布
@@ -784,12 +1083,17 @@
             if (previewCanvas) {
                 previewCanvas.remove();
             }
+            
+            // 重置图像信息
+            imageDimensions.textContent = '图像尺寸: 未生成';
+            imageSize.textContent = '文件大小: 未生成';
         }
         
         // 下载图像
         function downloadImage() {
             const link = document.createElement('a');
-            link.download = `binary-encoded-${Date.now()}.png`;
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            link.download = `binary-encoded-${currentWidth}x${currentHeight}-${timestamp}.png`;
             link.href = encodedCanvas.toDataURL('image/png');
             link.click();
             showNotification('图像下载成功！', 'success');
@@ -812,28 +1116,21 @@
                 const img = new Image();
                 img.onload = function() {
                     try {
-                        // 验证图像尺寸
-                        if (img.width !== CANVAS_WIDTH || img.height !== CANVAS_HEIGHT) {
-                            showNotification(`图像尺寸必须为${CANVAS_WIDTH}×${CANVAS_HEIGHT}像素，当前为${img.width}×${img.height}像素`, 'error');
-                            showLoading(false);
-                            return;
-                        }
-                        
                         // 创建临时canvas处理图像
                         const tempCanvas = document.createElement('canvas');
-                        tempCanvas.width = CANVAS_WIDTH;
-                        tempCanvas.height = CANVAS_HEIGHT;
+                        tempCanvas.width = img.width;
+                        tempCanvas.height = img.height;
                         const tempCtx = tempCanvas.getContext('2d');
                         
                         // 绘制图像到canvas
                         tempCtx.drawImage(img, 0, 0);
                         
                         // 获取像素数据
-                        const imageData = tempCtx.getImageData(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                        const imageData = tempCtx.getImageData(0, 0, img.width, img.height);
                         const data = imageData.data;
                         
                         // 从像素数据提取二进制字符串
-                        const binaryString = extractBinaryFromImage(data);
+                        const binaryString = extractBinaryFromImage(data, img.width, img.height);
                         
                         // 将二进制字符串转换为文本
                         const text = binaryToText(binaryString);
@@ -842,7 +1139,7 @@
                         decodedText.textContent = text;
                         copyTextBtn.disabled = false;
                         
-                        showNotification(`解码成功！从${binaryString.length}位二进制数据中解码出${text.length}个字符`, 'success');
+                        showNotification(`解码成功！从 ${img.width}×${img.height} 图像中解码出 ${text.length} 个字符`, 'success');
                     } catch (error) {
                         console.error('解码错误:', error);
                         showNotification('解码过程中发生错误: ' + error.message, 'error');
@@ -868,11 +1165,12 @@
         }
         
         // 从图像数据提取二进制字符串
-        function extractBinaryFromImage(data) {
+        function extractBinaryFromImage(data, width, height) {
             let binaryString = '';
+            const totalPixels = width * height;
             
             // 遍历所有像素（每个像素4个值：R,G,B,A）
-            for (let i = 0; i < TOTAL_PIXELS && i * 4 < data.length; i++) {
+            for (let i = 0; i < totalPixels && i * 4 < data.length; i++) {
                 const pixelIndex = i * 4;
                 const r = data[pixelIndex];
                 const g = data[pixelIndex + 1];
@@ -988,21 +1286,17 @@
         });
         
         function loadExampleText() {
-            const exampleText = `Binary Image Encoder/Decoder
+            const exampleText = `图像编码器
 
-This tool encodes text into a binary image and decodes it back.
+功能特点：
+1. 支持最多1,372,000个ASCII字符
+2. 自动计算图像尺寸，节省存储空间
+3. 支持手动设置图像尺寸
 
-Each ASCII character (0-127) is converted to 7-bit binary representation. For example:
-- 'A' (ASCII 65) becomes '1000001'
-- 'B' (ASCII 66) becomes '1000010'
-- 'a' (ASCII 97) becomes '1100001'
-- 'b' (ASCII 98) becomes '1100010'
+编码示例：
+5个字符 × 7位 = 35像素 → 图像尺寸约为 5×7 像素
 
-All bits are concatenated into a long binary string, which is then used to create a 980x1400 pixel image where 0=white and 1=black.
-
-The maximum text length is 196,000 characters, which translates to 1,372,000 bits (980*1400).
-
-Try encoding this text and then decoding the generated image!`;
+您可以切换"自动调整图像尺寸"开关，体验自动和手动模式的区别。`;
             
             inputText.value = exampleText;
             updateCharCount();
