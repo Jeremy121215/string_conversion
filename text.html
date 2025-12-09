@@ -1,0 +1,1996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图像编码/解码工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00dbde, #fc00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #a0a0c0;
+            margin-bottom: 5px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 1000px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: rgba(20, 20, 40, 0.8);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(100, 100, 200, 0.2);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3a3a7a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            color: #6c63ff;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            background: rgba(10, 10, 20, 0.8);
+            border: 1px solid #3a3a7a;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 16px;
+            resize: vertical;
+            margin-bottom: 15px;
+            transition: border 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #6c63ff;
+        }
+        
+        .char-count {
+            text-align: right;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #a0a0c0;
+        }
+        
+        .char-count.warning {
+            color: #ff9800;
+        }
+        
+        .char-count.error {
+            color: #ff5252;
+        }
+        
+        .validation-info {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #a0a0c0;
+        }
+        
+        .validation-info i {
+            color: #6c63ff;
+            margin-right: 8px;
+        }
+        
+        .dimension-controls {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .dimension-controls label {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .dimension-controls span {
+            font-size: 0.9rem;
+            color: #a0a0c0;
+        }
+        
+        .dimension-controls input {
+            padding: 8px 12px;
+            background: rgba(10, 10, 20, 0.8);
+            border: 1px solid #3a3a7a;
+            border-radius: 4px;
+            color: #e0e0e0;
+        }
+        
+        .dimension-controls input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .dimension-controls button {
+            padding: 8px 16px;
+            background: rgba(60, 60, 100, 0.8);
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .dimension-controls button:hover {
+            background: rgba(80, 80, 140, 0.8);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, #6c63ff, #3a3a7a);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #5a52e0, #2a2a5a);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(108, 99, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(60, 60, 100, 0.8);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(80, 80, 140, 0.8);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: linear-gradient(90deg, #4caf50, #2e7d32);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(90deg, #3d8b40, #1b5e20);
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(90deg, #ff9800, #f57c00);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: linear-gradient(90deg, #f57c00, #e65100);
+            transform: translateY(-2px);
+        }
+        
+        .btn-info {
+            background: linear-gradient(90deg, #2196f3, #0d47a1);
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: linear-gradient(90deg, #0d8bf2, #0a3d91);
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .canvas-wrapper {
+            width: 100%;
+            background: rgba(10, 10, 20, 0.8);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        canvas {
+            max-width: 100%;
+            border: 1px solid #3a3a7a;
+            border-radius: 4px;
+            background-color: white;
+        }
+        
+        .image-placeholder {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #8888aa;
+            border: 2px dashed #3a3a7a;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .image-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-label {
+            display: block;
+            padding: 12px 24px;
+            background: rgba(60, 60, 100, 0.8);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-input-label:hover {
+            background: rgba(80, 80, 140, 0.8);
+        }
+        
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(10, 10, 20, 0.8);
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border: 1px solid #3a3a7a;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #6c63ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .info-box {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+            background: rgba(30, 30, 60, 0.7);
+            border-left: 4px solid #6c63ff;
+        }
+        
+        .info-box h3 {
+            margin-bottom: 10px;
+            color: #a0a0ff;
+        }
+        
+        .info-box ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .info-box li {
+            margin-bottom: 5px;
+        }
+        
+        .algorithm {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #6c63ff;
+        }
+        
+        .image-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #a0a0c0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .size-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .ascii-badge {
+            background: rgba(108, 99, 255, 0.2);
+            color: #6c63ff;
+        }
+        
+        .unicode-badge {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(100, 100, 200, 0.2);
+            color: #8888aa;
+            font-size: 0.9rem;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: rgba(40, 40, 80, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .notification.success {
+            border-left: 4px solid #4caf50;
+        }
+        
+        .notification.error {
+            border-left: 4px solid #ff5252;
+        }
+        
+        .notification.info {
+            border-left: 4px solid #2196f3;
+        }
+        
+        .notification.warning {
+            border-left: 4px solid #ff9800;
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: rgba(60, 60, 100, 0.8);
+            border-radius: 13px;
+            margin-right: 10px;
+            transition: background 0.3s;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 11px;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-checkbox:checked + .toggle-switch {
+            background: #6c63ff;
+        }
+        
+        .toggle-checkbox:checked + .toggle-switch::after {
+            transform: translateX(24px);
+        }
+        
+        .toggle-checkbox {
+            display: none;
+        }
+        
+        .non-ascii-panel {
+            background: rgba(40, 20, 20, 0.8);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(200, 100, 100, 0.3);
+            display: none;
+        }
+        
+        .non-ascii-panel.show {
+            display: block;
+        }
+        
+        .non-ascii-panel h4 {
+            color: #ff9800;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .non-ascii-list {
+            max-height: 120px;
+            overflow-y: auto;
+            padding: 8px;
+            background: rgba(20, 10, 10, 0.6);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .non-ascii-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .non-ascii-item:last-child {
+            border-bottom: none;
+        }
+        
+        .non-ascii-char {
+            font-weight: bold;
+            color: #ff5252;
+        }
+        
+        .non-ascii-position {
+            color: #a0a0c0;
+            font-family: monospace;
+        }
+        
+        .non-ascii-code {
+            color: #ff9800;
+            font-family: monospace;
+        }
+        
+        .mode-toggle-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .mode-label {
+            font-size: 0.9rem;
+        }
+        
+        .mode-switch {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: rgba(60, 60, 100, 0.8);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        .mode-switch::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 8px;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        
+        .mode-checkbox:checked + .mode-switch {
+            background: #4caf50;
+        }
+        
+        .mode-checkbox:checked + .mode-switch::after {
+            transform: translateX(20px);
+        }
+        
+        .mode-checkbox {
+            display: none;
+        }
+        
+        .ignore-mode-badge {
+            background: rgba(76, 175, 80, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: #4caf50;
+        }
+        
+        .strict-mode-badge {
+            background: rgba(244, 67, 54, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: #f44336;
+        }
+        
+        .encoding-mode-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .encoding-mode-selector {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .encoding-radio-group {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .encoding-radio {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .encoding-radio input[type="radio"] {
+            margin: 0;
+        }
+        
+        .encoding-info {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #a0a0c0;
+            border-left: 3px solid #6c63ff;
+        }
+        
+        .bits-info {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .bits-info span {
+            font-family: monospace;
+            color: #6c63ff;
+            font-weight: bold;
+        }
+        
+        .unicode-info {
+            background: rgba(33, 150, 243, 0.1);
+            border-left: 3px solid #2196f3;
+        }
+        
+        .ascii-info {
+            background: rgba(108, 99, 255, 0.1);
+            border-left: 3px solid #6c63ff;
+        }
+        
+        @media (max-width: 768px) {
+            .encoding-radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .mode-toggle-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-code"></i> 图像编码/解码工具</h1>
+            <p class="subtitle">将文本编码为黑白图像，支持ASCII和Unicode两种编码模式</p>
+            <div class="stats">
+                <div class="stat-box">最大字符数: 1,372,000</div>
+                <div class="stat-box">最小尺寸: 100×142 像素</div>
+                <div class="stat-box">支持编码: ASCII / Unicode</div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <!-- 编码部分 -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-lock"></i> 编码文本到图像</h2>
+                
+                <!-- 编码模式选择 -->
+                <div class="encoding-mode-group">
+                    <div class="encoding-mode-selector">
+                        <div class="encoding-radio-group">
+                            <label class="encoding-radio">
+                                <input type="radio" name="encodingMode" id="asciiModeRadio" value="ascii" checked>
+                                <span>ASCII模式</span>
+                            </label>
+                            <label class="encoding-radio">
+                                <input type="radio" name="encodingMode" id="unicodeModeRadio" value="unicode">
+                                <span>全文模式 (Unicode)</span>
+                            </label>
+                        </div>
+                        <span id="encodingModeBadge" class="size-badge ascii-badge">ASCII 7位</span>
+                    </div>
+                    
+                    <div id="asciiModeInfo" class="encoding-info ascii-info">
+                        <i class="fas fa-info-circle"></i> ASCII模式：仅支持ASCII字符(0-127)，每个字符使用7位二进制编码
+                    </div>
+                    
+                    <div id="unicodeModeInfo" class="encoding-info unicode-info" style="display: none;">
+                        <i class="fas fa-info-circle"></i> 全文模式：支持所有Unicode字符，每个字符使用21位二进制编码（最大码点0x10FFFF）
+                    </div>
+                </div>
+                
+                <!-- ASCII处理模式切换（仅ASCII模式显示） -->
+                <div id="asciiHandlingGroup" class="mode-toggle-group">
+                    <div class="mode-toggle">
+                        <input type="radio" id="strictMode" name="asciiHandling" class="mode-checkbox" checked>
+                        <label for="strictMode" class="mode-switch"></label>
+                        <label for="strictMode" class="mode-label">严格模式</label>
+                        <span class="strict-mode-badge">发现非ASCII字符时阻止编码</span>
+                    </div>
+                    <div class="mode-toggle">
+                        <input type="radio" id="ignoreMode" name="asciiHandling" class="mode-checkbox">
+                        <label for="ignoreMode" class="mode-switch"></label>
+                        <label for="ignoreMode" class="mode-label">忽略模式</label>
+                        <span class="ignore-mode-badge">将非ASCII字符替换为NULL(0)</span>
+                    </div>
+                </div>
+                
+                <!-- 非ASCII字符显示面板（仅ASCII模式显示） -->
+                <div id="nonAsciiPanel" class="non-ascii-panel">
+                    <h4><i class="fas fa-exclamation-triangle"></i> 发现非ASCII字符:</h4>
+                    <div id="nonAsciiList" class="non-ascii-list">
+                        <!-- 非ASCII字符将在这里显示 -->
+                    </div>
+                    <div style="font-size: 0.85rem; color: #ff9800;">
+                        <i class="fas fa-info-circle"></i> 这些字符将被替换为NULL字符(ASCII 0)
+                    </div>
+                </div>
+                
+                <!-- 图像尺寸控制 -->
+                <div class="toggle-container">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="autoSizeToggle" class="toggle-checkbox" checked>
+                        <span class="toggle-switch"></span>
+                        <span>自动调整图像尺寸</span>
+                    </label>
+                    <span id="toggleStatus" class="size-badge ascii-badge">已启用</span>
+                </div>
+                
+                <div id="dimensionControls" class="dimension-controls" style="display: none;">
+                    <label>
+                        <span>图像宽度:</span>
+                        <input type="number" id="imageWidth" min="100" max="2000" value="980">
+                    </label>
+                    <label>
+                        <span>图像高度:</span>
+                        <input type="number" id="imageHeight" min="142" max="2800" value="1400">
+                    </label>
+                    <label>
+                        <span>宽高比:</span>
+                        <input type="text" id="aspectRatio" value="1:1.43" disabled>
+                    </label>
+                    <button id="calculateDimensionsBtn">
+                        <i class="fas fa-calculator"></i> 计算尺寸
+                    </button>
+                </div>
+                
+                <!-- 文本输入 -->
+                <textarea id="inputText" placeholder="请输入要编码的文本..."></textarea>
+                
+                <!-- 字符计数和位信息 -->
+                <div class="char-count" id="charCount">字符数: 0 / 1,372,000 (0像素)</div>
+                <div id="bitsInfo" class="bits-info" style="display: none;">
+                    <i class="fas fa-microchip"></i> 总位数: <span id="totalBits">0</span> 位 | 每个字符: <span id="bitsPerChar">7</span> 位
+                </div>
+                
+                <!-- 按钮组 -->
+                <div class="button-group">
+                    <button id="encodeBtn" class="btn btn-primary">
+                        <i class="fas fa-cogs"></i> 编码为图像
+                    </button>
+                    <button id="clearInputBtn" class="btn btn-secondary">
+                        <i class="fas fa-trash-alt"></i> 清空输入
+                    </button>
+                    <button id="showNonAsciiBtn" class="btn btn-warning" style="display: none;">
+                        <i class="fas fa-search"></i> 查看非ASCII字符
+                    </button>
+                </div>
+                
+                <!-- 图像输出 -->
+                <div class="image-container">
+                    <div id="imageOutput" class="canvas-wrapper">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <p>编码后的图像将在这里显示</p>
+                        </div>
+                        <canvas id="encodedCanvas" style="display:none;"></canvas>
+                    </div>
+                    
+                    <div class="image-info">
+                        <div id="imageDimensions">图像尺寸: 未生成</div>
+                        <div id="imageSize">文件大小: 未生成</div>
+                        <div id="encodingModeIndicator">编码模式: ASCII</div>
+                    </div>
+                    
+                    <button id="downloadBtn" class="btn btn-success" disabled>
+                        <i class="fas fa-download"></i> 下载图像
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 解码部分 -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-unlock"></i> 从图像解码文本</h2>
+                
+                <div class="validation-info">
+                    <i class="fas fa-info-circle"></i> 
+                    请上传之前编码生成的图像。支持ASCII和Unicode两种编码模式的图像。
+                </div>
+                
+                <!-- 解码模式选择 -->
+                <div class="encoding-mode-group" style="margin-top: 15px;">
+                    <div class="encoding-mode-selector">
+                        <div class="encoding-radio-group">
+                            <label class="encoding-radio">
+                                <input type="radio" name="decodeMode" id="decodeAsciiMode" value="ascii" checked>
+                                <span>ASCII解码</span>
+                            </label>
+                            <label class="encoding-radio">
+                                <input type="radio" name="decodeMode" id="decodeUnicodeMode" value="unicode">
+                                <span>Unicode解码</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="encoding-info">
+                        <i class="fas fa-lightbulb"></i> 提示：如果解码结果异常，请尝试切换解码模式
+                    </div>
+                </div>
+                
+                <div class="file-input-wrapper">
+                    <div class="file-input-label">
+                        <i class="fas fa-upload"></i> 选择图像文件（PNG格式）
+                    </div>
+                    <input type="file" id="imageInput" accept="image/png">
+                </div>
+                
+                <div class="button-group">
+                    <button id="decodeBtn" class="btn btn-primary" disabled>
+                        <i class="fas fa-search"></i> 解码图像
+                    </button>
+                    <button id="clearOutputBtn" class="btn btn-secondary">
+                        <i class="fas fa-trash-alt"></i> 清空输出
+                    </button>
+                </div>
+                
+                <div class="result-container">
+                    <h3 style="margin: 20px 0 10px;">解码结果:</h3>
+                    <div id="decodedText" class="result-box">
+                        解码后的文本将在这里显示
+                    </div>
+                    
+                    <div class="button-group" style="margin-top: 15px;">
+                        <button id="copyTextBtn" class="btn btn-secondary" disabled>
+                            <i class="fas fa-copy"></i> 复制文本
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 算法说明 -->
+            <div class="card info-box">
+                <h3><i class="fas fa-calculator"></i> 编码模式说明</h3>
+                <ul>
+                    <li><strong>ASCII模式</strong>：
+                        <ul>
+                            <li>仅支持ASCII字符(0-127)</li>
+                            <li>每个字符使用7位二进制编码</li>
+                            <li>提供严格模式和忽略模式处理非ASCII字符</li>
+                        </ul>
+                    </li>
+                    <li><strong>全文模式 (Unicode)</strong>：
+                        <ul>
+                            <li>支持所有Unicode字符（包括中文、日文、表情符号等）</li>
+                            <li>每个字符使用21位二进制编码（支持最大码点0x10FFFF）</li>
+                            <li>自动处理所有字符，无需特殊设置</li>
+                        </ul>
+                    </li>
+                    <li><strong>图像尺寸计算</strong>：
+                        <ul>
+                            <li>ASCII模式：总像素 = 字符数 × 7</li>
+                            <li>Unicode模式：总像素 = 字符数 × 21</li>
+                            <li>根据总像素自动计算接近A4比例(1:1.414)的图像尺寸</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>示例: 10个中文字符在Unicode模式下需要 10×21=210像素 → 图像尺寸约为 12×17 像素</p>
+            </div>
+        </div>
+        
+        <!-- 加载指示器 -->
+        <div id="loadingIndicator" class="loading">
+            <div class="spinner"></div>
+            <p>正在处理中，请稍候...</p>
+        </div>
+        
+        <footer>
+            <p>图像编码/解码工具 | 支持ASCII和Unicode编码 | 尺寸根据字符数动态调整</p>
+            <p>© 2023 编码工具 | 最多处理 1,372,000 个字符</p>
+        </footer>
+    </div>
+    
+    <!-- 通知 -->
+    <div id="notification" class="notification">
+        <i id="notificationIcon" class="fas fa-info-circle"></i>
+        <span id="notificationMessage">这是一条通知</span>
+    </div>
+
+    <script>
+        // ============== DOM元素 ==============
+        const inputText = document.getElementById('inputText');
+        const charCount = document.getElementById('charCount');
+        const encodeBtn = document.getElementById('encodeBtn');
+        const clearInputBtn = document.getElementById('clearInputBtn');
+        const encodedCanvas = document.getElementById('encodedCanvas');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const imageInput = document.getElementById('imageInput');
+        const decodeBtn = document.getElementById('decodeBtn');
+        const clearOutputBtn = document.getElementById('clearOutputBtn');
+        const decodedText = document.getElementById('decodedText');
+        const copyTextBtn = document.getElementById('copyTextBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const notification = document.getElementById('notification');
+        const notificationIcon = document.getElementById('notificationIcon');
+        const notificationMessage = document.getElementById('notificationMessage');
+        const autoSizeToggle = document.getElementById('autoSizeToggle');
+        const dimensionControls = document.getElementById('dimensionControls');
+        const imageWidthInput = document.getElementById('imageWidth');
+        const imageHeightInput = document.getElementById('imageHeight');
+        const aspectRatioInput = document.getElementById('aspectRatio');
+        const calculateDimensionsBtn = document.getElementById('calculateDimensionsBtn');
+        const toggleStatus = document.getElementById('toggleStatus');
+        const imageDimensions = document.getElementById('imageDimensions');
+        const imageSize = document.getElementById('imageSize');
+        const encodingModeIndicator = document.getElementById('encodingModeIndicator');
+        
+        // 编码模式相关元素
+        const asciiModeRadio = document.getElementById('asciiModeRadio');
+        const unicodeModeRadio = document.getElementById('unicodeModeRadio');
+        const encodingModeBadge = document.getElementById('encodingModeBadge');
+        const asciiModeInfo = document.getElementById('asciiModeInfo');
+        const unicodeModeInfo = document.getElementById('unicodeModeInfo');
+        
+        // ASCII处理相关元素
+        const asciiHandlingGroup = document.getElementById('asciiHandlingGroup');
+        const strictModeRadio = document.getElementById('strictMode');
+        const ignoreModeRadio = document.getElementById('ignoreMode');
+        const nonAsciiPanel = document.getElementById('nonAsciiPanel');
+        const nonAsciiList = document.getElementById('nonAsciiList');
+        const showNonAsciiBtn = document.getElementById('showNonAsciiBtn');
+        
+        // 解码模式相关元素
+        const decodeAsciiMode = document.getElementById('decodeAsciiMode');
+        const decodeUnicodeMode = document.getElementById('decodeUnicodeMode');
+        
+        // 位信息相关元素
+        const bitsInfo = document.getElementById('bitsInfo');
+        const totalBits = document.getElementById('totalBits');
+        const bitsPerChar = document.getElementById('bitsPerChar');
+        
+        // ============== 常量定义 ==============
+        const MAX_CHARS = 1372000; // 最大字符数（基于7位编码计算）
+        const MIN_WIDTH = 100;
+        const MIN_HEIGHT = 142;
+        const MAX_WIDTH = 2000;
+        const MAX_HEIGHT = 2828;
+        const ASPECT_RATIO = 1.414; // A4比例
+        
+        // 编码配置
+        const ENCODING_CONFIG = {
+            ascii: {
+                bitsPerChar: 7,
+                maxCodePoint: 127,
+                description: "ASCII 7位",
+                badgeClass: "ascii-badge",
+                badgeText: "ASCII 7位",
+                infoClass: "ascii-info"
+            },
+            unicode: {
+                bitsPerChar: 21,
+                maxCodePoint: 0x10FFFF, // Unicode最大码点
+                description: "Unicode 21位",
+                badgeClass: "unicode-badge",
+                badgeText: "Unicode 21位",
+                infoClass: "unicode-info"
+            }
+        };
+        
+        // ============== 状态变量 ==============
+        let currentWidth = 980;
+        let currentHeight = 1400;
+        let autoSizeEnabled = true;
+        let encodingMode = 'ascii'; // 'ascii' 或 'unicode'
+        let asciiHandlingMode = 'strict'; // 'strict' 或 'ignore'
+        let decodeMode = 'ascii'; // 解码模式
+        let nonAsciiChars = [];
+        
+        // ============== 初始化 ==============
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+        });
+        
+        function initializePage() {
+            setupEventListeners();
+            updateCharCount();
+            updateAspectRatio();
+            updateEncodingModeUI();
+            updateBitsInfo();
+            
+            // 显示欢迎信息
+            setTimeout(() => {
+                showNotification('欢迎使用图像编码/解码工具！支持ASCII和Unicode两种编码模式。', 'info');
+            }, 1000);
+        }
+        
+        // ============== 事件监听器设置 ==============
+        function setupEventListeners() {
+            // 输入文本变化
+            inputText.addEventListener('input', updateCharCount);
+            
+            // 编码模式切换
+            asciiModeRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    encodingMode = 'ascii';
+                    updateEncodingModeUI();
+                    updateCharCount();
+                    showNotification('已切换到ASCII模式（7位/字符）', 'info');
+                }
+            });
+            
+            unicodeModeRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    encodingMode = 'unicode';
+                    updateEncodingModeUI();
+                    updateCharCount();
+                    showNotification('已切换到全文模式（Unicode，21位/字符）', 'info');
+                }
+            });
+            
+            // ASCII处理模式切换
+            strictModeRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    asciiHandlingMode = 'strict';
+                    updateCharCount();
+                    showNotification('已切换到严格模式：发现非ASCII字符时将阻止编码', 'info');
+                }
+            });
+            
+            ignoreModeRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    asciiHandlingMode = 'ignore';
+                    updateCharCount();
+                    showNotification('已切换到忽略模式：非ASCII字符将被替换为NULL', 'warning');
+                }
+            });
+            
+            // 解码模式切换
+            decodeAsciiMode.addEventListener('change', function() {
+                if (this.checked) {
+                    decodeMode = 'ascii';
+                    showNotification('解码模式：ASCII（7位/字符）', 'info');
+                }
+            });
+            
+            decodeUnicodeMode.addEventListener('change', function() {
+                if (this.checked) {
+                    decodeMode = 'unicode';
+                    showNotification('解码模式：Unicode（21位/字符）', 'info');
+                }
+            });
+            
+            // 查看非ASCII字符按钮
+            showNonAsciiBtn.addEventListener('click', function() {
+                if (nonAsciiChars.length > 0) {
+                    showNonAsciiDetails();
+                }
+            });
+            
+            // 自动尺寸切换
+            autoSizeToggle.addEventListener('change', function() {
+                autoSizeEnabled = this.checked;
+                dimensionControls.style.display = autoSizeEnabled ? 'none' : 'flex';
+                toggleStatus.textContent = autoSizeEnabled ? '已启用' : '已禁用';
+                
+                if (!autoSizeEnabled) {
+                    updateCharCount();
+                }
+            });
+            
+            // 手动尺寸输入
+            imageWidthInput.addEventListener('input', function() {
+                if (!autoSizeEnabled) {
+                    const width = parseInt(this.value) || MIN_WIDTH;
+                    const height = Math.round(width * ASPECT_RATIO);
+                    imageHeightInput.value = height;
+                    updateAspectRatio();
+                }
+            });
+            
+            imageHeightInput.addEventListener('input', function() {
+                if (!autoSizeEnabled) {
+                    const height = parseInt(this.value) || MIN_HEIGHT;
+                    const width = Math.round(height / ASPECT_RATIO);
+                    imageWidthInput.value = width;
+                    updateAspectRatio();
+                }
+            });
+            
+            // 计算尺寸按钮
+            calculateDimensionsBtn.addEventListener('click', function() {
+                if (!autoSizeEnabled) {
+                    const width = parseInt(imageWidthInput.value) || MIN_WIDTH;
+                    const height = parseInt(imageHeightInput.value) || MIN_HEIGHT;
+                    currentWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
+                    currentHeight = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, height));
+                    imageWidthInput.value = currentWidth;
+                    imageHeightInput.value = currentHeight;
+                    updateAspectRatio();
+                    showNotification(`图像尺寸已设置为 ${currentWidth}×${currentHeight} 像素`, 'info');
+                }
+            });
+            
+            // 编码按钮
+            encodeBtn.addEventListener('click', encodeTextToImage);
+            
+            // 清空输入按钮
+            clearInputBtn.addEventListener('click', () => {
+                inputText.value = '';
+                updateCharCount();
+                hideCanvas();
+                downloadBtn.disabled = true;
+                showNotification('输入已清空', 'info');
+            });
+            
+            // 下载按钮
+            downloadBtn.addEventListener('click', downloadImage);
+            
+            // 图像文件选择
+            imageInput.addEventListener('change', function() {
+                decodeBtn.disabled = !this.files.length;
+            });
+            
+            // 解码按钮
+            decodeBtn.addEventListener('click', decodeImageToText);
+            
+            // 清空输出按钮
+            clearOutputBtn.addEventListener('click', () => {
+                decodedText.textContent = '解码后的文本将在这里显示';
+                copyTextBtn.disabled = true;
+                imageInput.value = '';
+                decodeBtn.disabled = true;
+                showNotification('输出已清空', 'info');
+            });
+            
+            // 复制文本按钮
+            copyTextBtn.addEventListener('click', copyDecodedText);
+            
+            // 设置键盘快捷键
+            setupKeyboardShortcuts();
+        }
+        
+        // ============== 编码模式UI更新 ==============
+        function updateEncodingModeUI() {
+            const config = ENCODING_CONFIG[encodingMode];
+            
+            // 更新徽章
+            encodingModeBadge.textContent = config.badgeText;
+            encodingModeBadge.className = `size-badge ${config.badgeClass}`;
+            
+            // 更新信息显示
+            asciiModeInfo.style.display = encodingMode === 'ascii' ? 'block' : 'none';
+            unicodeModeInfo.style.display = encodingMode === 'unicode' ? 'block' : 'none';
+            
+            // 更新ASCII处理组显示
+            asciiHandlingGroup.style.display = encodingMode === 'ascii' ? 'flex' : 'none';
+            nonAsciiPanel.style.display = 'none';
+            showNonAsciiBtn.style.display = 'none';
+            
+            // 更新编码模式指示器
+            encodingModeIndicator.textContent = `编码模式: ${encodingMode === 'ascii' ? 'ASCII' : 'Unicode'}`;
+            
+            // 更新每个字符位数
+            bitsPerChar.textContent = config.bitsPerChar;
+        }
+        
+        // ============== 字符计数更新 ==============
+        function updateCharCount() {
+            const text = inputText.value;
+            const count = text.length;
+            const config = ENCODING_CONFIG[encodingMode];
+            const pixelsNeeded = count * config.bitsPerChar;
+            
+            // 显示字符计数
+            if (autoSizeEnabled && count > 0) {
+                calculateAutoDimensions(pixelsNeeded);
+                charCount.textContent = `字符数: ${count.toLocaleString()} / ${MAX_CHARS.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
+                charCount.textContent += ` | 图像尺寸: ${currentWidth}×${currentHeight}`;
+            } else {
+                charCount.textContent = `字符数: ${count.toLocaleString()} / ${MAX_CHARS.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
+            }
+            
+            // ASCII模式：检查非ASCII字符
+            if (encodingMode === 'ascii') {
+                nonAsciiChars = findNonAsciiChars(text);
+                
+                if (nonAsciiChars.length > 0) {
+                    if (asciiHandlingMode === 'strict') {
+                        charCount.classList.add('error');
+                        encodeBtn.disabled = true;
+                        charCount.textContent += ` (发现${nonAsciiChars.length}个非ASCII字符)`;
+                        showNonAsciiBtn.style.display = 'flex';
+                    } else {
+                        charCount.classList.add('warning');
+                        encodeBtn.disabled = false;
+                        charCount.textContent += ` (${nonAsciiChars.length}个非ASCII字符将被替换)`;
+                        showNonAsciiBtn.style.display = 'flex';
+                    }
+                } else {
+                    charCount.classList.remove('error', 'warning');
+                    encodeBtn.disabled = false;
+                    showNonAsciiBtn.style.display = 'none';
+                    nonAsciiPanel.classList.remove('show');
+                }
+            } else {
+                // Unicode模式：不检查非ASCII字符
+                charCount.classList.remove('error', 'warning');
+                encodeBtn.disabled = false;
+                showNonAsciiBtn.style.display = 'none';
+                nonAsciiPanel.classList.remove('show');
+            }
+            
+            // 检查是否超过字符限制
+            if (count > MAX_CHARS) {
+                charCount.classList.add('error');
+                encodeBtn.disabled = true;
+                charCount.textContent += ' (超过最大限制!)';
+            }
+            
+            // 如果手动设置尺寸，检查像素容量
+            if (!autoSizeEnabled && count > 0) {
+                const maxCharsForSize = Math.floor((currentWidth * currentHeight) / config.bitsPerChar);
+                if (count > maxCharsForSize) {
+                    charCount.classList.add('warning');
+                    charCount.textContent += ` (警告: 当前尺寸最多容纳 ${maxCharsForSize.toLocaleString()} 字符)`;
+                }
+            }
+            
+            // 更新位信息
+            updateBitsInfo();
+        }
+        
+        // ============== 位信息更新 ==============
+        function updateBitsInfo() {
+            const text = inputText.value;
+            const config = ENCODING_CONFIG[encodingMode];
+            const total = text.length * config.bitsPerChar;
+            
+            totalBits.textContent = total.toLocaleString();
+            bitsPerChar.textContent = config.bitsPerChar;
+            
+            // 显示位信息
+            bitsInfo.style.display = text.length > 0 ? 'block' : 'none';
+        }
+        
+        // ============== 显示非ASCII字符详情 ==============
+        function showNonAsciiDetails() {
+            nonAsciiList.innerHTML = '';
+            
+            // 只显示前20个，避免列表过长
+            const displayCount = Math.min(nonAsciiChars.length, 20);
+            
+            for (let i = 0; i < displayCount; i++) {
+                const item = nonAsciiChars[i];
+                const nonAsciiItem = document.createElement('div');
+                nonAsciiItem.className = 'non-ascii-item';
+                
+                nonAsciiItem.innerHTML = `
+                    <span>位置 <span class="non-ascii-position">${item.position + 1}</span>:</span>
+                    <span>字符 "<span class="non-ascii-char">${escapeHtml(item.char)}</span>"</span>
+                    <span>编码: <span class="non-ascii-code">${item.code}</span> (ASCII范围: 0-127)</span>
+                `;
+                
+                nonAsciiList.appendChild(nonAsciiItem);
+            }
+            
+            // 如果超过20个，显示更多信息
+            if (nonAsciiChars.length > 20) {
+                const moreInfo = document.createElement('div');
+                moreInfo.className = 'non-ascii-item';
+                moreInfo.style.fontStyle = 'italic';
+                moreInfo.textContent = `... 还有 ${nonAsciiChars.length - 20} 个非ASCII字符未显示`;
+                nonAsciiList.appendChild(moreInfo);
+            }
+            
+            // 显示面板
+            nonAsciiPanel.classList.add('show');
+        }
+        
+        // ============== 计算自动尺寸 ==============
+        function calculateAutoDimensions(pixelsNeeded) {
+            if (pixelsNeeded <= 0) {
+                currentWidth = MIN_WIDTH;
+                currentHeight = MIN_HEIGHT;
+                return;
+            }
+            
+            // 根据A4比例计算宽度：width = sqrt(pixels / aspectRatio)
+            let width = Math.sqrt(pixelsNeeded / ASPECT_RATIO);
+            
+            // 确保在最小和最大范围内
+            width = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
+            
+            // 计算高度，保持A4比例
+            let height = Math.round(width * ASPECT_RATIO);
+            
+            // 调整高度确保能容纳所有像素
+            const totalPixels = width * height;
+            if (totalPixels < pixelsNeeded) {
+                height = Math.ceil(pixelsNeeded / width);
+            }
+            
+            // 确保高度也在范围内
+            height = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, height));
+            
+            // 再次检查宽度是否需要调整
+            if (width * height < pixelsNeeded) {
+                width = Math.ceil(pixelsNeeded / height);
+                width = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
+            }
+            
+            currentWidth = Math.floor(width);
+            currentHeight = Math.floor(height);
+        }
+        
+        // ============== 更新宽高比显示 ==============
+        function updateAspectRatio() {
+            const width = parseInt(imageWidthInput.value) || MIN_WIDTH;
+            const height = parseInt(imageHeightInput.value) || MIN_HEIGHT;
+            const ratio = (height / width).toFixed(3);
+            aspectRatioInput.value = `1:${ratio}`;
+        }
+        
+        // ============== 查找非ASCII字符 ==============
+        function findNonAsciiChars(text) {
+            const nonAscii = [];
+            for (let i = 0; i < text.length; i++) {
+                const charCode = text.charCodeAt(i);
+                if (charCode > 127) {
+                    nonAscii.push({
+                        char: text[i],
+                        position: i,
+                        code: charCode
+                    });
+                }
+            }
+            return nonAscii;
+        }
+        
+        // ============== HTML转义函数 ==============
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ============== 编码文本为图像 ==============
+        function encodeTextToImage() {
+            const text = inputText.value;
+            
+            // 验证输入
+            if (text.length === 0) {
+                showNotification('请输入要编码的文本', 'error');
+                return;
+            }
+            
+            if (text.length > MAX_CHARS) {
+                showNotification(`文本过长，最多支持${MAX_CHARS.toLocaleString()}个字符`, 'error');
+                return;
+            }
+            
+            // ASCII模式：检查非ASCII字符
+            if (encodingMode === 'ascii') {
+                nonAsciiChars = findNonAsciiChars(text);
+                
+                if (asciiHandlingMode === 'strict' && nonAsciiChars.length > 0) {
+                    showNonAsciiDetails();
+                    showNotification(`发现${nonAsciiChars.length}个非ASCII字符，请切换到"忽略模式"或修改文本`, 'error');
+                    return;
+                }
+            }
+            
+            // 显示加载指示器
+            showLoading(true);
+            
+            // 使用setTimeout避免阻塞UI
+            setTimeout(() => {
+                try {
+                    // 计算图像尺寸
+                    const config = ENCODING_CONFIG[encodingMode];
+                    const pixelsNeeded = text.length * config.bitsPerChar;
+                    
+                    if (autoSizeEnabled) {
+                        calculateAutoDimensions(pixelsNeeded);
+                    } else {
+                        currentWidth = parseInt(imageWidthInput.value) || MIN_WIDTH;
+                        currentHeight = parseInt(imageHeightInput.value) || MIN_HEIGHT;
+                    }
+                    
+                    // 设置画布尺寸
+                    encodedCanvas.width = currentWidth;
+                    encodedCanvas.height = currentHeight;
+                    
+                    // 将文本转换为二进制字符串
+                    const binaryString = textToBinary(text);
+                    
+                    // 创建图像
+                    createBinaryImage(binaryString);
+                    
+                    // 显示图像
+                    displayEncodedImage();
+                    
+                    // 更新图像信息
+                    updateImageInfo();
+                    
+                    // 启用下载按钮
+                    downloadBtn.disabled = false;
+                    
+                    // 显示编码成功信息
+                    let successMessage = `编码成功！将${text.length.toLocaleString()}个字符编码为${binaryString.length.toLocaleString()}位二进制数据，图像尺寸 ${currentWidth}×${currentHeight}`;
+                    
+                    if (encodingMode === 'ascii' && nonAsciiChars.length > 0 && asciiHandlingMode === 'ignore') {
+                        successMessage += ` (${nonAsciiChars.length}个非ASCII字符已被替换为NULL)`;
+                    }
+                    
+                    showNotification(successMessage, 'success');
+                } catch (error) {
+                    console.error('编码错误:', error);
+                    showNotification('编码过程中发生错误: ' + error.message, 'error');
+                } finally {
+                    showLoading(false);
+                }
+            }, 100);
+        }
+        
+        // ============== 将文本转换为二进制字符串 ==============
+        function textToBinary(text) {
+            let binaryString = '';
+            const config = ENCODING_CONFIG[encodingMode];
+            
+            // 将每个字符转换为二进制
+            for (let i = 0; i < text.length; i++) {
+                const charCode = text.codePointAt(i);
+                
+                // 处理代理对（UTF-16代理对）
+                if (charCode >= 0xD800 && charCode <= 0xDFFF) {
+                    // 跳过代理对的低代理项
+                    continue;
+                }
+                
+                // ASCII模式处理
+                if (encodingMode === 'ascii') {
+                    if (charCode > 127) {
+                        if (asciiHandlingMode === 'ignore') {
+                            // 忽略模式：将非ASCII字符替换为NULL(0)
+                            const binary = '0'.padStart(config.bitsPerChar, '0');
+                            binaryString += binary;
+                        } else {
+                            // 严格模式：应该在上一步已经被阻止
+                            throw new Error(`字符 "${text[i]}" (位置 ${i}) 不是有效的ASCII字符`);
+                        }
+                    } else {
+                        // 正常ASCII字符
+                        const binary = charCode.toString(2).padStart(config.bitsPerChar, '0');
+                        binaryString += binary;
+                    }
+                } else {
+                    // Unicode模式：使用21位编码
+                    // 确保码点在有效范围内
+                    if (charCode > config.maxCodePoint) {
+                        throw new Error(`字符码点 ${charCode} 超出Unicode范围 (最大: ${config.maxCodePoint})`);
+                    }
+                    
+                    const binary = charCode.toString(2).padStart(config.bitsPerChar, '0');
+                    binaryString += binary;
+                }
+            }
+            
+            // 计算总像素数
+            const totalPixels = currentWidth * currentHeight;
+            
+            // 填充或截断二进制字符串
+            if (binaryString.length < totalPixels) {
+                binaryString = binaryString.padEnd(totalPixels, '0');
+            } else if (binaryString.length > totalPixels) {
+                binaryString = binaryString.substring(0, totalPixels);
+            }
+            
+            return binaryString;
+        }
+        
+        // ============== 创建二进制图像 ==============
+        function createBinaryImage(binaryString) {
+            const ctx = encodedCanvas.getContext('2d');
+            const imageData = ctx.createImageData(currentWidth, currentHeight);
+            const data = imageData.data;
+            
+            // 用白色填充整个画布
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = 255;     // R
+                data[i+1] = 255;   // G
+                data[i+2] = 255;   // B
+                data[i+3] = 255;   // A
+            }
+            
+            // 根据二进制字符串设置像素颜色
+            for (let i = 0; i < binaryString.length && i < currentWidth * currentHeight; i++) {
+                const bit = binaryString[i];
+                const pixelIndex = i * 4;
+                
+                if (bit === '1') {
+                    data[pixelIndex] = 0;     // R
+                    data[pixelIndex+1] = 0;   // G
+                    data[pixelIndex+2] = 0;   // B
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+        
+        // ============== 显示编码后的图像 ==============
+        function displayEncodedImage() {
+            const imageOutput = document.getElementById('imageOutput');
+            const placeholder = imageOutput.querySelector('.image-placeholder');
+            const canvas = document.getElementById('encodedCanvas');
+            
+            // 隐藏占位符，显示画布
+            placeholder.style.display = 'none';
+            canvas.style.display = 'block';
+            
+            // 创建图像预览
+            const previewCanvas = document.createElement('canvas');
+            const previewCtx = previewCanvas.getContext('2d');
+            
+            // 设置预览尺寸
+            const maxWidth = imageOutput.clientWidth - 30;
+            const scale = Math.min(maxWidth / currentWidth, 1);
+            const previewWidth = currentWidth * scale;
+            const previewHeight = currentHeight * scale;
+            
+            previewCanvas.width = previewWidth;
+            previewCanvas.height = previewHeight;
+            
+            // 绘制缩放后的图像
+            previewCtx.drawImage(encodedCanvas, 0, 0, currentWidth, currentHeight, 
+                                0, 0, previewWidth, previewHeight);
+            
+            // 替换原来的canvas
+            imageOutput.appendChild(previewCanvas);
+            canvas.style.display = 'none';
+            
+            // 移除旧的预览canvas
+            const existingPreview = imageOutput.querySelector('canvas:not(#encodedCanvas)');
+            if (existingPreview && existingPreview !== previewCanvas) {
+                existingPreview.remove();
+            }
+        }
+        
+        // ============== 更新图像信息 ==============
+        function updateImageInfo() {
+            imageDimensions.textContent = `图像尺寸: ${currentWidth}×${currentHeight} 像素`;
+            
+            // 估计文件大小
+            const estimatedSizeKB = Math.round((currentWidth * currentHeight * 0.1) / 1024);
+            imageSize.textContent = `文件大小: ~${estimatedSizeKB} KB`;
+            
+            // 更新编码模式指示器
+            encodingModeIndicator.textContent = `编码模式: ${encodingMode === 'ascii' ? 'ASCII' : 'Unicode'}`;
+        }
+        
+        // ============== 隐藏画布 ==============
+        function hideCanvas() {
+            const imageOutput = document.getElementById('imageOutput');
+            const placeholder = imageOutput.querySelector('.image-placeholder');
+            const canvas = document.getElementById('encodedCanvas');
+            const previewCanvas = imageOutput.querySelector('canvas:not(#encodedCanvas)');
+            
+            placeholder.style.display = 'flex';
+            canvas.style.display = 'none';
+            
+            if (previewCanvas) {
+                previewCanvas.remove();
+            }
+            
+            // 重置图像信息
+            imageDimensions.textContent = '图像尺寸: 未生成';
+            imageSize.textContent = '文件大小: 未生成';
+        }
+        
+        // ============== 下载图像 ==============
+        function downloadImage() {
+            const link = document.createElement('a');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            
+            // 在文件名中添加编码模式信息
+            const modeSuffix = encodingMode === 'ascii' ? 
+                (asciiHandlingMode === 'strict' ? 'ascii-strict' : 'ascii-ignore') : 
+                'unicode';
+            
+            link.download = `encoded-${modeSuffix}-${currentWidth}x${currentHeight}-${timestamp}.png`;
+            link.href = encodedCanvas.toDataURL('image/png');
+            link.click();
+            showNotification('图像下载成功！', 'success');
+        }
+        
+        // ============== 解码图像为文本 ==============
+        function decodeImageToText() {
+            const file = imageInput.files[0];
+            if (!file) {
+                showNotification('请先选择图像文件', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    try {
+                        // 创建临时canvas
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = img.width;
+                        tempCanvas.height = img.height;
+                        const tempCtx = tempCanvas.getContext('2d');
+                        
+                        // 绘制图像
+                        tempCtx.drawImage(img, 0, 0);
+                        
+                        // 获取像素数据
+                        const imageData = tempCtx.getImageData(0, 0, img.width, img.height);
+                        const data = imageData.data;
+                        
+                        // 提取二进制字符串
+                        const binaryString = extractBinaryFromImage(data, img.width, img.height);
+                        
+                        // 将二进制字符串转换为文本
+                        const text = binaryToText(binaryString);
+                        
+                        // 显示解码结果
+                        decodedText.textContent = text;
+                        copyTextBtn.disabled = false;
+                        
+                        // 检查解码结果
+                        const nullCharCount = (text.match(/\x00/g) || []).length;
+                        let successMessage = `解码成功！从 ${img.width}×${img.height} 图像中解码出 ${text.length} 个字符`;
+                        
+                        if (nullCharCount > 0) {
+                            successMessage += ` (包含${nullCharCount}个NULL字符)`;
+                        }
+                        
+                        showNotification(successMessage, 'success');
+                    } catch (error) {
+                        console.error('解码错误:', error);
+                        showNotification('解码过程中发生错误: ' + error.message, 'error');
+                    } finally {
+                        showLoading(false);
+                    }
+                };
+                
+                img.onerror = function() {
+                    showNotification('无法加载图像文件', 'error');
+                    showLoading(false);
+                };
+                
+                img.src = e.target.result;
+            };
+            
+            reader.onerror = function() {
+                showNotification('无法读取文件', 'error');
+                showLoading(false);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        // ============== 从图像数据提取二进制字符串 ==============
+        function extractBinaryFromImage(data, width, height) {
+            let binaryString = '';
+            const totalPixels = width * height;
+            
+            for (let i = 0; i < totalPixels && i * 4 < data.length; i++) {
+                const pixelIndex = i * 4;
+                const r = data[pixelIndex];
+                const g = data[pixelIndex + 1];
+                const b = data[pixelIndex + 2];
+                
+                // 阈值判断
+                const isBlack = (r < 128 && g < 128 && b < 128);
+                binaryString += isBlack ? '1' : '0';
+            }
+            
+            return binaryString;
+        }
+        
+        // ============== 将二进制字符串转换为文本 ==============
+        function binaryToText(binaryString) {
+            let text = '';
+            const config = ENCODING_CONFIG[decodeMode];
+            const bitsPerChar = config.bitsPerChar;
+            
+            // 每bitsPerChar位一组转换为字符
+            for (let i = 0; i < binaryString.length; i += bitsPerChar) {
+                if (i + bitsPerChar > binaryString.length) break;
+                
+                const binaryChunk = binaryString.substring(i, i + bitsPerChar);
+                const charCode = parseInt(binaryChunk, 2);
+                
+                // 根据解码模式创建字符
+                if (decodeMode === 'unicode') {
+                    // Unicode模式：使用fromCodePoint处理所有码点
+                    if (charCode <= 0x10FFFF) {
+                        text += String.fromCodePoint(charCode);
+                    } else {
+                        // 无效码点，添加替换字符
+                        text += '�';
+                    }
+                } else {
+                    // ASCII模式：使用fromCharCode
+                    text += String.fromCharCode(charCode);
+                }
+            }
+            
+            // 移除末尾的NULL字符
+            while (text.length > 0 && text.charCodeAt(text.length - 1) === 0) {
+                text = text.substring(0, text.length - 1);
+            }
+            
+            return text;
+        }
+        
+        // ============== 复制解码文本 ==============
+        function copyDecodedText() {
+            const text = decodedText.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('文本已复制到剪贴板', 'success');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                
+                // 降级方案
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    showNotification('文本已复制到剪贴板', 'success');
+                } catch (err) {
+                    console.error('降级复制也失败:', err);
+                    showNotification('复制失败，请手动复制文本', 'error');
+                }
+                
+                document.body.removeChild(textArea);
+            });
+        }
+        
+        // ============== 显示/隐藏加载指示器 ==============
+        function showLoading(show) {
+            if (show) {
+                loadingIndicator.classList.add('active');
+                encodeBtn.disabled = true;
+                decodeBtn.disabled = true;
+            } else {
+                loadingIndicator.classList.remove('active');
+                encodeBtn.disabled = false;
+                decodeBtn.disabled = imageInput.files.length === 0;
+            }
+        }
+        
+        // ============== 显示通知 ==============
+        function showNotification(message, type = 'info') {
+            notificationMessage.textContent = message;
+            notification.className = 'notification';
+            notification.classList.add(type);
+            
+            let iconClass = 'fas fa-info-circle';
+            if (type === 'success') iconClass = 'fas fa-check-circle';
+            else if (type === 'error') iconClass = 'fas fa-exclamation-circle';
+            else if (type === 'warning') iconClass = 'fas fa-exclamation-triangle';
+            
+            notificationIcon.className = iconClass;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // ============== 键盘快捷键 ==============
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+Enter 编码
+                if (e.ctrlKey && e.key === 'Enter') {
+                    if (!encodeBtn.disabled) {
+                        encodeTextToImage();
+                        e.preventDefault();
+                    }
+                }
+                
+                // Ctrl+D 解码
+                if (e.ctrlKey && e.key === 'd') {
+                    if (!decodeBtn.disabled) {
+                        decodeImageToText();
+                        e.preventDefault();
+                    }
+                }
+                
+                // Ctrl+A 切换到ASCII模式
+                if (e.ctrlKey && e.key === 'a') {
+                    asciiModeRadio.click();
+                    e.preventDefault();
+                }
+                
+                // Ctrl+U 切换到Unicode模式
+                if (e.ctrlKey && e.key === 'u') {
+                    unicodeModeRadio.click();
+                    e.preventDefault();
+                }
+            });
+        }
+        
+        // ============== 示例文本 ==============
+        window.addEventListener('load', function() {
+            // 添加示例文本按钮
+            const exampleBtn = document.createElement('button');
+            exampleBtn.className = 'btn btn-info';
+            exampleBtn.innerHTML = '<i class="fas fa-magic"></i> 加载示例文本';
+            exampleBtn.style.marginTop = '10px';
+            exampleBtn.onclick = loadExampleText;
+            
+            const buttonGroup = document.querySelector('.button-group');
+            if (buttonGroup) {
+                buttonGroup.appendChild(exampleBtn);
+            }
+        });
+        
+        function loadExampleText() {
+            const exampleText = `图像编码/解码工具 - 示例文本
+
+支持两种编码模式：
+
+1. ASCII模式：
+   - 仅支持ASCII字符(0-127)
+   - 每个字符7位二进制
+   - 可切换严格/忽略模式处理非ASCII字符
+
+2. 全文模式 (Unicode)：
+   - 支持所有字符：中文、日文、表情符号等
+   - 每个字符21位二进制
+   - 自动处理，无需特殊设置
+
+示例字符测试：
+ASCII: Hello World! 123
+中文: 你好，世界！🌍
+混合: ASCII + 中文 + 😊 Emoji
+
+计算示例：
+10个ASCII字符 = 10×7 = 70像素
+10个中文字符 = 10×21 = 210像素
+
+请尝试切换不同编码模式查看效果！`;
+            
+            inputText.value = exampleText;
+            updateCharCount();
+            showNotification('示例文本已加载！尝试切换ASCII/Unicode模式查看差异。', 'info');
+        }
+        
+        // ============== 导出工具函数（用于调试） ==============
+        window.ImageEncoderTools = {
+            encodeTextToImage,
+            decodeImageToText,
+            findNonAsciiChars,
+            calculateAutoDimensions,
+            textToBinary,
+            binaryToText,
+            getCurrentSettings: function() {
+                return {
+                    encodingMode,
+                    asciiHandlingMode,
+                    decodeMode,
+                    autoSizeEnabled,
+                    currentWidth,
+                    currentHeight,
+                    maxChars: MAX_CHARS,
+                    nonAsciiChars,
+                    encodingConfig: ENCODING_CONFIG
+                };
+            },
+            version: '3.0.0',
+            author: '图像编码工具',
+            buildDate: new Date().toISOString().split('T')[0]
+        };
+        
+        // ============== 控制台欢迎信息 ==============
+        console.log('%c🔐 图像编码/解码工具 v3.0.0 %c已加载完成！', 
+            'color: #6c63ff; font-size: 16px; font-weight: bold;', 
+            'color: #4caf50; font-size: 14px;');
+        console.log('%c📋 功能特性:', 'color: #2196f3; font-weight: bold;');
+        console.log('- 支持ASCII模式（7位/字符）和全文模式（Unicode，21位/字符）');
+        console.log('- 自动调整图像尺寸，接近A4比例');
+        console.log('- 严格/忽略两种ASCII字符处理模式');
+        console.log('- 支持所有Unicode字符（包括中文、表情符号等）');
+        console.log('%c⌨️ 快捷键:', 'color: #ff9800; font-weight: bold;');
+        console.log('Ctrl+Enter: 编码文本');
+        console.log('Ctrl+D: 解码图像');
+        console.log('Ctrl+A: ASCII模式');
+        console.log('Ctrl+U: Unicode模式');
+    </script>
+</body>
+</html>
