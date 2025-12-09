@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文件↔图像转换器（文本编码版）</title>
+    <title>文件↔图像转换器（Base64编码）</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* CSS样式保持不变，与原始文件相同 */
         * {
             margin: 0;
             padding: 0;
@@ -570,6 +569,26 @@
             margin-bottom: 10px;
             color: #b0d4e0;
         }
+        
+        /* 编码信息 */
+        .encoding-info {
+            background: rgba(63, 81, 181, 0.1);
+            border: 1px solid rgba(63, 81, 181, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .encoding-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .encoding-info-row:last-child {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -577,8 +596,8 @@
         <header>
             <div class="header-content">
                 <div>
-                    <h1><i class="fas fa-file"></i> 文件↔图像转换器（文本编码版）</h1>
-                    <p class="subtitle">将文件内容转换为文本格式，再编码到图像中。支持1位黑白和4位彩色模式</p>
+                    <h1><i class="fas fa-file"></i> 文件↔图像转换器（Base64编码）</h1>
+                    <p class="subtitle">使用Base64编码，支持黑白（1位）和彩色（4位）模式，每个字符固定16位</p>
                 </div>
                 <a href="index.html" class="back-btn">
                     <i class="fas fa-arrow-left"></i> 返回主页
@@ -612,7 +631,7 @@
                         <span id="fileSize" class="file-info-value">0 KB</span>
                     </div>
                     <div class="file-info-row">
-                        <span class="file-info-label">文本化后大小：</span>
+                        <span class="file-info-label">Base64大小：</span>
                         <span id="textSize" class="file-info-value">0 KB</span>
                     </div>
                     <div class="file-info-row">
@@ -625,13 +644,29 @@
                     </div>
                 </div>
                 
+                <!-- Base64编码信息 -->
+                <div id="encodingInfo" class="encoding-info" style="display: none;">
+                    <div class="encoding-info-row">
+                        <span>编码方式：</span>
+                        <span id="encodingMethod">UTF-8 → Base64</span>
+                    </div>
+                    <div class="encoding-info-row">
+                        <span>字符位数：</span>
+                        <span id="charBits">16位/字符</span>
+                    </div>
+                    <div class="encoding-info-row">
+                        <span>数据密度：</span>
+                        <span id="dataDensity">--</span>
+                    </div>
+                </div>
+                
                 <!-- 文本预览 -->
                 <div id="textPreviewContainer" class="preview-section" style="display: none;">
                     <h3 class="preview-title">
-                        <i class="fas fa-file-alt"></i> 文本化预览（前1000字符）
+                        <i class="fas fa-file-alt"></i> Base64编码预览（前500字符）
                     </h3>
                     <div class="text-preview-header">
-                        <span>Base64编码预览：</span>
+                        <span>Base64字符串：</span>
                         <span id="textPreviewLength">0 字符</span>
                     </div>
                     <div id="textPreview" class="text-preview"></div>
@@ -642,8 +677,8 @@
                     <div class="config-group">
                         <label class="config-label">编码模式：</label>
                         <select id="encodingModeSelect" class="config-input">
-                            <option value="1bit">1位黑白模式 (每像素1位，每个像素代表2种状态)</option>
-                            <option value="4bit">4位彩色模式 (每像素4位，16种颜色，每个像素代表1个字符)</option>
+                            <option value="1bit">1位黑白模式 (每个像素1位，每像素代表2种状态)</option>
+                            <option value="4bit">4位彩色模式 (每个像素4位，16种颜色，每个像素代表1个字符的1/4)</option>
                         </select>
                     </div>
                     
@@ -813,6 +848,10 @@
                         <span id="encodingModeInfo" class="file-info-value">未识别</span>
                     </div>
                     <div class="file-info-row">
+                        <span class="file-info-label">Base64长度：</span>
+                        <span id="base64Length" class="file-info-value">0 字符</span>
+                    </div>
+                    <div class="file-info-row">
                         <span class="file-info-label">创建时间：</span>
                         <span id="creationTime" class="file-info-value">--</span>
                     </div>
@@ -825,10 +864,10 @@
                 <!-- 解码文本预览 -->
                 <div id="decodedTextContainer" class="preview-section" style="display: none;">
                     <h3 class="preview-title">
-                        <i class="fas fa-file-alt"></i> 解码文本预览
+                        <i class="fas fa-file-alt"></i> Base64解码预览
                     </h3>
                     <div class="text-preview-header">
-                        <span>Base64解码预览：</span>
+                        <span>Base64字符串：</span>
                         <span id="decodedTextLength">0 字符</span>
                     </div>
                     <div id="decodedTextPreview" class="text-preview"></div>
@@ -853,8 +892,8 @@
         </div>
         
         <footer>
-            <p>文件↔图像转换器（文本编码版） | 支持任意文件类型 | 1位黑白/4位彩色编码 | © 2023</p>
-            <p><strong>编码原理：</strong>文件内容 → Base64文本 → 二进制数据 → 图像像素</p>
+            <p>文件↔图像转换器（Base64编码） | 支持任意文件类型 | 1位黑白/4位彩色编码 | 每个字符固定16位 | © 2023</p>
+            <p><strong>编码原理：</strong>文件内容 → UTF-8编码 → Base64字符串 → 固定16位二进制 → 图像像素</p>
         </footer>
     </div>
     
@@ -890,6 +929,11 @@
         const estimatedSize = document.getElementById('estimatedSize');
         const memoryInfo = document.getElementById('memoryInfo');
         const memoryEstimate = document.getElementById('memoryEstimate');
+        
+        const encodingInfo = document.getElementById('encodingInfo');
+        const encodingMethod = document.getElementById('encodingMethod');
+        const charBits = document.getElementById('charBits');
+        const dataDensity = document.getElementById('dataDensity');
         
         const textPreviewContainer = document.getElementById('textPreviewContainer');
         const textPreview = document.getElementById('textPreview');
@@ -932,6 +976,7 @@
         const originalFileName = document.getElementById('originalFileName');
         const originalFileSize = document.getElementById('originalFileSize');
         const encodingModeInfo = document.getElementById('encodingModeInfo');
+        const base64Length = document.getElementById('base64Length');
         const creationTime = document.getElementById('creationTime');
         const checksumInfo = document.getElementById('checksumInfo');
         
@@ -961,6 +1006,11 @@
         let metadata = null;
         let currentEncodingMode = '1bit';
         let decodedBase64Text = null;
+        
+        // ============== 常量定义 ==============
+        const BITS_PER_CHAR = 16; // 每个字符固定16位
+        const MAGIC_HEADER = 'FIMG2023'; // 8字节魔术头
+        const SEPARATOR = '|||'; // 分隔符
         
         // ============== 初始化 ==============
         document.addEventListener('DOMContentLoaded', function() {
@@ -1115,13 +1165,20 @@
                 const bytes = new Uint8Array(fileData);
                 base64Text = arrayBufferToBase64(bytes);
                 
+                // 显示Base64信息
+                encodingInfo.style.display = 'block';
+                encodingMethod.textContent = 'UTF-8 → Base64';
+                charBits.textContent = `${BITS_PER_CHAR}位/字符`;
+                const density = (base64Text.length * BITS_PER_CHAR) / (file.size * 8);
+                dataDensity.textContent = `密度: ${density.toFixed(2)}`;
+                
                 // 显示文本预览
                 textPreviewContainer.style.display = 'block';
                 textPreviewLength.textContent = `${base64Text.length} 字符`;
                 
-                // 只显示前1000个字符作为预览
-                const previewText = base64Text.length > 1000 
-                    ? base64Text.substring(0, 1000) + '...' 
+                // 只显示前500个字符作为预览
+                const previewText = base64Text.length > 500 
+                    ? base64Text.substring(0, 500) + '...' 
                     : base64Text;
                 textPreview.textContent = previewText;
                 
@@ -1166,6 +1223,54 @@
             return bytes.buffer;
         }
         
+        // ============== Unicode字符编码 ==============
+        function encodeUnicodeToBinary(text) {
+            // 将字符串中的每个字符编码为16位二进制
+            const binaryArray = [];
+            
+            for (let i = 0; i < text.length; i++) {
+                const charCode = text.charCodeAt(i);
+                
+                // 确保每个字符使用16位表示
+                let binary = charCode.toString(2);
+                
+                // 填充到16位
+                while (binary.length < BITS_PER_CHAR) {
+                    binary = '0' + binary;
+                }
+                
+                // 添加到数组
+                for (let bit = 0; bit < BITS_PER_CHAR; bit++) {
+                    binaryArray.push(parseInt(binary[bit]));
+                }
+            }
+            
+            return binaryArray;
+        }
+        
+        function decodeBinaryToUnicode(binaryArray) {
+            // 将16位二进制数组解码为字符串
+            let text = '';
+            
+            for (let i = 0; i < binaryArray.length; i += BITS_PER_CHAR) {
+                if (i + BITS_PER_CHAR > binaryArray.length) break;
+                
+                // 提取16位二进制
+                let binary = '';
+                for (let j = 0; j < BITS_PER_CHAR; j++) {
+                    binary += binaryArray[i + j];
+                }
+                
+                // 转换为字符代码
+                const charCode = parseInt(binary, 2);
+                
+                // 添加到字符串
+                text += String.fromCharCode(charCode);
+            }
+            
+            return text;
+        }
+        
         // ============== 滑块更新 ==============
         function updateSliders() {
             maxWidthValue.textContent = `${maxWidthSlider.value} px`;
@@ -1176,7 +1281,7 @@
         
         // ============== 内存估算 ==============
         function updateMemoryEstimate() {
-            if (!currentFile) return;
+            if (!currentFile || !base64Text) return;
             
             const maxWidth = parseInt(maxWidthSlider.value);
             const maxHeight = parseInt(maxHeightSlider.value);
@@ -1189,16 +1294,26 @@
                 default: bitsPerPixel = 1;
             }
             
-            // Base64文本的长度（每个字符8位）
-            const textLength = base64Text ? base64Text.length : 0;
-            const totalBitsNeeded = textLength * 8;
+            // 准备元数据
+            const metadataStr = JSON.stringify({
+                filename: currentFile.name,
+                filesize: currentFile.size,
+                encoding: currentEncodingMode,
+                createdAt: new Date().toISOString(),
+                version: '3.0',
+                textLength: base64Text.length,
+                bitsPerChar: BITS_PER_CHAR,
+                checksum: calculateChecksum(base64Text)
+            });
             
-            // 添加元数据开销（文件名、校验和等）
-            const metadataBits = (fileInfo.textContent.length + 256) * 8; // 估算
-            const totalBitsWithMetadata = totalBitsNeeded + metadataBits + 32; // 32位用于标识头
+            // 完整数据：魔术头 + 元数据 + 分隔符 + Base64文本
+            const fullData = MAGIC_HEADER + metadataStr + SEPARATOR + base64Text;
+            
+            // 计算总位数
+            const totalBitsNeeded = fullData.length * BITS_PER_CHAR;
             
             // 计算所需像素数
-            const totalPixelsNeeded = Math.ceil(totalBitsWithMetadata / bitsPerPixel);
+            const totalPixelsNeeded = Math.ceil(totalBitsNeeded / bitsPerPixel);
             
             // 计算图像尺寸
             const aspectRatio = 1.414; // A4比例
@@ -1219,7 +1334,7 @@
             height = Math.floor(height);
             
             const imageMemory = width * height * 4; // RGBA
-            const processingMemory = (currentFile.size + textLength) * 2;
+            const processingMemory = (currentFile.size + base64Text.length) * 2;
             const totalMemoryMB = (imageMemory + processingMemory) / (1024 * 1024);
             
             // 更新显示
@@ -1268,41 +1383,27 @@
             
             try {
                 // 准备元数据
-                const metadata = {
+                metadata = {
                     filename: currentFile.name,
                     filesize: currentFile.size,
                     encoding: currentEncodingMode,
                     createdAt: new Date().toISOString(),
-                    version: '2.0',
+                    version: '3.0',
                     textLength: base64Text.length,
+                    bitsPerChar: BITS_PER_CHAR,
                     checksum: calculateChecksum(base64Text)
                 };
                 
                 const metadataStr = JSON.stringify(metadata);
                 updateProgress(5);
                 
-                // 组合数据：元数据 + 分隔符 + Base64文本
-                const separator = '|FIMG|';
-                const fullData = metadataStr + separator + base64Text;
+                // 组合数据：魔术头 + 元数据 + 分隔符 + Base64文本
+                const fullData = MAGIC_HEADER + metadataStr + SEPARATOR + base64Text;
                 updateProgress(10);
                 
-                // 转换为二进制位
-                const binaryBits = [];
-                for (let i = 0; i < fullData.length; i++) {
-                    const charCode = fullData.charCodeAt(i);
-                    // 将每个字符转换为8位二进制
-                    for (let bit = 7; bit >= 0; bit--) {
-                        binaryBits.push((charCode >> bit) & 1);
-                    }
-                    
-                    // 更新进度
-                    if (i % 1000 === 0) {
-                        const progress = 10 + (i / fullData.length) * 40;
-                        updateProgress(progress);
-                    }
-                }
-                
-                updateProgress(50);
+                // 将完整数据编码为16位二进制数组
+                const binaryBits = encodeUnicodeToBinary(fullData);
+                updateProgress(30);
                 
                 // 根据编码模式计算图像尺寸
                 let bitsPerPixel;
@@ -1329,7 +1430,7 @@
                 width = Math.floor(width);
                 height = Math.floor(height);
                 
-                updateProgress(60);
+                updateProgress(40);
                 
                 // 创建Canvas
                 const canvas = document.createElement('canvas');
@@ -1341,7 +1442,7 @@
                 const imageData = ctx.createImageData(width, height);
                 const data = imageData.data;
                 
-                // 初始化所有像素为灰色背景（防止死循环检测）
+                // 初始化所有像素为灰色背景
                 for (let i = 0; i < data.length; i += 4) {
                     data[i] = 128;     // R
                     data[i + 1] = 128; // G
@@ -1349,7 +1450,7 @@
                     data[i + 3] = 255; // A
                 }
                 
-                updateProgress(70);
+                updateProgress(50);
                 
                 // 编码数据到像素
                 let pixelIndex = 0;
@@ -1379,6 +1480,8 @@
                         for (let i = 0; i < 4; i++) {
                             if (bitIndex + i < binaryBits.length) {
                                 fourBits = (fourBits << 1) | binaryBits[bitIndex + i];
+                            } else {
+                                fourBits = (fourBits << 1) | 0; // 用0填充
                             }
                         }
                         
@@ -1395,7 +1498,7 @@
                     
                     // 更新进度
                     if (pixelIndex % 10000 === 0) {
-                        const progress = 70 + (pixelIndex / (width * height)) * 25;
+                        const progress = 50 + (pixelIndex / (width * height)) * 45;
                         updateProgress(progress);
                     }
                 }
@@ -1419,7 +1522,7 @@
                 downloadImageBtn.disabled = false;
                 
                 const modeName = currentEncodingMode === '1bit' ? '1位黑白' : '4位16色';
-                showNotification(`编码完成！${modeName}，尺寸：${width}×${height}像素`, 'success');
+                showNotification(`编码完成！${modeName}，尺寸：${width}×${height}像素，每个字符${BITS_PER_CHAR}位`, 'success');
                 
             } catch (error) {
                 console.error('编码错误:', error);
@@ -1549,15 +1652,22 @@
                 return false;
             }
             
-            // 简单检查：图像是否大部分是灰度
+            // 简单检查：图像是否大部分是黑白或灰度
             const imageData = ctx.getImageData(0, 0, Math.min(50, img.width), Math.min(50, img.height));
             const data = imageData.data;
             
             let grayCount = 0;
+            let bwCount = 0;
+            
             for (let i = 0; i < data.length; i += 4) {
                 const r = data[i];
                 const g = data[i + 1];
                 const b = data[i + 2];
+                
+                // 检查是否为黑白（纯黑或纯白）
+                if ((r === 0 && g === 0 && b === 0) || (r === 255 && g === 255 && b === 255)) {
+                    bwCount++;
+                }
                 
                 // 检查是否为灰度（RGB值相近）
                 if (Math.abs(r - g) < 10 && Math.abs(r - b) < 10 && Math.abs(g - b) < 10) {
@@ -1565,8 +1675,11 @@
                 }
             }
             
-            // 如果灰度像素超过50%，可能是编码图像
-            return grayCount > (data.length / 4) * 0.5;
+            const samplePixels = data.length / 4;
+            
+            // 如果黑白像素超过70%，可能是1位编码
+            // 如果灰度像素超过70%，可能是4位编码
+            return (bwCount > samplePixels * 0.7) || (grayCount > samplePixels * 0.7);
         }
         
         // ============== 显示解码预览 ==============
@@ -1627,13 +1740,40 @@
                 
                 updateProgress(30);
                 
-                // 检测编码模式（通过分析像素值）
-                let detectedMode = detectEncodingMode(data);
+                // 第一步：尝试检测编码模式
+                // 先读取前100个像素来确定编码模式
+                let detectedMode = null;
                 
-                // 如果没有检测到模式，使用默认值
-                if (!detectedMode) {
+                // 检测黑白模式
+                let bwCount = 0;
+                let grayCount = 0;
+                
+                for (let i = 0; i < Math.min(400, data.length); i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    
+                    // 检查是否为黑白
+                    if ((r === 0 && g === 0 && b === 0) || (r === 255 && g === 255 && b === 255)) {
+                        bwCount++;
+                    }
+                    
+                    // 检查是否为灰度
+                    if (Math.abs(r - g) < 10 && Math.abs(r - b) < 10 && Math.abs(g - b) < 10) {
+                        grayCount++;
+                    }
+                }
+                
+                const samplePixels = Math.min(100, data.length / 4);
+                
+                if (bwCount > samplePixels * 0.8) {
                     detectedMode = '1bit';
-                    showNotification('无法检测编码模式，使用默认1位模式', 'warning');
+                } else if (grayCount > samplePixels * 0.8) {
+                    detectedMode = '4bit';
+                } else {
+                    // 默认使用1位模式
+                    detectedMode = '1bit';
+                    showNotification('无法确定编码模式，使用默认1位模式', 'warning');
                 }
                 
                 currentEncodingMode = detectedMode;
@@ -1667,7 +1807,7 @@
                         const grayValue = r; // 因为是灰度图，RGB值相同
                         
                         // 将灰度值(0-255)转换为4位值(0-15)
-                        const fourBits = Math.floor(grayValue / 17);
+                        const fourBits = Math.round(grayValue / 17);
                         
                         // 将4位值转换为4个二进制位
                         for (let bit = 3; bit >= 0; bit--) {
@@ -1684,37 +1824,24 @@
                 
                 updateProgress(70);
                 
-                // 将二进制位转换为字符
-                let decodedString = '';
-                for (let i = 0; i < binaryBits.length; i += 8) {
-                    if (i + 8 > binaryBits.length) break;
-                    
-                    let charCode = 0;
-                    for (let j = 0; j < 8; j++) {
-                        charCode = (charCode << 1) | binaryBits[i + j];
-                    }
-                    
-                    decodedString += String.fromCharCode(charCode);
-                    
-                    // 更新进度
-                    if (i % 8000 === 0) {
-                        const progress = 70 + ((i / binaryBits.length) * 25);
-                        updateProgress(progress);
-                    }
+                // 将二进制位解码为字符串（每个字符16位）
+                const decodedString = decodeBinaryToUnicode(binaryBits);
+                
+                updateProgress(80);
+                
+                // 验证魔术头
+                if (!decodedString.startsWith(MAGIC_HEADER)) {
+                    throw new Error('无效的编码图像：魔术头不匹配');
                 }
                 
-                updateProgress(95);
-                
-                // 解析元数据和Base64文本
-                const separator = '|FIMG|';
-                const separatorIndex = decodedString.indexOf(separator);
-                
+                // 查找分隔符
+                const separatorIndex = decodedString.indexOf(SEPARATOR);
                 if (separatorIndex === -1) {
                     throw new Error('无效的编码图像：找不到数据分隔符');
                 }
                 
-                const metadataStr = decodedString.substring(0, separatorIndex);
-                const extractedBase64 = decodedString.substring(separatorIndex + separator.length);
+                // 提取元数据
+                const metadataStr = decodedString.substring(MAGIC_HEADER.length, separatorIndex);
                 
                 // 解析元数据
                 try {
@@ -1723,18 +1850,25 @@
                     throw new Error('元数据解析失败：' + e.message);
                 }
                 
+                // 提取Base64文本
+                decodedBase64Text = decodedString.substring(separatorIndex + SEPARATOR.length);
+                
+                // 验证Base64长度
+                if (decodedBase64Text.length !== metadata.textLength) {
+                    console.warn(`Base64长度不匹配：预期${metadata.textLength}，实际${decodedBase64Text.length}`);
+                }
+                
                 // 验证校验和
-                const calculatedChecksum = calculateChecksum(extractedBase64);
+                const calculatedChecksum = calculateChecksum(decodedBase64Text);
                 const checksumValid = calculatedChecksum === metadata.checksum;
                 
-                decodedBase64Text = extractedBase64;
-                
-                updateProgress(100);
+                updateProgress(95);
                 
                 // 显示解码信息
                 originalFileName.textContent = metadata.filename;
                 originalFileSize.textContent = formatFileSize(metadata.filesize);
                 encodingModeInfo.textContent = metadata.encoding === '1bit' ? '1位黑白' : '4位16色';
+                base64Length.textContent = `${decodedBase64Text.length} 字符`;
                 creationTime.textContent = new Date(metadata.createdAt).toLocaleString();
                 checksumInfo.textContent = checksumValid ? '✓ 验证通过' : '✗ 验证失败';
                 checksumInfo.style.color = checksumValid ? '#4caf50' : '#ff5252';
@@ -1743,14 +1877,16 @@
                 
                 // 显示解码文本预览
                 decodedTextContainer.style.display = 'block';
-                decodedTextLength.textContent = `${extractedBase64.length} 字符`;
-                const previewText = extractedBase64.length > 1000 
-                    ? extractedBase64.substring(0, 1000) + '...' 
-                    : extractedBase64;
+                decodedTextLength.textContent = `${decodedBase64Text.length} 字符`;
+                const previewText = decodedBase64Text.length > 500 
+                    ? decodedBase64Text.substring(0, 500) + '...' 
+                    : decodedBase64Text;
                 decodedTextPreview.textContent = previewText;
                 
                 // 启用下载文件按钮
                 downloadFileBtn.disabled = false;
+                
+                updateProgress(100);
                 
                 if (checksumValid) {
                     showNotification(`解码完成！文件：${metadata.filename}，校验通过`, 'success');
@@ -1767,42 +1903,6 @@
                     progressContainer.style.display = 'none';
                 }, 1000);
             }
-        }
-        
-        // ============== 检测编码模式 ==============
-        function detectEncodingMode(data) {
-            // 分析前1000个像素来确定编码模式
-            let blackWhiteCount = 0;
-            let grayCount = 0;
-            
-            for (let i = 0; i < Math.min(4000, data.length); i += 4) {
-                const r = data[i];
-                const g = data[i + 1];
-                const b = data[i + 2];
-                
-                // 检查是否为纯黑或纯白
-                if ((r === 0 && g === 0 && b === 0) || (r === 255 && g === 255 && b === 255)) {
-                    blackWhiteCount++;
-                }
-                
-                // 检查是否为灰度（RGB值相等）
-                if (r === g && r === b) {
-                    grayCount++;
-                }
-            }
-            
-            const samplePixels = Math.min(1000, data.length / 4);
-            
-            // 如果大部分像素是纯黑或纯白，可能是1位模式
-            if (blackWhiteCount > samplePixels * 0.8) {
-                return '1bit';
-            }
-            // 如果大部分像素是灰度，可能是4位模式
-            else if (grayCount > samplePixels * 0.8) {
-                return '4bit';
-            }
-            
-            return null;
         }
         
         // ============== 下载解码文件 ==============
@@ -1870,6 +1970,7 @@
             // 重置UI
             fileInfo.style.display = 'none';
             decodeInfo.style.display = 'none';
+            encodingInfo.style.display = 'none';
             textPreviewContainer.style.display = 'none';
             decodedTextContainer.style.display = 'none';
             imageValidation.style.display = 'none';
@@ -1959,18 +2060,20 @@
         }
         
         // ============== 控制台信息 ==============
-        console.log('%c📁 文件↔图像转换器（文本编码版）v2.0 %c已加载', 
+        console.log('%c📁 文件↔图像转换器（Base64编码）v3.0 %c已加载', 
             'color: #ff6b9d; font-size: 18px; font-weight: bold;', 
             'color: #40a4df; font-size: 16px;');
         console.log('%c✨ 新功能：', 'color: #4caf50; font-weight: bold;');
-        console.log('1. 文件内容转换为Base64文本格式');
-        console.log('2. 1位黑白模式（每像素1位）');
-        console.log('3. 4位彩色模式（每像素4位，16级灰度）');
-        console.log('4. 完整的元数据和校验和验证');
+        console.log('1. 使用Base64编码文件内容');
+        console.log('2. 每个字符固定16位编码（支持Unicode、中文、emoji等）');
+        console.log('3. 1位黑白模式（每像素1位）');
+        console.log('4. 4位彩色模式（每像素4位，16级灰度）');
+        console.log('5. 完整的元数据和校验和验证系统');
         console.log('%c⚠️ 注意：', 'color: #ff9800; font-weight: bold;');
         console.log('1. Base64编码会增加约33%的文件大小');
-        console.log('2. 1位模式适合文本文件，4位模式适合二进制文件');
-        console.log('3. 编码图像为灰度图，便于准确解码');
+        console.log('2. 每个字符使用16位编码，确保支持所有Unicode字符');
+        console.log('3. 编码图像为黑白或灰度图，便于准确解码');
+        console.log('4. 魔术头："FIMG2023"，分隔符："|||"');
     </script>
 </body>
 </html>
