@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文件↔图像转换器（Base64编码）</title>
+    <title>文件↔图像转换器（黑白Unicode编码）</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,10 +14,11 @@
         }
         
         body {
-            background: linear-gradient(135deg, #0f2027 0%, #203a43 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: #e0e0e0;
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.6;
         }
         
         .container {
@@ -25,62 +26,46 @@
             margin: 0 auto;
         }
         
-        /* 头部 */
         header {
             text-align: center;
             margin-bottom: 30px;
-            padding: 25px;
-            background: rgba(15, 30, 40, 0.8);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 107, 157, 0.3);
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
         }
         
         h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
-            background: linear-gradient(90deg, #ff6b9d, #c44569);
+            background: linear-gradient(90deg, #00dbde, #fc00ff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .back-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            background: rgba(255, 107, 157, 0.1);
-            color: #ffb8d0;
-            text-decoration: none;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 107, 157, 0.3);
-            transition: all 0.3s;
-        }
-        
-        .back-btn:hover {
-            background: rgba(255, 107, 157, 0.2);
-            transform: translateY(-2px);
         }
         
         .subtitle {
             font-size: 1.1rem;
-            color: #b0d4e0;
-            margin-top: 10px;
+            color: #a0a0c0;
+            margin-bottom: 5px;
         }
         
-        /* 主内容 */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
         .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -94,50 +79,47 @@
             }
         }
         
-        /* 卡片样式 */
         .card {
-            background: rgba(20, 30, 40, 0.8);
-            border-radius: 15px;
+            background: rgba(20, 20, 40, 0.8);
+            border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(100, 100, 200, 0.2);
         }
         
         .card-title {
             font-size: 1.5rem;
             margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(255, 107, 157, 0.5);
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3a3a7a;
             display: flex;
             align-items: center;
-            gap: 12px;
-            color: #ffffff;
+            gap: 10px;
         }
         
         .card-title i {
-            color: #ff6b9d;
+            color: #6c63ff;
         }
         
-        /* 文件上传区域 */
         .file-upload-area {
-            border: 3px dashed rgba(255, 107, 157, 0.3);
+            border: 3px dashed #3a3a7a;
             border-radius: 12px;
             padding: 40px 20px;
             text-align: center;
-            background: rgba(255, 107, 157, 0.05);
+            background: rgba(30, 30, 60, 0.5);
             margin-bottom: 20px;
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .file-upload-area:hover {
-            border-color: rgba(255, 107, 157, 0.6);
-            background: rgba(255, 107, 157, 0.1);
+            border-color: #6c63ff;
+            background: rgba(60, 60, 100, 0.7);
         }
         
         .upload-icon {
             font-size: 3.5rem;
-            color: #ff6b9d;
+            color: #6c63ff;
             margin-bottom: 15px;
         }
         
@@ -161,7 +143,7 @@
         }
         
         .file-info-label {
-            color: #b0d4e0;
+            color: #a0a0c0;
         }
         
         .file-info-value {
@@ -169,93 +151,57 @@
             font-weight: 600;
         }
         
-        /* 配置面板 */
-        .config-panel {
-            background: rgba(30, 40, 50, 0.7);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
-        
-        .config-group {
-            margin-bottom: 20px;
-        }
-        
-        .config-label {
-            display: block;
-            margin-bottom: 8px;
-            color: #b0d4e0;
-            font-weight: 600;
-        }
-        
-        .config-input {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(10, 20, 30, 0.9);
-            border: 1px solid rgba(255, 107, 157, 0.3);
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 16px;
-        }
-        
-        .config-input:focus {
-            outline: none;
-            border-color: #ff6b9d;
-            box-shadow: 0 0 0 2px rgba(255, 107, 157, 0.2);
-        }
-        
-        .range-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .range-value {
-            min-width: 80px;
-            text-align: center;
-            background: rgba(255, 107, 157, 0.1);
-            padding: 8px 12px;
-            border-radius: 6px;
-            color: #ffb8d0;
-            font-weight: 600;
-        }
-        
-        input[type="range"] {
-            flex: 1;
-            height: 8px;
-            -webkit-appearance: none;
-            background: linear-gradient(to right, #ff6b9d, #c44569);
-            border-radius: 4px;
-            outline: none;
-        }
-        
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
-            background: #ffffff;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* 内存信息 */
-        .memory-info {
-            background: rgba(255, 152, 0, 0.1);
-            border: 1px solid rgba(255, 152, 0, 0.3);
-            border-radius: 10px;
+        .dimension-controls {
+            background: rgba(30, 30, 60, 0.7);
             padding: 15px;
+            border-radius: 8px;
             margin-bottom: 20px;
-            color: #ffcc80;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
         }
         
-        .memory-info.warning {
-            background: rgba(255, 87, 34, 0.1);
-            border-color: rgba(255, 87, 34, 0.3);
-            color: #ffab91;
+        .dimension-controls label {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 150px;
         }
         
-        /* 按钮组 */
+        .dimension-controls span {
+            font-size: 0.9rem;
+            color: #a0a0c0;
+        }
+        
+        .dimension-controls input {
+            padding: 8px 12px;
+            background: rgba(10, 10, 20, 0.8);
+            border: 1px solid #3a3a7a;
+            border-radius: 4px;
+            color: #e0e0e0;
+        }
+        
+        .dimension-controls input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .dimension-controls button {
+            padding: 8px 16px;
+            background: rgba(60, 60, 100, 0.8);
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .dimension-controls button:hover {
+            background: rgba(80, 80, 140, 0.8);
+        }
+        
         .button-group {
             display: flex;
             gap: 15px;
@@ -263,38 +209,37 @@
         }
         
         .btn {
-            padding: 14px 28px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
+            border-radius: 8px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            flex: 1;
-            min-width: 120px;
+            gap: 8px;
         }
         
         .btn-primary {
-            background: linear-gradient(90deg, #ff6b9d, #c44569);
+            background: linear-gradient(90deg, #6c63ff, #3a3a7a);
             color: white;
         }
         
         .btn-primary:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255, 107, 157, 0.4);
+            background: linear-gradient(90deg, #5a52e0, #2a2a5a);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(108, 99, 255, 0.3);
         }
         
         .btn-secondary {
-            background: rgba(100, 100, 200, 0.3);
+            background: rgba(60, 60, 100, 0.8);
             color: white;
         }
         
         .btn-secondary:hover {
-            background: rgba(100, 100, 200, 0.4);
+            background: rgba(80, 80, 140, 0.8);
             transform: translateY(-2px);
         }
         
@@ -304,8 +249,18 @@
         }
         
         .btn-success:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
+            background: linear-gradient(90deg, #3d8b40, #1b5e20);
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(90deg, #ff9800, #f57c00);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: linear-gradient(90deg, #f57c00, #e65100);
+            transform: translateY(-2px);
         }
         
         .btn:disabled {
@@ -314,125 +269,87 @@
             transform: none !important;
         }
         
-        /* 图像预览容器 */
-        .image-preview-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .preview-section {
-            background: rgba(10, 20, 30, 0.9);
-            border-radius: 10px;
-            padding: 20px;
-            border: 1px solid rgba(255, 107, 157, 0.2);
-        }
-        
-        .preview-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
         .canvas-wrapper {
             width: 100%;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(10, 10, 20, 0.8);
             border-radius: 8px;
             padding: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: center;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         
         canvas {
             max-width: 100%;
-            max-height: 300px;
-            border: 2px solid rgba(255, 107, 157, 0.3);
-            border-radius: 5px;
-            background: linear-gradient(45deg, #2c3e50, #4a6278);
+            border: 1px solid #3a3a7a;
+            border-radius: 4px;
+            background-color: white;
         }
         
         .image-placeholder {
             width: 100%;
-            height: 200px;
+            height: 300px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: #8888aa;
-            border: 2px dashed rgba(255, 107, 157, 0.3);
+            border: 2px dashed #3a3a7a;
             border-radius: 8px;
+            margin-bottom: 20px;
         }
         
         .image-placeholder i {
-            font-size: 2.5rem;
+            font-size: 3rem;
             margin-bottom: 15px;
-            color: #ff6b9d;
         }
         
-        .image-info {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #a0a0c0;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .image-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 15px;
-        }
-        
-        .small-btn {
-            padding: 8px 16px;
-            font-size: 0.9rem;
-            border-radius: 6px;
-        }
-        
-        /* 进度条 */
-        .progress-container {
-            width: 100%;
-            margin: 20px 0;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
+        .file-input-wrapper {
+            position: relative;
             overflow: hidden;
+            display: inline-block;
+            width: 100%;
         }
         
-        .progress-fill {
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, #ff6b9d, #c44569);
-            width: 0%;
-            transition: width 0.3s;
+            cursor: pointer;
         }
         
-        .progress-text {
+        .file-input-label {
+            display: block;
+            padding: 12px 24px;
+            background: rgba(60, 60, 100, 0.8);
+            border-radius: 8px;
             text-align: center;
-            margin-top: 8px;
-            font-size: 0.9rem;
-            color: #b0d4e0;
+            cursor: pointer;
+            transition: all 0.3s;
         }
         
-        /* 加载指示器 */
+        .file-input-label:hover {
+            background: rgba(80, 80, 140, 0.8);
+        }
+        
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(10, 10, 20, 0.8);
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border: 1px solid #3a3a7a;
+        }
+        
         .loading {
             display: none;
             text-align: center;
-            padding: 30px;
+            padding: 20px;
         }
         
         .loading.active {
@@ -441,12 +358,12 @@
         
         .spinner {
             border: 4px solid rgba(255, 255, 255, 0.1);
-            border-left-color: #ff6b9d;
+            border-left-color: #6c63ff;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
         }
         
         @keyframes spin {
@@ -454,23 +371,72 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* 通知 */
+        .info-box {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+            background: rgba(30, 30, 60, 0.7);
+            border-left: 4px solid #6c63ff;
+        }
+        
+        .info-box h3 {
+            margin-bottom: 10px;
+            color: #a0a0ff;
+        }
+        
+        .info-box ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .info-box li {
+            margin-bottom: 5px;
+        }
+        
+        .image-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #a0a0c0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .size-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .unicode-badge {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(100, 100, 200, 0.2);
+            color: #8888aa;
+            font-size: 0.9rem;
+        }
+        
         .notification {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            padding: 15px 25px;
+            padding: 15px 20px;
             background: rgba(40, 40, 80, 0.95);
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.4s ease;
             z-index: 1000;
-            max-width: 400px;
         }
         
         .notification.show {
@@ -479,78 +445,108 @@
         }
         
         .notification.success {
-            border-left: 5px solid #4caf50;
+            border-left: 4px solid #4caf50;
         }
         
         .notification.error {
-            border-left: 5px solid #ff5252;
-        }
-        
-        .notification.warning {
-            border-left: 5px solid #ff9800;
+            border-left: 4px solid #ff5252;
         }
         
         .notification.info {
-            border-left: 5px solid #2196f3;
+            border-left: 4px solid #2196f3;
         }
         
-        /* 文件验证信息 */
-        .validation-info {
-            background: rgba(33, 150, 243, 0.1);
-            border: 1px solid rgba(33, 150, 243, 0.3);
-            border-radius: 8px;
-            padding: 12px 15px;
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #90caf9;
+        .notification.warning {
+            border-left: 4px solid #ff9800;
         }
         
-        .validation-info.valid {
-            background: rgba(76, 175, 80, 0.1);
-            border-color: rgba(76, 175, 80, 0.3);
-            color: #a5d6a7;
-        }
-        
-        .validation-info.invalid {
-            background: rgba(244, 67, 54, 0.1);
-            border-color: rgba(244, 67, 54, 0.3);
-            color: #ef9a9a;
-        }
-        
-        /* 页脚 */
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #8888aa;
-            font-size: 0.9rem;
-        }
-        
-        /* 色彩预览 */
-        .color-preview {
+        .toggle-container {
             display: flex;
-            gap: 5px;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: rgba(60, 60, 100, 0.8);
+            border-radius: 13px;
+            margin-right: 10px;
+            transition: background 0.3s;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 11px;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-checkbox:checked + .toggle-switch {
+            background: #6c63ff;
+        }
+        
+        .toggle-checkbox:checked + .toggle-switch::after {
+            transform: translateX(24px);
+        }
+        
+        .toggle-checkbox {
+            display: none;
+        }
+        
+        .encoding-info {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #a0a0c0;
+            border-left: 3px solid #6c63ff;
+            margin-bottom: 15px;
+        }
+        
+        .bits-info {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 8px 12px;
+            border-radius: 6px;
             margin-top: 10px;
-            justify-content: center;
+            font-size: 0.85rem;
         }
         
-        .color-box {
-            width: 30px;
-            height: 30px;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .bits-info span {
+            font-family: monospace;
+            color: #6c63ff;
+            font-weight: bold;
         }
         
-        .color-label {
-            font-size: 0.8rem;
-            text-align: center;
-            margin-top: 5px;
+        .char-count {
+            text-align: right;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
             color: #a0a0c0;
         }
         
-        /* 文本预览 */
-        .text-preview {
+        .char-count.warning {
+            color: #ff9800;
+        }
+        
+        .char-count.error {
+            color: #ff5252;
+        }
+        
+        .preview-text {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 8px;
             padding: 15px;
@@ -563,45 +559,43 @@
             word-break: break-all;
         }
         
-        .text-preview-header {
+        .preview-header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
             color: #b0d4e0;
         }
         
-        /* 编码信息 */
-        .encoding-info {
-            background: rgba(63, 81, 181, 0.1);
-            border: 1px solid rgba(63, 81, 181, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            font-size: 0.9rem;
+        .header-marker {
+            background: rgba(108, 99, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.8rem;
         }
         
-        .encoding-info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-        
-        .encoding-info-row:last-child {
-            margin-bottom: 0;
+        @media (max-width: 768px) {
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .dimension-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="header-content">
-                <div>
-                    <h1><i class="fas fa-file"></i> 文件↔图像转换器（Base64编码）</h1>
-                    <p class="subtitle">使用Base64编码，支持黑白（1位）和彩色（4位）模式，每个字符固定16位</p>
-                </div>
-                <a href="index.html" class="back-btn">
-                    <i class="fas fa-arrow-left"></i> 返回主页
-                </a>
+            <h1><i class="fas fa-file-image"></i> 文件↔图像转换器（黑白Unicode编码）</h1>
+            <p class="subtitle">将任意文件编码为黑白图像，支持Unicode编码（21位/字符）</p>
+            <div class="stats">
+                <div class="stat-box">编码模式: Unicode 21位/字符</div>
+                <div class="stat-box">像素类型: 黑白（1位/像素）</div>
+                <div class="stat-box">支持文件: 任意类型</div>
             </div>
         </header>
         
@@ -610,7 +604,13 @@
             <div class="card">
                 <h2 class="card-title"><i class="fas fa-lock"></i> 编码文件到图像</h2>
                 
-                <!-- 文件上传 -->
+                <!-- 编码信息 -->
+                <div class="encoding-info">
+                    <i class="fas fa-info-circle"></i> 
+                    Unicode编码模式：每个字符使用21位二进制编码，支持所有Unicode字符和任意文件类型
+                </div>
+                
+                <!-- 文件上传区域 -->
                 <div id="fileUploadArea" class="file-upload-area">
                     <div class="upload-icon">
                         <i class="fas fa-cloud-upload-alt"></i>
@@ -627,122 +627,61 @@
                         <span id="fileName" class="file-info-value">未选择文件</span>
                     </div>
                     <div class="file-info-row">
-                        <span class="file-info-label">原始大小：</span>
+                        <span class="file-info-label">文件大小：</span>
                         <span id="fileSize" class="file-info-value">0 KB</span>
-                    </div>
-                    <div class="file-info-row">
-                        <span class="file-info-label">Base64大小：</span>
-                        <span id="textSize" class="file-info-value">0 KB</span>
                     </div>
                     <div class="file-info-row">
                         <span class="file-info-label">文件类型：</span>
                         <span id="fileType" class="file-info-value">未知</span>
                     </div>
                     <div class="file-info-row">
-                        <span class="file-info-label">预计图像尺寸：</span>
-                        <span id="estimatedSize" class="file-info-value">0×0 像素</span>
-                    </div>
-                </div>
-                
-                <!-- Base64编码信息 -->
-                <div id="encodingInfo" class="encoding-info" style="display: none;">
-                    <div class="encoding-info-row">
-                        <span>编码方式：</span>
-                        <span id="encodingMethod">UTF-8 → Base64</span>
-                    </div>
-                    <div class="encoding-info-row">
-                        <span>字符位数：</span>
-                        <span id="charBits">16位/字符</span>
-                    </div>
-                    <div class="encoding-info-row">
-                        <span>数据密度：</span>
-                        <span id="dataDensity">--</span>
+                        <span class="file-info-label">数据头部：</span>
+                        <span id="fileHeader" class="file-info-value">待生成</span>
                     </div>
                 </div>
                 
                 <!-- 文本预览 -->
-                <div id="textPreviewContainer" class="preview-section" style="display: none;">
-                    <h3 class="preview-title">
-                        <i class="fas fa-file-alt"></i> Base64编码预览（前500字符）
-                    </h3>
-                    <div class="text-preview-header">
-                        <span>Base64字符串：</span>
+                <div id="textPreviewContainer" class="preview-text" style="display: none;">
+                    <div class="preview-header">
+                        <span>文件内容Base64预览（前500字符）：</span>
                         <span id="textPreviewLength">0 字符</span>
                     </div>
-                    <div id="textPreview" class="text-preview"></div>
+                    <div id="textPreview"></div>
                 </div>
                 
-                <!-- 配置面板 -->
-                <div class="config-panel">
-                    <div class="config-group">
-                        <label class="config-label">编码模式：</label>
-                        <select id="encodingModeSelect" class="config-input">
-                            <option value="1bit">1位黑白模式 (每个像素1位，每像素代表2种状态)</option>
-                            <option value="4bit">4位彩色模式 (每个像素4位，16种颜色，每个像素代表1个字符的1/4)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="config-group">
-                        <label class="config-label">最大图像宽度 (像素)：</label>
-                        <div class="range-container">
-                            <input type="range" id="maxWidthSlider" min="100" max="10000" value="2000" step="100">
-                            <span id="maxWidthValue" class="range-value">2000 px</span>
-                        </div>
-                    </div>
-                    
-                    <div class="config-group">
-                        <label class="config-label">最大图像高度 (像素)：</label>
-                        <div class="range-container">
-                            <input type="range" id="maxHeightSlider" min="100" max="10000" value="2000" step="100">
-                            <span id="maxHeightValue" class="range-value">2000 px</span>
-                        </div>
-                    </div>
-                    
-                    <!-- 色彩预览 -->
-                    <div id="colorPreview1bit" class="color-preview">
-                        <div>
-                            <div class="color-box" style="background: #000000;"></div>
-                            <div class="color-label">0 (黑)</div>
-                        </div>
-                        <div>
-                            <div class="color-box" style="background: #ffffff;"></div>
-                            <div class="color-label">1 (白)</div>
-                        </div>
-                    </div>
-                    
-                    <div id="colorPreview4bit" class="color-preview" style="display: none;">
-                        <div>
-                            <div class="color-box" style="background: #000000;"></div>
-                            <div class="color-label">0</div>
-                        </div>
-                        <div>
-                            <div class="color-box" style="background: #111111;"></div>
-                            <div class="color-label">1</div>
-                        </div>
-                        <div>
-                            <div class="color-box" style="background: #222222;"></div>
-                            <div class="color-label">2</div>
-                        </div>
-                        <div>
-                            <div class="color-box" style="background: #333333;"></div>
-                            <div class="color-label">3</div>
-                        </div>
-                        <div>
-                            <div class="color-box" style="background: #666666;"></div>
-                            <div class="color-label">...</div>
-                        </div>
-                        <div>
-                            <div class="color-box" style="background: #ffffff;"></div>
-                            <div class="color-label">15</div>
-                        </div>
-                    </div>
+                <!-- 自动尺寸切换 -->
+                <div class="toggle-container">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="autoSizeToggle" class="toggle-checkbox" checked>
+                        <span class="toggle-switch"></span>
+                        <span>自动调整图像尺寸</span>
+                    </label>
+                    <span id="toggleStatus" class="size-badge unicode-badge">已启用</span>
                 </div>
                 
-                <!-- 内存信息 -->
-                <div id="memoryInfo" class="memory-info">
-                    <i class="fas fa-memory"></i> 
-                    <strong>内存使用估算：</strong> 
-                    <span id="memoryEstimate">--</span>
+                <!-- 图像尺寸控制 -->
+                <div id="dimensionControls" class="dimension-controls" style="display: none;">
+                    <label>
+                        <span>图像宽度:</span>
+                        <input type="number" id="imageWidth" min="100" max="10000" value="980">
+                    </label>
+                    <label>
+                        <span>图像高度:</span>
+                        <input type="number" id="imageHeight" min="142" max="10000" value="1400">
+                    </label>
+                    <label>
+                        <span>宽高比:</span>
+                        <input type="text" id="aspectRatio" value="1:1.43" disabled>
+                    </label>
+                    <button id="calculateDimensionsBtn">
+                        <i class="fas fa-calculator"></i> 计算尺寸
+                    </button>
+                </div>
+                
+                <!-- 字符计数和位信息 -->
+                <div class="char-count" id="charCount">总字符数: 0 (0像素)</div>
+                <div id="bitsInfo" class="bits-info" style="display: none;">
+                    <i class="fas fa-microchip"></i> 总位数: <span id="totalBits">0</span> 位 | 每个字符: <span id="bitsPerChar">21</span> 位
                 </div>
                 
                 <!-- 按钮组 -->
@@ -750,138 +689,140 @@
                     <button id="encodeBtn" class="btn btn-primary" disabled>
                         <i class="fas fa-cogs"></i> 编码为图像
                     </button>
-                    <button id="downloadImageBtn" class="btn btn-success" disabled>
-                        <i class="fas fa-download"></i> 下载图像
-                    </button>
-                    <button id="clearBtn" class="btn btn-secondary">
-                        <i class="fas fa-trash-alt"></i> 清空
+                    <button id="clearInputBtn" class="btn btn-secondary">
+                        <i class="fas fa-trash-alt"></i> 清空输入
                     </button>
                 </div>
                 
-                <!-- 进度条 -->
-                <div class="progress-container" style="display: none;">
-                    <div class="progress-bar">
-                        <div id="progressFill" class="progress-fill"></div>
+                <!-- 图像输出 -->
+                <div class="canvas-wrapper">
+                    <div id="imageOutput" class="image-placeholder">
+                        <i class="fas fa-image"></i>
+                        <p>编码后的图像将在这里显示</p>
                     </div>
-                    <div id="progressText" class="progress-text">0%</div>
+                    <canvas id="encodedCanvas" style="display:none;"></canvas>
                 </div>
                 
-                <!-- 编码图像预览 -->
-                <div class="preview-section">
-                    <h3 class="preview-title">
-                        <i class="fas fa-image"></i> 编码图像预览
-                    </h3>
-                    <div id="encodedPreview" class="canvas-wrapper">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <p>编码后的图像将在这里预览</p>
-                        </div>
-                        <canvas id="encodedCanvas"></canvas>
-                    </div>
-                    <div class="image-info">
-                        <div id="encodedImageDimensions">尺寸: 未生成</div>
-                        <div id="encodedImageFormat">格式: 未设置</div>
-                    </div>
-                    <div class="image-actions">
-                        <button id="previewEncodedBtn" class="btn btn-secondary small-btn" disabled>
-                            <i class="fas fa-search"></i> 放大预览
-                        </button>
-                    </div>
+                <div class="image-info">
+                    <div id="imageDimensions">图像尺寸: 未生成</div>
+                    <div id="imageSize">文件大小: 未生成</div>
+                    <div id="encodingModeIndicator">编码模式: Unicode</div>
                 </div>
+                
+                <button id="downloadBtn" class="btn btn-success" disabled>
+                    <i class="fas fa-download"></i> 下载图像
+                </button>
             </div>
             
             <!-- 解码部分 -->
             <div class="card">
                 <h2 class="card-title"><i class="fas fa-unlock"></i> 从图像解码文件</h2>
                 
+                <div class="encoding-info">
+                    <i class="fas fa-info-circle"></i> 
+                    请上传之前编码生成的图像。系统会自动识别编码模式并提取文件。
+                </div>
+                
                 <!-- 图像上传 -->
-                <div class="file-upload-area" id="imageUploadArea">
-                    <div class="upload-icon">
-                        <i class="fas fa-image"></i>
+                <div class="file-input-wrapper" style="margin-bottom: 20px;">
+                    <div class="file-input-label">
+                        <i class="fas fa-upload"></i> 选择编码图像（PNG格式）
                     </div>
-                    <h3>点击或拖放图像文件</h3>
-                    <p>支持PNG格式的编码图像</p>
-                    <input type="file" id="imageInput" accept="image/png" style="display: none;">
-                </div>
-                
-                <!-- 图像验证 -->
-                <div id="imageValidation" class="validation-info" style="display: none;">
-                    <i class="fas fa-check-circle"></i>
-                    <span id="validationText">图像验证中...</span>
-                </div>
-                
-                <!-- 解码图像预览 -->
-                <div class="preview-section">
-                    <h3 class="preview-title">
-                        <i class="fas fa-file-image"></i> 输入图像预览
-                    </h3>
-                    <div id="decodedPreview" class="canvas-wrapper">
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <p>上传的图像将在这里预览</p>
-                        </div>
-                        <canvas id="decodedCanvas"></canvas>
-                    </div>
-                    <div class="image-info">
-                        <div id="decodedImageDimensions">尺寸: 未加载</div>
-                        <div id="decodedImageType">类型: 未识别</div>
-                    </div>
-                    <div class="image-actions">
-                        <button id="previewDecodedBtn" class="btn btn-secondary small-btn" disabled>
-                            <i class="fas fa-search"></i> 放大预览
-                        </button>
-                    </div>
+                    <input type="file" id="imageInput" accept="image/png">
                 </div>
                 
                 <!-- 解码信息 -->
                 <div id="decodeInfo" class="file-info" style="display: none;">
                     <div class="file-info-row">
-                        <span class="file-info-label">原始文件名：</span>
-                        <span id="originalFileName" class="file-info-value">未知</span>
+                        <span class="file-info-label">检测到文件：</span>
+                        <span id="detectedFileName" class="file-info-value">未识别</span>
                     </div>
                     <div class="file-info-row">
                         <span class="file-info-label">文件大小：</span>
-                        <span id="originalFileSize" class="file-info-value">0 KB</span>
+                        <span id="detectedFileSize" class="file-info-value">0 KB</span>
                     </div>
                     <div class="file-info-row">
-                        <span class="file-info-label">编码模式：</span>
-                        <span id="encodingModeInfo" class="file-info-value">未识别</span>
+                        <span class="file-info-label">头部标识：</span>
+                        <span id="detectedHeader" class="file-info-value">未识别</span>
                     </div>
                     <div class="file-info-row">
-                        <span class="file-info-label">Base64长度：</span>
-                        <span id="base64Length" class="file-info-value">0 字符</span>
-                    </div>
-                    <div class="file-info-row">
-                        <span class="file-info-label">创建时间：</span>
-                        <span id="creationTime" class="file-info-value">--</span>
-                    </div>
-                    <div class="file-info-row">
-                        <span class="file-info-label">校验和：</span>
-                        <span id="checksumInfo" class="file-info-value">--</span>
+                        <span class="file-info-label">图像尺寸：</span>
+                        <span id="detectedImageSize" class="file-info-value">0×0 像素</span>
                     </div>
                 </div>
                 
-                <!-- 解码文本预览 -->
-                <div id="decodedTextContainer" class="preview-section" style="display: none;">
-                    <h3 class="preview-title">
-                        <i class="fas fa-file-alt"></i> Base64解码预览
-                    </h3>
-                    <div class="text-preview-header">
-                        <span>Base64字符串：</span>
-                        <span id="decodedTextLength">0 字符</span>
+                <!-- 解码图像预览 -->
+                <div class="canvas-wrapper">
+                    <div id="decodedImagePlaceholder" class="image-placeholder">
+                        <i class="fas fa-image"></i>
+                        <p>上传的图像将在这里预览</p>
                     </div>
-                    <div id="decodedTextPreview" class="text-preview"></div>
+                    <canvas id="decodedCanvas" style="display:none;"></canvas>
                 </div>
                 
-                <!-- 解码按钮 -->
+                <!-- 按钮组 -->
                 <div class="button-group">
                     <button id="decodeBtn" class="btn btn-primary" disabled>
                         <i class="fas fa-search"></i> 解码图像
                     </button>
-                    <button id="downloadFileBtn" class="btn btn-success" disabled>
-                        <i class="fas fa-download"></i> 下载文件
+                    <button id="clearOutputBtn" class="btn btn-secondary">
+                        <i class="fas fa-trash-alt"></i> 清空
                     </button>
                 </div>
+                
+                <!-- 解码文本预览 -->
+                <div id="decodedTextContainer" class="preview-text" style="display: none;">
+                    <div class="preview-header">
+                        <span>解码数据Base64预览：</span>
+                        <span id="decodedTextLength">0 字符</span>
+                    </div>
+                    <div id="decodedTextPreview"></div>
+                </div>
+                
+                <!-- 下载按钮 -->
+                <button id="downloadFileBtn" class="btn btn-success" disabled style="margin-top: 20px; width: 100%;">
+                    <i class="fas fa-download"></i> 下载解码文件
+                </button>
+            </div>
+            
+            <!-- 算法说明 -->
+            <div class="card info-box">
+                <h3><i class="fas fa-calculator"></i> 编码算法说明</h3>
+                <ul>
+                    <li><strong>数据格式</strong>：
+                        <ul>
+                            <li>头部标识：<span class="header-marker">FIMG|</span> (固定5字符)</li>
+                            <li>文件名长度：4字节（32位）整数</li>
+                            <li>文件名：原文件名（Unicode编码）</li>
+                            <li>文件数据长度：4字节（32位）整数</li>
+                            <li>文件数据：文件内容的Base64编码</li>
+                        </ul>
+                    </li>
+                    <li><strong>编码过程</strong>：
+                        <ul>
+                            <li>1. 将文件内容转换为Base64字符串</li>
+                            <li>2. 构建完整数据：头部 + 文件名长度 + 文件名 + 数据长度 + Base64数据</li>
+                            <li>3. 每个字符转换为21位二进制（Unicode编码）</li>
+                            <li>4. 每个二进制位对应一个像素（0=白色，1=黑色）</li>
+                        </ul>
+                    </li>
+                    <li><strong>解码过程</strong>：
+                        <ul>
+                            <li>1. 从图像中读取黑白像素，转换为二进制位</li>
+                            <li>2. 每21位转换为一个Unicode字符</li>
+                            <li>3. 识别头部标识，提取文件名和文件数据</li>
+                            <li>4. 将Base64数据转换回原始文件</li>
+                        </ul>
+                    </li>
+                    <li><strong>技术参数</strong>：
+                        <ul>
+                            <li>每个字符：21位二进制编码</li>
+                            <li>每个像素：1位（黑白）</li>
+                            <li>支持最大Unicode码点：0x10FFFF</li>
+                            <li>图像宽高比：接近A4比例（1:1.414）</li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </div>
         
@@ -892,8 +833,8 @@
         </div>
         
         <footer>
-            <p>文件↔图像转换器（Base64编码） | 支持任意文件类型 | 1位黑白/4位彩色编码 | 每个字符固定16位 | © 2023</p>
-            <p><strong>编码原理：</strong>文件内容 → UTF-8编码 → Base64字符串 → 固定16位二进制 → 图像像素</p>
+            <p>文件↔图像转换器（黑白Unicode编码） | 支持任意文件类型 | 每个字符21位 | 黑白像素编码</p>
+            <p>© 2023 文件图像转换工具 | 基于Unicode编码标准</p>
         </footer>
     </div>
     
@@ -903,20 +844,6 @@
         <span id="notificationMessage">这是一条通知</span>
     </div>
 
-    <!-- 图像预览弹窗 -->
-    <div id="imageModal" class="memory-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 2000; align-items: center; justify-content: center;">
-        <div style="background: rgba(20, 30, 40, 0.95); padding: 20px; border-radius: 10px; max-width: 90%; max-height: 90%;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="color: white;">图像预览</h3>
-                <button onclick="closeImageModal()" style="background: none; border: none; color: #ff6b9d; font-size: 1.5rem; cursor: pointer;">×</button>
-            </div>
-            <canvas id="modalCanvas" style="max-width: 100%; max-height: 70vh; display: block; margin: 0 auto;"></canvas>
-            <div style="text-align: center; margin-top: 15px; color: #b0d4e0;">
-                <div id="modalInfo">点击图像外区域关闭</div>
-            </div>
-        </div>
-    </div>
-
     <script>
         // ============== DOM元素 ==============
         const fileInput = document.getElementById('fileInput');
@@ -924,103 +851,90 @@
         const fileInfo = document.getElementById('fileInfo');
         const fileName = document.getElementById('fileName');
         const fileSize = document.getElementById('fileSize');
-        const textSize = document.getElementById('textSize');
         const fileType = document.getElementById('fileType');
-        const estimatedSize = document.getElementById('estimatedSize');
-        const memoryInfo = document.getElementById('memoryInfo');
-        const memoryEstimate = document.getElementById('memoryEstimate');
-        
-        const encodingInfo = document.getElementById('encodingInfo');
-        const encodingMethod = document.getElementById('encodingMethod');
-        const charBits = document.getElementById('charBits');
-        const dataDensity = document.getElementById('dataDensity');
+        const fileHeader = document.getElementById('fileHeader');
         
         const textPreviewContainer = document.getElementById('textPreviewContainer');
         const textPreview = document.getElementById('textPreview');
         const textPreviewLength = document.getElementById('textPreviewLength');
         
-        const maxWidthSlider = document.getElementById('maxWidthSlider');
-        const maxHeightSlider = document.getElementById('maxHeightSlider');
-        const maxWidthValue = document.getElementById('maxWidthValue');
-        const maxHeightValue = document.getElementById('maxHeightValue');
-        const encodingModeSelect = document.getElementById('encodingModeSelect');
-        
-        const colorPreview1bit = document.getElementById('colorPreview1bit');
-        const colorPreview4bit = document.getElementById('colorPreview4bit');
-        
+        const charCount = document.getElementById('charCount');
         const encodeBtn = document.getElementById('encodeBtn');
-        const downloadImageBtn = document.getElementById('downloadImageBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const progressContainer = document.querySelector('.progress-container');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-        
-        const imageInput = document.getElementById('imageInput');
-        const imageUploadArea = document.getElementById('imageUploadArea');
-        const imageValidation = document.getElementById('imageValidation');
-        const validationText = document.getElementById('validationText');
-        
+        const clearInputBtn = document.getElementById('clearInputBtn');
         const encodedCanvas = document.getElementById('encodedCanvas');
-        const encodedPreview = document.getElementById('encodedPreview');
-        const encodedImageDimensions = document.getElementById('encodedImageDimensions');
-        const encodedImageFormat = document.getElementById('encodedImageFormat');
-        const previewEncodedBtn = document.getElementById('previewEncodedBtn');
-        
-        const decodedCanvas = document.getElementById('decodedCanvas');
-        const decodedPreview = document.getElementById('decodedPreview');
-        const decodedImageDimensions = document.getElementById('decodedImageDimensions');
-        const decodedImageType = document.getElementById('decodedImageType');
-        const previewDecodedBtn = document.getElementById('previewDecodedBtn');
-        
-        const decodeInfo = document.getElementById('decodeInfo');
-        const originalFileName = document.getElementById('originalFileName');
-        const originalFileSize = document.getElementById('originalFileSize');
-        const encodingModeInfo = document.getElementById('encodingModeInfo');
-        const base64Length = document.getElementById('base64Length');
-        const creationTime = document.getElementById('creationTime');
-        const checksumInfo = document.getElementById('checksumInfo');
-        
-        const decodedTextContainer = document.getElementById('decodedTextContainer');
-        const decodedTextPreview = document.getElementById('decodedTextPreview');
-        const decodedTextLength = document.getElementById('decodedTextLength');
-        
+        const downloadBtn = document.getElementById('downloadBtn');
+        const imageInput = document.getElementById('imageInput');
         const decodeBtn = document.getElementById('decodeBtn');
+        const clearOutputBtn = document.getElementById('clearOutputBtn');
         const downloadFileBtn = document.getElementById('downloadFileBtn');
-        
         const loadingIndicator = document.getElementById('loadingIndicator');
         const notification = document.getElementById('notification');
         const notificationIcon = document.getElementById('notificationIcon');
         const notificationMessage = document.getElementById('notificationMessage');
         
-        const imageModal = document.getElementById('imageModal');
-        const modalCanvas = document.getElementById('modalCanvas');
-        const modalInfo = document.getElementById('modalInfo');
+        const autoSizeToggle = document.getElementById('autoSizeToggle');
+        const dimensionControls = document.getElementById('dimensionControls');
+        const imageWidthInput = document.getElementById('imageWidth');
+        const imageHeightInput = document.getElementById('imageHeight');
+        const aspectRatioInput = document.getElementById('aspectRatio');
+        const calculateDimensionsBtn = document.getElementById('calculateDimensionsBtn');
+        const toggleStatus = document.getElementById('toggleStatus');
+        const imageDimensions = document.getElementById('imageDimensions');
+        const imageSize = document.getElementById('imageSize');
+        const encodingModeIndicator = document.getElementById('encodingModeIndicator');
+        
+        const bitsInfo = document.getElementById('bitsInfo');
+        const totalBits = document.getElementById('totalBits');
+        const bitsPerChar = document.getElementById('bitsPerChar');
+        
+        const decodeInfo = document.getElementById('decodeInfo');
+        const detectedFileName = document.getElementById('detectedFileName');
+        const detectedFileSize = document.getElementById('detectedFileSize');
+        const detectedHeader = document.getElementById('detectedHeader');
+        const detectedImageSize = document.getElementById('detectedImageSize');
+        
+        const decodedImagePlaceholder = document.getElementById('decodedImagePlaceholder');
+        const decodedCanvas = document.getElementById('decodedCanvas');
+        const decodedTextContainer = document.getElementById('decodedTextContainer');
+        const decodedTextPreview = document.getElementById('decodedTextPreview');
+        const decodedTextLength = document.getElementById('decodedTextLength');
+        
+        // ============== 常量定义 ==============
+        const HEADER_MARKER = 'FIMG|'; // 头部标识
+        const BITS_PER_CHAR = 21; // Unicode编码每个字符21位
+        const MAX_UNICODE = 0x10FFFF; // Unicode最大码点
+        const MIN_WIDTH = 100;
+        const MIN_HEIGHT = 142;
+        const MAX_WIDTH = 10000;
+        const MAX_HEIGHT = 14140;
+        const ASPECT_RATIO = 1.414; // A4比例
         
         // ============== 状态变量 ==============
         let currentFile = null;
         let fileData = null;
-        let base64Text = null;
+        let base64Data = null;
         let encodedImageData = null;
-        let encodedCanvasData = null;
-        let decodedImageData = null;
-        let metadata = null;
-        let currentEncodingMode = '1bit';
-        let decodedBase64Text = null;
-        
-        // ============== 常量定义 ==============
-        const BITS_PER_CHAR = 16; // 每个字符固定16位
-        const MAGIC_HEADER = 'FIMG2023'; // 8字节魔术头
-        const SEPARATOR = '|||'; // 分隔符
+        let autoSizeEnabled = true;
+        let currentWidth = 980;
+        let currentHeight = 1400;
+        let decodedFileInfo = null;
         
         // ============== 初始化 ==============
         document.addEventListener('DOMContentLoaded', function() {
-            setupEventListeners();
-            updateSliders();
-            updateColorPreview();
-            showNotification('文件转换工具已加载！请选择要处理的文件。', 'info');
+            initializePage();
         });
         
-        // ============== 事件监听器 ==============
+        function initializePage() {
+            setupEventListeners();
+            updateAspectRatio();
+            
+            // 显示欢迎信息
+            setTimeout(() => {
+                showNotification('文件↔图像转换器已加载！支持任意文件类型的黑白Unicode编码。', 'info');
+            }, 1000);
+        }
+        
+        // ============== 事件监听器设置 ==============
         function setupEventListeners() {
             // 文件上传区域点击
             fileUploadArea.addEventListener('click', () => fileInput.click());
@@ -1028,19 +942,19 @@
             // 文件拖放支持
             fileUploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                fileUploadArea.style.borderColor = 'rgba(255, 107, 157, 0.6)';
-                fileUploadArea.style.background = 'rgba(255, 107, 157, 0.1)';
+                fileUploadArea.style.borderColor = '#6c63ff';
+                fileUploadArea.style.background = 'rgba(60, 60, 100, 0.7)';
             });
             
             fileUploadArea.addEventListener('dragleave', () => {
-                fileUploadArea.style.borderColor = 'rgba(255, 107, 157, 0.3)';
-                fileUploadArea.style.background = 'rgba(255, 107, 157, 0.05)';
+                fileUploadArea.style.borderColor = '#3a3a7a';
+                fileUploadArea.style.background = 'rgba(30, 30, 60, 0.5)';
             });
             
             fileUploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
-                fileUploadArea.style.borderColor = 'rgba(255, 107, 157, 0.3)';
-                fileUploadArea.style.background = 'rgba(255, 107, 157, 0.05)';
+                fileUploadArea.style.borderColor = '#3a3a7a';
+                fileUploadArea.style.background = 'rgba(30, 30, 60, 0.5)';
                 
                 if (e.dataTransfer.files.length > 0) {
                     handleFileSelect(e.dataTransfer.files[0]);
@@ -1055,138 +969,145 @@
             });
             
             // 图像上传区域
-            imageUploadArea.addEventListener('click', () => imageInput.click());
-            
-            // 图像拖放支持
-            imageUploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                imageUploadArea.style.borderColor = 'rgba(255, 107, 157, 0.6)';
-                imageUploadArea.style.background = 'rgba(255, 107, 157, 0.1)';
-            });
-            
-            imageUploadArea.addEventListener('dragleave', () => {
-                imageUploadArea.style.borderColor = 'rgba(255, 107, 157, 0.3)';
-                imageUploadArea.style.background = 'rgba(255, 107, 157, 0.05)';
-            });
-            
-            imageUploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                imageUploadArea.style.borderColor = 'rgba(255, 107, 157, 0.3)';
-                imageUploadArea.style.background = 'rgba(255, 107, 157, 0.05)';
-                
-                if (e.dataTransfer.files.length > 0) {
-                    const file = e.dataTransfer.files[0];
-                    if (file.type.startsWith('image/')) {
-                        handleImageSelect(file);
-                    } else {
-                        showNotification('请选择图像文件', 'error');
-                    }
+            imageInput.addEventListener('change', function() {
+                decodeBtn.disabled = !this.files.length;
+                if (this.files.length > 0) {
+                    previewEncodedImage(this.files[0]);
                 }
             });
             
-            // 滑块事件
-            maxWidthSlider.addEventListener('input', updateSliders);
-            maxHeightSlider.addEventListener('input', updateSliders);
+            // 自动尺寸切换
+            autoSizeToggle.addEventListener('change', function() {
+                autoSizeEnabled = this.checked;
+                dimensionControls.style.display = autoSizeEnabled ? 'none' : 'flex';
+                toggleStatus.textContent = autoSizeEnabled ? '已启用' : '已禁用';
+            });
             
-            // 编码模式选择
-            encodingModeSelect.addEventListener('change', () => {
-                currentEncodingMode = encodingModeSelect.value;
-                updateColorPreview();
-                updateMemoryEstimate();
+            // 手动尺寸输入
+            imageWidthInput.addEventListener('input', function() {
+                if (!autoSizeEnabled) {
+                    const width = parseInt(this.value) || MIN_WIDTH;
+                    const height = Math.round(width * ASPECT_RATIO);
+                    imageHeightInput.value = height;
+                    updateAspectRatio();
+                }
+            });
+            
+            imageHeightInput.addEventListener('input', function() {
+                if (!autoSizeEnabled) {
+                    const height = parseInt(this.value) || MIN_HEIGHT;
+                    const width = Math.round(height / ASPECT_RATIO);
+                    imageWidthInput.value = width;
+                    updateAspectRatio();
+                }
+            });
+            
+            // 计算尺寸按钮
+            calculateDimensionsBtn.addEventListener('click', function() {
+                if (!autoSizeEnabled) {
+                    const width = parseInt(imageWidthInput.value) || MIN_WIDTH;
+                    const height = parseInt(imageHeightInput.value) || MIN_HEIGHT;
+                    currentWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
+                    currentHeight = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, height));
+                    imageWidthInput.value = currentWidth;
+                    imageHeightInput.value = currentHeight;
+                    updateAspectRatio();
+                    showNotification(`图像尺寸已设置为 ${currentWidth}×${currentHeight} 像素`, 'info');
+                }
             });
             
             // 编码按钮
             encodeBtn.addEventListener('click', encodeFileToImage);
             
-            // 下载图像按钮
-            downloadImageBtn.addEventListener('click', downloadEncodedImage);
+            // 清空输入按钮
+            clearInputBtn.addEventListener('click', () => {
+                currentFile = null;
+                fileData = null;
+                base64Data = null;
+                fileInput.value = '';
+                fileInfo.style.display = 'none';
+                textPreviewContainer.style.display = 'none';
+                hideCanvas();
+                encodeBtn.disabled = true;
+                downloadBtn.disabled = true;
+                showNotification('输入已清空', 'info');
+            });
             
-            // 清空按钮
-            clearBtn.addEventListener('click', clearAll);
+            // 下载按钮
+            downloadBtn.addEventListener('click', downloadImage);
             
             // 解码按钮
             decodeBtn.addEventListener('click', decodeImageToFile);
             
+            // 清空输出按钮
+            clearOutputBtn.addEventListener('click', () => {
+                decodedFileInfo = null;
+                imageInput.value = '';
+                decodeInfo.style.display = 'none';
+                decodedTextContainer.style.display = 'none';
+                decodedImagePlaceholder.style.display = 'flex';
+                decodedCanvas.style.display = 'none';
+                decodeBtn.disabled = true;
+                downloadFileBtn.disabled = true;
+                showNotification('输出已清空', 'info');
+            });
+            
             // 下载文件按钮
             downloadFileBtn.addEventListener('click', downloadDecodedFile);
             
-            // 图像选择
-            imageInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    if (file.type.startsWith('image/')) {
-                        handleImageSelect(file);
-                    } else {
-                        showNotification('请选择图像文件', 'error');
-                    }
-                }
-            });
-            
-            // 预览按钮
-            previewEncodedBtn.addEventListener('click', () => previewImage(encodedCanvas, '编码图像'));
-            previewDecodedBtn.addEventListener('click', () => previewImage(decodedCanvas, '解码图像'));
-            
-            // 模态框点击关闭
-            imageModal.addEventListener('click', (e) => {
-                if (e.target === imageModal) {
-                    closeImageModal();
-                }
-            });
+            // 设置键盘快捷键
+            setupKeyboardShortcuts();
         }
         
-        // ============== 更新颜色预览 ==============
-        function updateColorPreview() {
-            if (currentEncodingMode === '1bit') {
-                colorPreview1bit.style.display = 'flex';
-                colorPreview4bit.style.display = 'none';
-            } else {
-                colorPreview1bit.style.display = 'none';
-                colorPreview4bit.style.display = 'flex';
-            }
-        }
-        
-        // ============== 文件处理 ==============
+        // ============== 文件选择处理 ==============
         function handleFileSelect(file) {
-            if (!file) return;
-            
             currentFile = file;
             
             // 显示文件信息
             fileName.textContent = file.name;
             fileSize.textContent = formatFileSize(file.size);
             fileType.textContent = getFileExtension(file.name);
+            fileHeader.textContent = HEADER_MARKER;
+            
+            // 显示文件信息面板
+            fileInfo.style.display = 'block';
             
             // 读取文件数据
             const reader = new FileReader();
             reader.onload = function(e) {
                 fileData = e.target.result;
                 
-                // 将文件内容转换为Base64文本
+                // 将文件内容转换为Base64
                 const bytes = new Uint8Array(fileData);
-                base64Text = arrayBufferToBase64(bytes);
-                
-                // 显示Base64信息
-                encodingInfo.style.display = 'block';
-                encodingMethod.textContent = 'UTF-8 → Base64';
-                charBits.textContent = `${BITS_PER_CHAR}位/字符`;
-                const density = (base64Text.length * BITS_PER_CHAR) / (file.size * 8);
-                dataDensity.textContent = `密度: ${density.toFixed(2)}`;
+                base64Data = arrayBufferToBase64(bytes);
                 
                 // 显示文本预览
                 textPreviewContainer.style.display = 'block';
-                textPreviewLength.textContent = `${base64Text.length} 字符`;
+                textPreviewLength.textContent = `${base64Data.length} 字符`;
                 
                 // 只显示前500个字符作为预览
-                const previewText = base64Text.length > 500 
-                    ? base64Text.substring(0, 500) + '...' 
-                    : base64Text;
+                const previewText = base64Data.length > 500 
+                    ? base64Data.substring(0, 500) + '...' 
+                    : base64Data;
                 textPreview.textContent = previewText;
                 
-                // 更新文本大小
-                textSize.textContent = formatFileSize(base64Text.length);
+                // 计算并显示字符数
+                const totalChars = calculateTotalChars(file.name, base64Data);
+                const pixelsNeeded = totalChars * BITS_PER_CHAR;
                 
-                updateMemoryEstimate();
-                updateEstimatedSize();
+                if (autoSizeEnabled) {
+                    calculateAutoDimensions(pixelsNeeded);
+                    charCount.textContent = `总字符数: ${totalChars.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
+                    charCount.textContent += ` | 图像尺寸: ${currentWidth}×${currentHeight}`;
+                } else {
+                    charCount.textContent = `总字符数: ${totalChars.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
+                }
+                
+                // 更新位信息
+                updateBitsInfo(totalChars);
+                
+                // 启用编码按钮
+                encodeBtn.disabled = false;
             };
             
             reader.onerror = function() {
@@ -1195,11 +1116,41 @@
             
             reader.readAsArrayBuffer(file);
             
-            // 显示文件信息面板
-            fileInfo.style.display = 'block';
-            encodeBtn.disabled = false;
-            
             showNotification(`已选择文件：${file.name}`, 'success');
+        }
+        
+        // ============== 计算总字符数 ==============
+        function calculateTotalChars(filename, base64Data) {
+            // 数据格式：头部(5) + 文件名长度(4字节=2字符) + 文件名 + 数据长度(4字节=2字符) + Base64数据
+            // 注意：每个32位整数在Unicode编码中占用2个字符（21位×2=42位 > 32位）
+            
+            // 头部标识
+            let total = HEADER_MARKER.length;
+            
+            // 文件名长度（32位整数，需要2个Unicode字符）
+            total += 2;
+            
+            // 文件名本身
+            total += filename.length;
+            
+            // 数据长度（32位整数，需要2个Unicode字符）
+            total += 2;
+            
+            // Base64数据
+            total += base64Data.length;
+            
+            return total;
+        }
+        
+        // ============== 更新位信息 ==============
+        function updateBitsInfo(totalChars) {
+            const totalBitsValue = totalChars * BITS_PER_CHAR;
+            
+            totalBits.textContent = totalBitsValue.toLocaleString();
+            bitsPerChar.textContent = BITS_PER_CHAR;
+            
+            // 显示位信息
+            bitsInfo.style.display = totalChars > 0 ? 'block' : 'none';
         }
         
         // ============== Base64转换函数 ==============
@@ -1223,18 +1174,29 @@
             return bytes.buffer;
         }
         
-        // ============== Unicode字符编码 ==============
+        // ============== Unicode编码函数 ==============
         function encodeUnicodeToBinary(text) {
-            // 将字符串中的每个字符编码为16位二进制
+            // 将字符串中的每个字符编码为21位二进制
             const binaryArray = [];
             
             for (let i = 0; i < text.length; i++) {
-                const charCode = text.charCodeAt(i);
+                const charCode = text.codePointAt(i);
                 
-                // 确保每个字符使用16位表示
+                // 处理代理对（UTF-16代理对）
+                if (charCode >= 0xD800 && charCode <= 0xDFFF) {
+                    // 跳过代理对的低代理项
+                    continue;
+                }
+                
+                // 确保码点在有效范围内
+                if (charCode > MAX_UNICODE) {
+                    throw new Error(`字符码点 ${charCode} 超出Unicode范围 (最大: ${MAX_UNICODE})`);
+                }
+                
+                // 转换为21位二进制
                 let binary = charCode.toString(2);
                 
-                // 填充到16位
+                // 填充到21位
                 while (binary.length < BITS_PER_CHAR) {
                     binary = '0' + binary;
                 }
@@ -1249,774 +1211,520 @@
         }
         
         function decodeBinaryToUnicode(binaryArray) {
-            // 将16位二进制数组解码为字符串
+            // 将21位二进制数组解码为字符串
             let text = '';
             
             for (let i = 0; i < binaryArray.length; i += BITS_PER_CHAR) {
                 if (i + BITS_PER_CHAR > binaryArray.length) break;
                 
-                // 提取16位二进制
+                // 提取21位二进制
                 let binary = '';
                 for (let j = 0; j < BITS_PER_CHAR; j++) {
-                    binary += binaryArray[i + j];
+                    binary += binaryArray[i + j] || '0';
                 }
                 
                 // 转换为字符代码
                 const charCode = parseInt(binary, 2);
                 
                 // 添加到字符串
-                text += String.fromCharCode(charCode);
+                text += String.fromCodePoint(charCode);
             }
             
             return text;
         }
         
-        // ============== 滑块更新 ==============
-        function updateSliders() {
-            maxWidthValue.textContent = `${maxWidthSlider.value} px`;
-            maxHeightValue.textContent = `${maxHeightSlider.value} px`;
-            updateMemoryEstimate();
-            updateEstimatedSize();
+        // ============== 计算自动尺寸 ==============
+        function calculateAutoDimensions(pixelsNeeded) {
+            if (pixelsNeeded <= 0) {
+                currentWidth = MIN_WIDTH;
+                currentHeight = MIN_HEIGHT;
+                return;
+            }
+            
+            // 根据A4比例计算宽度：width = sqrt(pixels / aspectRatio)
+            let width = Math.sqrt(pixelsNeeded / ASPECT_RATIO);
+            
+            // 确保在最小和最大范围内
+            width = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
+            
+            // 计算高度，保持A4比例
+            let height = Math.round(width * ASPECT_RATIO);
+            
+            // 调整高度确保能容纳所有像素
+            const totalPixels = width * height;
+            if (totalPixels < pixelsNeeded) {
+                height = Math.ceil(pixelsNeeded / width);
+            }
+            
+            // 确保高度也在范围内
+            height = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, height));
+            
+            // 再次检查宽度是否需要调整
+            if (width * height < pixelsNeeded) {
+                width = Math.ceil(pixelsNeeded / height);
+                width = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
+            }
+            
+            currentWidth = Math.floor(width);
+            currentHeight = Math.floor(height);
         }
         
-        // ============== 内存估算 ==============
-        function updateMemoryEstimate() {
-            if (!currentFile || !base64Text) return;
-            
-            const maxWidth = parseInt(maxWidthSlider.value);
-            const maxHeight = parseInt(maxHeightSlider.value);
-            
-            // 根据编码模式计算位数
-            let bitsPerPixel;
-            switch(currentEncodingMode) {
-                case '1bit': bitsPerPixel = 1; break;
-                case '4bit': bitsPerPixel = 4; break;
-                default: bitsPerPixel = 1;
-            }
-            
-            // 准备元数据
-            const metadataStr = JSON.stringify({
-                filename: currentFile.name,
-                filesize: currentFile.size,
-                encoding: currentEncodingMode,
-                createdAt: new Date().toISOString(),
-                version: '3.0',
-                textLength: base64Text.length,
-                bitsPerChar: BITS_PER_CHAR,
-                checksum: calculateChecksum(base64Text)
-            });
-            
-            // 完整数据：魔术头 + 元数据 + 分隔符 + Base64文本
-            const fullData = MAGIC_HEADER + metadataStr + SEPARATOR + base64Text;
-            
-            // 计算总位数
-            const totalBitsNeeded = fullData.length * BITS_PER_CHAR;
-            
-            // 计算所需像素数
-            const totalPixelsNeeded = Math.ceil(totalBitsNeeded / bitsPerPixel);
-            
-            // 计算图像尺寸
-            const aspectRatio = 1.414; // A4比例
-            let width = Math.sqrt(totalPixelsNeeded / aspectRatio);
-            let height = width * aspectRatio;
-            
-            // 限制最大尺寸
-            width = Math.min(width, maxWidth);
-            height = Math.min(height, maxHeight);
-            
-            // 如果仍然不够，调整高度
-            if (width * height < totalPixelsNeeded) {
-                height = Math.min(Math.ceil(totalPixelsNeeded / width), maxHeight);
-            }
-            
-            // 计算内存使用
-            width = Math.floor(width);
-            height = Math.floor(height);
-            
-            const imageMemory = width * height * 4; // RGBA
-            const processingMemory = (currentFile.size + base64Text.length) * 2;
-            const totalMemoryMB = (imageMemory + processingMemory) / (1024 * 1024);
-            
-            // 更新显示
-            memoryEstimate.textContent = `${totalMemoryMB.toFixed(1)} MB`;
-            
-            // 根据内存大小显示警告
-            if (totalMemoryMB > 500) {
-                memoryInfo.className = 'memory-info warning';
-                memoryInfo.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <strong>警告：</strong> 预计使用 ${totalMemoryMB.toFixed(1)} MB 内存`;
-            } else if (totalMemoryMB > 100) {
-                memoryInfo.className = 'memory-info';
-                memoryInfo.innerHTML = `<i class="fas fa-memory"></i> <strong>内存使用：</strong> 预计 ${totalMemoryMB.toFixed(1)} MB`;
-            } else {
-                memoryInfo.className = 'memory-info';
-                memoryInfo.innerHTML = `<i class="fas fa-memory"></i> <strong>内存使用：</strong> 预计 ${totalMemoryMB.toFixed(1)} MB`;
-            }
-            
-            return { width, height, totalMemoryMB };
-        }
-        
-        // ============== 更新预估尺寸 ==============
-        function updateEstimatedSize() {
-            if (!currentFile) return;
-            
-            const estimate = updateMemoryEstimate();
-            if (estimate) {
-                estimatedSize.textContent = `${estimate.width}×${estimate.height} 像素`;
-            }
+        // ============== 更新宽高比显示 ==============
+        function updateAspectRatio() {
+            const width = parseInt(imageWidthInput.value) || MIN_WIDTH;
+            const height = parseInt(imageHeightInput.value) || MIN_HEIGHT;
+            const ratio = (height / width).toFixed(3);
+            aspectRatioInput.value = `1:${ratio}`;
         }
         
         // ============== 编码文件为图像 ==============
-        async function encodeFileToImage() {
-            if (!currentFile || !fileData || !base64Text) {
+        function encodeFileToImage() {
+            if (!currentFile || !fileData || !base64Data) {
                 showNotification('请先选择文件', 'error');
                 return;
             }
             
-            const maxWidth = parseInt(maxWidthSlider.value);
-            const maxHeight = parseInt(maxHeightSlider.value);
-            
-            // 显示加载和进度
+            // 显示加载指示器
             showLoading(true);
-            progressContainer.style.display = 'block';
-            progressFill.style.width = '0%';
-            progressText.textContent = '0%';
             
-            try {
-                // 准备元数据
-                metadata = {
-                    filename: currentFile.name,
-                    filesize: currentFile.size,
-                    encoding: currentEncodingMode,
-                    createdAt: new Date().toISOString(),
-                    version: '3.0',
-                    textLength: base64Text.length,
-                    bitsPerChar: BITS_PER_CHAR,
-                    checksum: calculateChecksum(base64Text)
-                };
-                
-                const metadataStr = JSON.stringify(metadata);
-                updateProgress(5);
-                
-                // 组合数据：魔术头 + 元数据 + 分隔符 + Base64文本
-                const fullData = MAGIC_HEADER + metadataStr + SEPARATOR + base64Text;
-                updateProgress(10);
-                
-                // 将完整数据编码为16位二进制数组
-                const binaryBits = encodeUnicodeToBinary(fullData);
-                updateProgress(30);
-                
-                // 根据编码模式计算图像尺寸
-                let bitsPerPixel;
-                switch(currentEncodingMode) {
-                    case '1bit': bitsPerPixel = 1; break;
-                    case '4bit': bitsPerPixel = 4; break;
-                }
-                
-                const totalBits = binaryBits.length;
-                const totalPixelsNeeded = Math.ceil(totalBits / bitsPerPixel);
-                
-                // 计算图像尺寸
-                const aspectRatio = 1.414;
-                let width = Math.sqrt(totalPixelsNeeded / aspectRatio);
-                let height = width * aspectRatio;
-                
-                width = Math.min(width, maxWidth);
-                height = Math.min(height, maxHeight);
-                
-                if (width * height < totalPixelsNeeded) {
-                    height = Math.min(Math.ceil(totalPixelsNeeded / width), maxHeight);
-                }
-                
-                width = Math.floor(width);
-                height = Math.floor(height);
-                
-                updateProgress(40);
-                
-                // 创建Canvas
-                const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                
-                // 创建图像数据
-                const imageData = ctx.createImageData(width, height);
-                const data = imageData.data;
-                
-                // 初始化所有像素为灰色背景
-                for (let i = 0; i < data.length; i += 4) {
-                    data[i] = 128;     // R
-                    data[i + 1] = 128; // G
-                    data[i + 2] = 128; // B
-                    data[i + 3] = 255; // A
-                }
-                
-                updateProgress(50);
-                
-                // 编码数据到像素
-                let pixelIndex = 0;
-                let bitIndex = 0;
-                
-                while (pixelIndex < width * height && bitIndex < binaryBits.length) {
-                    if (currentEncodingMode === '1bit') {
-                        // 1位模式：黑白
-                        const bit = binaryBits[bitIndex];
-                        const baseIndex = pixelIndex * 4;
-                        
-                        if (bit === 1) {
-                            data[baseIndex] = 255;     // R: 白色
-                            data[baseIndex + 1] = 255; // G: 白色
-                            data[baseIndex + 2] = 255; // B: 白色
-                        } else {
-                            data[baseIndex] = 0;       // R: 黑色
-                            data[baseIndex + 1] = 0;   // G: 黑色
-                            data[baseIndex + 2] = 0;   // B: 黑色
-                        }
-                        
-                        pixelIndex++;
-                        bitIndex++;
+            // 使用setTimeout避免阻塞UI
+            setTimeout(() => {
+                try {
+                    // 构建完整数据
+                    const fullData = buildFileData(currentFile.name, base64Data);
+                    
+                    // 计算图像尺寸
+                    const totalChars = fullData.length;
+                    const pixelsNeeded = totalChars * BITS_PER_CHAR;
+                    
+                    if (autoSizeEnabled) {
+                        calculateAutoDimensions(pixelsNeeded);
                     } else {
-                        // 4位模式：16级灰度
-                        let fourBits = 0;
-                        for (let i = 0; i < 4; i++) {
-                            if (bitIndex + i < binaryBits.length) {
-                                fourBits = (fourBits << 1) | binaryBits[bitIndex + i];
-                            } else {
-                                fourBits = (fourBits << 1) | 0; // 用0填充
-                            }
-                        }
-                        
-                        const baseIndex = pixelIndex * 4;
-                        const grayValue = Math.floor(fourBits * 17); // 0-15 映射到 0-255
-                        
-                        data[baseIndex] = grayValue;     // R
-                        data[baseIndex + 1] = grayValue; // G
-                        data[baseIndex + 2] = grayValue; // B
-                        
-                        pixelIndex++;
-                        bitIndex += 4;
+                        currentWidth = parseInt(imageWidthInput.value) || MIN_WIDTH;
+                        currentHeight = parseInt(imageHeightInput.value) || MIN_HEIGHT;
                     }
                     
-                    // 更新进度
-                    if (pixelIndex % 10000 === 0) {
-                        const progress = 50 + (pixelIndex / (width * height)) * 45;
-                        updateProgress(progress);
-                    }
+                    // 设置画布尺寸
+                    encodedCanvas.width = currentWidth;
+                    encodedCanvas.height = currentHeight;
+                    
+                    // 将完整数据转换为二进制
+                    const binaryArray = encodeUnicodeToBinary(fullData);
+                    
+                    // 创建黑白图像
+                    createBinaryImage(binaryArray);
+                    
+                    // 显示图像
+                    displayEncodedImage();
+                    
+                    // 更新图像信息
+                    updateImageInfo();
+                    
+                    // 启用下载按钮
+                    downloadBtn.disabled = false;
+                    
+                    // 显示编码成功信息
+                    const successMessage = `编码成功！文件 "${currentFile.name}" 已编码为 ${currentWidth}×${currentHeight} 像素的黑白图像`;
+                    showNotification(successMessage, 'success');
+                } catch (error) {
+                    console.error('编码错误:', error);
+                    showNotification('编码过程中发生错误: ' + error.message, 'error');
+                } finally {
+                    showLoading(false);
                 }
+            }, 100);
+        }
+        
+        // ============== 构建文件数据 ==============
+        function buildFileData(filename, base64Data) {
+            // 数据格式：头部标识 + 文件名长度 + 文件名 + 数据长度 + Base64数据
+            
+            // 头部标识
+            let data = HEADER_MARKER;
+            
+            // 文件名长度（32位整数）
+            const filenameLength = filename.length;
+            const filenameLengthBinary = encode32BitInteger(filenameLength);
+            data += filenameLengthBinary;
+            
+            // 文件名
+            data += filename;
+            
+            // 数据长度（32位整数）
+            const dataLength = base64Data.length;
+            const dataLengthBinary = encode32BitInteger(dataLength);
+            data += dataLengthBinary;
+            
+            // Base64数据
+            data += base64Data;
+            
+            return data;
+        }
+        
+        // ============== 编码32位整数为2个Unicode字符 ==============
+        function encode32BitInteger(value) {
+            // 将32位整数编码为2个Unicode字符（21位×2=42位 > 32位）
+            const high = (value >>> 21) & 0x7FF; // 高11位
+            const low = value & 0x1FFFFF; // 低21位
+            
+            // 转换为两个Unicode字符
+            return String.fromCodePoint(low) + String.fromCodePoint(high);
+        }
+        
+        // ============== 解码2个Unicode字符为32位整数 ==============
+        function decode32BitInteger(str) {
+            if (str.length < 2) return 0;
+            
+            const low = str.codePointAt(0);
+            const high = str.codePointAt(1);
+            
+            return (high << 21) | low;
+        }
+        
+        // ============== 创建二进制图像 ==============
+        function createBinaryImage(binaryArray) {
+            const ctx = encodedCanvas.getContext('2d');
+            const imageData = ctx.createImageData(currentWidth, currentHeight);
+            const data = imageData.data;
+            
+            // 用白色填充整个画布
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = 255;     // R
+                data[i+1] = 255;   // G
+                data[i+2] = 255;   // B
+                data[i+3] = 255;   // A
+            }
+            
+            // 根据二进制数组设置像素颜色
+            for (let i = 0; i < binaryArray.length && i < currentWidth * currentHeight; i++) {
+                const bit = binaryArray[i];
+                const pixelIndex = i * 4;
                 
-                updateProgress(95);
-                
-                // 绘制图像
-                ctx.putImageData(imageData, 0, 0);
-                
-                // 保存编码数据
-                encodedImageData = canvas.toDataURL('image/png');
-                encodedCanvasData = canvas;
-                
-                // 显示预览
-                displayEncodedPreview(canvas);
-                
-                // 完成
-                updateProgress(100);
-                
-                // 启用下载图像按钮
-                downloadImageBtn.disabled = false;
-                
-                const modeName = currentEncodingMode === '1bit' ? '1位黑白' : '4位16色';
-                showNotification(`编码完成！${modeName}，尺寸：${width}×${height}像素，每个字符${BITS_PER_CHAR}位`, 'success');
-                
-            } catch (error) {
-                console.error('编码错误:', error);
-                showNotification(`编码失败：${error.message}`, 'error');
-            } finally {
-                showLoading(false);
-                setTimeout(() => {
-                    progressContainer.style.display = 'none';
-                }, 1000);
+                if (bit === 1) {
+                    data[pixelIndex] = 0;     // R
+                    data[pixelIndex+1] = 0;   // G
+                    data[pixelIndex+2] = 0;   // B
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+        
+        // ============== 显示编码后的图像 ==============
+        function displayEncodedImage() {
+            const imageOutput = document.getElementById('imageOutput');
+            const canvas = document.getElementById('encodedCanvas');
+            
+            // 隐藏占位符，显示画布
+            imageOutput.style.display = 'none';
+            canvas.style.display = 'block';
+            
+            // 创建图像预览
+            const previewCanvas = document.createElement('canvas');
+            const previewCtx = previewCanvas.getContext('2d');
+            
+            // 设置预览尺寸
+            const maxWidth = imageOutput.parentElement.clientWidth - 30;
+            const scale = Math.min(maxWidth / currentWidth, 1);
+            const previewWidth = currentWidth * scale;
+            const previewHeight = currentHeight * scale;
+            
+            previewCanvas.width = previewWidth;
+            previewCanvas.height = previewHeight;
+            
+            // 绘制缩放后的图像
+            previewCtx.drawImage(encodedCanvas, 0, 0, currentWidth, currentHeight, 
+                                0, 0, previewWidth, previewHeight);
+            
+            // 添加到容器中
+            imageOutput.parentElement.appendChild(previewCanvas);
+            
+            // 移除旧的预览canvas
+            const existingPreview = imageOutput.parentElement.querySelector('canvas:not(#encodedCanvas)');
+            if (existingPreview && existingPreview !== previewCanvas) {
+                existingPreview.remove();
             }
         }
         
-        // ============== 显示编码预览 ==============
-        function displayEncodedPreview(canvas) {
-            const placeholder = encodedPreview.querySelector('.image-placeholder');
+        // ============== 隐藏画布 ==============
+        function hideCanvas() {
+            const imageOutput = document.getElementById('imageOutput');
+            const canvas = document.getElementById('encodedCanvas');
+            const previewCanvas = imageOutput.parentElement.querySelector('canvas:not(#encodedCanvas)');
             
-            // 复制图像到显示canvas
-            encodedCanvas.width = canvas.width;
-            encodedCanvas.height = canvas.height;
-            const ctx = encodedCanvas.getContext('2d');
-            ctx.drawImage(canvas, 0, 0);
+            imageOutput.style.display = 'flex';
+            canvas.style.display = 'none';
             
-            // 显示
-            placeholder.style.display = 'none';
-            encodedCanvas.style.display = 'block';
+            if (previewCanvas) {
+                previewCanvas.remove();
+            }
             
-            // 更新信息
-            encodedImageDimensions.textContent = `尺寸: ${canvas.width}×${canvas.height} 像素`;
-            encodedImageFormat.textContent = `格式: ${currentEncodingMode === '1bit' ? '1位黑白' : '4位16色'}`;
-            
-            // 启用预览按钮
-            previewEncodedBtn.disabled = false;
+            // 重置图像信息
+            imageDimensions.textContent = '图像尺寸: 未生成';
+            imageSize.textContent = '文件大小: 未生成';
         }
         
-        // ============== 下载编码图像 ==============
-        function downloadEncodedImage() {
-            if (!encodedCanvasData) {
-                showNotification('没有可下载的图像', 'error');
+        // ============== 更新图像信息 ==============
+        function updateImageInfo() {
+            imageDimensions.textContent = `图像尺寸: ${currentWidth}×${currentHeight} 像素`;
+            
+            // 估计文件大小（PNG格式）
+            const estimatedSizeKB = Math.round((currentWidth * currentHeight * 0.1) / 1024);
+            imageSize.textContent = `文件大小: ~${estimatedSizeKB} KB`;
+        }
+        
+        // ============== 下载图像 ==============
+        function downloadImage() {
+            const link = document.createElement('a');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            
+            link.download = `encoded-${currentFile.name.replace(/\.[^/.]+$/, "")}-${timestamp}.png`;
+            link.href = encodedCanvas.toDataURL('image/png');
+            link.click();
+            showNotification('图像下载成功！', 'success');
+        }
+        
+        // ============== 预览编码图像 ==============
+        function previewEncodedImage(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // 设置canvas尺寸
+                    decodedCanvas.width = img.width;
+                    decodedCanvas.height = img.height;
+                    const ctx = decodedCanvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // 显示图像
+                    decodedImagePlaceholder.style.display = 'none';
+                    decodedCanvas.style.display = 'block';
+                    
+                    // 更新检测到的图像尺寸
+                    detectedImageSize.textContent = `${img.width}×${img.height} 像素`;
+                };
+                
+                img.onerror = function() {
+                    showNotification('无法加载图像文件', 'error');
+                };
+                
+                img.src = e.target.result;
+            };
+            
+            reader.onerror = function() {
+                showNotification('无法读取文件', 'error');
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        // ============== 解码图像为文件 ==============
+        function decodeImageToFile() {
+            const file = imageInput.files[0];
+            if (!file) {
+                showNotification('请先选择图像文件', 'error');
                 return;
             }
             
-            try {
-                const link = document.createElement('a');
-                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-                link.download = `encoded_${currentFile.name.replace(/\.[^/.]+$/, "")}_${timestamp}.png`;
-                link.href = encodedImageData;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                showNotification('图像下载成功！', 'success');
-            } catch (error) {
-                showNotification(`下载失败：${error.message}`, 'error');
-            }
-        }
-        
-        // ============== 图像选择处理 ==============
-        async function handleImageSelect(file) {
             showLoading(true);
             
             const reader = new FileReader();
             
-            reader.onload = async function(e) {
-                try {
-                    const img = new Image();
-                    
-                    await new Promise((resolve, reject) => {
-                        img.onload = resolve;
-                        img.onerror = reject;
-                        img.src = e.target.result;
-                    });
-                    
-                    decodedImageData = e.target.result;
-                    
-                    // 验证图像是否包含编码数据
-                    const isValid = await validateEncodedImage(img);
-                    
-                    if (isValid) {
-                        // 显示预览
-                        displayDecodedPreview(img);
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    try {
+                        // 创建临时canvas
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = img.width;
+                        tempCanvas.height = img.height;
+                        const tempCtx = tempCanvas.getContext('2d');
                         
-                        // 更新验证信息
-                        imageValidation.style.display = 'block';
-                        imageValidation.className = 'validation-info valid';
-                        validationText.innerHTML = `<i class="fas fa-check-circle"></i> 验证通过：这是一个有效的编码图像`;
+                        // 绘制图像
+                        tempCtx.drawImage(img, 0, 0);
                         
-                        // 启用解码按钮
-                        decodeBtn.disabled = false;
+                        // 获取像素数据
+                        const imageData = tempCtx.getImageData(0, 0, img.width, img.height);
+                        const data = imageData.data;
                         
-                        showNotification(`已加载编码图像：${file.name}`, 'success');
-                    } else {
-                        imageValidation.style.display = 'block';
-                        imageValidation.className = 'validation-info invalid';
-                        validationText.innerHTML = `<i class="fas fa-exclamation-triangle"></i> 验证失败：这不是一个有效的编码图像`;
-                        decodeBtn.disabled = true;
+                        // 提取二进制字符串
+                        const binaryArray = extractBinaryFromImage(data, img.width, img.height);
                         
-                        showNotification('这不是一个有效的编码图像文件', 'warning');
+                        // 将二进制数组转换为文本
+                        const text = decodeBinaryToUnicode(binaryArray);
+                        
+                        // 解析文件数据
+                        const fileInfo = parseFileData(text);
+                        
+                        if (!fileInfo) {
+                            throw new Error('无法识别文件数据格式');
+                        }
+                        
+                        // 保存解码信息
+                        decodedFileInfo = fileInfo;
+                        
+                        // 显示解码信息
+                        detectedFileName.textContent = fileInfo.filename;
+                        detectedFileSize.textContent = formatFileSize(fileInfo.data.length);
+                        detectedHeader.textContent = HEADER_MARKER;
+                        decodeInfo.style.display = 'block';
+                        
+                        // 显示解码文本预览
+                        decodedTextContainer.style.display = 'block';
+                        decodedTextLength.textContent = `${fileInfo.base64Data.length} 字符`;
+                        const previewText = fileInfo.base64Data.length > 500 
+                            ? fileInfo.base64Data.substring(0, 500) + '...' 
+                            : fileInfo.base64Data;
+                        decodedTextPreview.textContent = previewText;
+                        
+                        // 启用下载文件按钮
+                        downloadFileBtn.disabled = false;
+                        
+                        showNotification(`解码成功！检测到文件: ${fileInfo.filename}`, 'success');
+                    } catch (error) {
+                        console.error('解码错误:', error);
+                        showNotification('解码过程中发生错误: ' + error.message, 'error');
+                    } finally {
+                        showLoading(false);
                     }
-                    
-                } catch (error) {
-                    console.error('图像加载错误:', error);
-                    showNotification(`图像加载失败：${error.message}`, 'error');
-                } finally {
+                };
+                
+                img.onerror = function() {
+                    showNotification('无法加载图像文件', 'error');
                     showLoading(false);
-                }
+                };
+                
+                img.src = e.target.result;
             };
             
             reader.onerror = function() {
-                showNotification('文件读取失败', 'error');
+                showNotification('无法读取文件', 'error');
                 showLoading(false);
             };
             
             reader.readAsDataURL(file);
         }
         
-        // ============== 验证编码图像 ==============
-        async function validateEncodedImage(img) {
-            // 创建临时canvas
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
+        // ============== 从图像数据提取二进制数组 ==============
+        function extractBinaryFromImage(data, width, height) {
+            const binaryArray = [];
+            const totalPixels = width * height;
             
-            // 检查图像尺寸是否合理
-            if (img.width < 10 || img.height < 10) {
-                return false;
+            for (let i = 0; i < totalPixels && i * 4 < data.length; i++) {
+                const pixelIndex = i * 4;
+                const r = data[pixelIndex];
+                const g = data[pixelIndex + 1];
+                const b = data[pixelIndex + 2];
+                
+                // 阈值判断（黑白图像）
+                const isBlack = (r < 128 && g < 128 && b < 128);
+                binaryArray.push(isBlack ? 1 : 0);
             }
             
-            // 简单检查：图像是否大部分是黑白或灰度
-            const imageData = ctx.getImageData(0, 0, Math.min(50, img.width), Math.min(50, img.height));
-            const data = imageData.data;
-            
-            let grayCount = 0;
-            let bwCount = 0;
-            
-            for (let i = 0; i < data.length; i += 4) {
-                const r = data[i];
-                const g = data[i + 1];
-                const b = data[i + 2];
-                
-                // 检查是否为黑白（纯黑或纯白）
-                if ((r === 0 && g === 0 && b === 0) || (r === 255 && g === 255 && b === 255)) {
-                    bwCount++;
-                }
-                
-                // 检查是否为灰度（RGB值相近）
-                if (Math.abs(r - g) < 10 && Math.abs(r - b) < 10 && Math.abs(g - b) < 10) {
-                    grayCount++;
-                }
-            }
-            
-            const samplePixels = data.length / 4;
-            
-            // 如果黑白像素超过70%，可能是1位编码
-            // 如果灰度像素超过70%，可能是4位编码
-            return (bwCount > samplePixels * 0.7) || (grayCount > samplePixels * 0.7);
+            return binaryArray;
         }
         
-        // ============== 显示解码预览 ==============
-        function displayDecodedPreview(img) {
-            const placeholder = decodedPreview.querySelector('.image-placeholder');
-            
-            // 设置canvas尺寸
-            decodedCanvas.width = img.width;
-            decodedCanvas.height = img.height;
-            const ctx = decodedCanvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            
-            // 显示
-            placeholder.style.display = 'none';
-            decodedCanvas.style.display = 'block';
-            
-            // 更新信息
-            decodedImageDimensions.textContent = `尺寸: ${img.width}×${img.height} 像素`;
-            decodedImageType.textContent = `类型: 编码图像`;
-            
-            // 启用预览按钮
-            previewDecodedBtn.disabled = false;
-        }
-        
-        // ============== 解码图像为文件 ==============
-        async function decodeImageToFile() {
-            if (!decodedImageData) {
-                showNotification('请先上传编码图像', 'error');
-                return;
+        // ============== 解析文件数据 ==============
+        function parseFileData(text) {
+            // 检查头部标识
+            if (!text.startsWith(HEADER_MARKER)) {
+                return null;
             }
             
-            showLoading(true);
-            progressContainer.style.display = 'block';
-            progressFill.style.width = '0%';
-            progressText.textContent = '0%';
+            let index = HEADER_MARKER.length;
             
-            try {
-                const img = new Image();
-                
-                await new Promise((resolve, reject) => {
-                    img.onload = resolve;
-                    img.onerror = reject;
-                    img.src = decodedImageData;
-                });
-                
-                // 创建canvas处理图像
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                
-                updateProgress(20);
-                
-                // 获取图像数据
-                const imageData = ctx.getImageData(0, 0, img.width, img.height);
-                const data = imageData.data;
-                
-                updateProgress(30);
-                
-                // 第一步：尝试检测编码模式
-                // 先读取前100个像素来确定编码模式
-                let detectedMode = null;
-                
-                // 检测黑白模式
-                let bwCount = 0;
-                let grayCount = 0;
-                
-                for (let i = 0; i < Math.min(400, data.length); i += 4) {
-                    const r = data[i];
-                    const g = data[i + 1];
-                    const b = data[i + 2];
-                    
-                    // 检查是否为黑白
-                    if ((r === 0 && g === 0 && b === 0) || (r === 255 && g === 255 && b === 255)) {
-                        bwCount++;
-                    }
-                    
-                    // 检查是否为灰度
-                    if (Math.abs(r - g) < 10 && Math.abs(r - b) < 10 && Math.abs(g - b) < 10) {
-                        grayCount++;
-                    }
-                }
-                
-                const samplePixels = Math.min(100, data.length / 4);
-                
-                if (bwCount > samplePixels * 0.8) {
-                    detectedMode = '1bit';
-                } else if (grayCount > samplePixels * 0.8) {
-                    detectedMode = '4bit';
-                } else {
-                    // 默认使用1位模式
-                    detectedMode = '1bit';
-                    showNotification('无法确定编码模式，使用默认1位模式', 'warning');
-                }
-                
-                currentEncodingMode = detectedMode;
-                updateProgress(40);
-                
-                // 解码像素数据
-                const binaryBits = [];
-                
-                if (detectedMode === '1bit') {
-                    // 1位模式解码
-                    for (let i = 0; i < data.length; i += 4) {
-                        const r = data[i];
-                        const g = data[i + 1];
-                        const b = data[i + 2];
-                        
-                        // 判断是黑(0)还是白(1)
-                        // 如果RGB值都大于128，认为是白色(1)，否则是黑色(0)
-                        const bit = (r > 128 && g > 128 && b > 128) ? 1 : 0;
-                        binaryBits.push(bit);
-                        
-                        // 更新进度
-                        if (i % 40000 === 0) {
-                            const progress = 40 + (i / data.length) * 30;
-                            updateProgress(progress);
-                        }
-                    }
-                } else {
-                    // 4位模式解码
-                    for (let i = 0; i < data.length; i += 4) {
-                        const r = data[i];
-                        const grayValue = r; // 因为是灰度图，RGB值相同
-                        
-                        // 将灰度值(0-255)转换为4位值(0-15)
-                        const fourBits = Math.round(grayValue / 17);
-                        
-                        // 将4位值转换为4个二进制位
-                        for (let bit = 3; bit >= 0; bit--) {
-                            binaryBits.push((fourBits >> bit) & 1);
-                        }
-                        
-                        // 更新进度
-                        if (i % 40000 === 0) {
-                            const progress = 40 + (i / data.length) * 30;
-                            updateProgress(progress);
-                        }
-                    }
-                }
-                
-                updateProgress(70);
-                
-                // 将二进制位解码为字符串（每个字符16位）
-                const decodedString = decodeBinaryToUnicode(binaryBits);
-                
-                updateProgress(80);
-                
-                // 验证魔术头
-                if (!decodedString.startsWith(MAGIC_HEADER)) {
-                    throw new Error('无效的编码图像：魔术头不匹配');
-                }
-                
-                // 查找分隔符
-                const separatorIndex = decodedString.indexOf(SEPARATOR);
-                if (separatorIndex === -1) {
-                    throw new Error('无效的编码图像：找不到数据分隔符');
-                }
-                
-                // 提取元数据
-                const metadataStr = decodedString.substring(MAGIC_HEADER.length, separatorIndex);
-                
-                // 解析元数据
-                try {
-                    metadata = JSON.parse(metadataStr);
-                } catch (e) {
-                    throw new Error('元数据解析失败：' + e.message);
-                }
-                
-                // 提取Base64文本
-                decodedBase64Text = decodedString.substring(separatorIndex + SEPARATOR.length);
-                
-                // 验证Base64长度
-                if (decodedBase64Text.length !== metadata.textLength) {
-                    console.warn(`Base64长度不匹配：预期${metadata.textLength}，实际${decodedBase64Text.length}`);
-                }
-                
-                // 验证校验和
-                const calculatedChecksum = calculateChecksum(decodedBase64Text);
-                const checksumValid = calculatedChecksum === metadata.checksum;
-                
-                updateProgress(95);
-                
-                // 显示解码信息
-                originalFileName.textContent = metadata.filename;
-                originalFileSize.textContent = formatFileSize(metadata.filesize);
-                encodingModeInfo.textContent = metadata.encoding === '1bit' ? '1位黑白' : '4位16色';
-                base64Length.textContent = `${decodedBase64Text.length} 字符`;
-                creationTime.textContent = new Date(metadata.createdAt).toLocaleString();
-                checksumInfo.textContent = checksumValid ? '✓ 验证通过' : '✗ 验证失败';
-                checksumInfo.style.color = checksumValid ? '#4caf50' : '#ff5252';
-                
-                decodeInfo.style.display = 'block';
-                
-                // 显示解码文本预览
-                decodedTextContainer.style.display = 'block';
-                decodedTextLength.textContent = `${decodedBase64Text.length} 字符`;
-                const previewText = decodedBase64Text.length > 500 
-                    ? decodedBase64Text.substring(0, 500) + '...' 
-                    : decodedBase64Text;
-                decodedTextPreview.textContent = previewText;
-                
-                // 启用下载文件按钮
-                downloadFileBtn.disabled = false;
-                
-                updateProgress(100);
-                
-                if (checksumValid) {
-                    showNotification(`解码完成！文件：${metadata.filename}，校验通过`, 'success');
-                } else {
-                    showNotification(`解码完成！文件：${metadata.filename}，但校验失败，文件可能已损坏`, 'warning');
-                }
-                
-            } catch (error) {
-                console.error('解码错误:', error);
-                showNotification(`解码失败：${error.message}`, 'error');
-            } finally {
-                showLoading(false);
-                setTimeout(() => {
-                    progressContainer.style.display = 'none';
-                }, 1000);
-            }
+            // 读取文件名长度
+            if (index + 2 > text.length) return null;
+            const filenameLengthStr = text.substring(index, index + 2);
+            const filenameLength = decode32BitInteger(filenameLengthStr);
+            index += 2;
+            
+            // 读取文件名
+            if (index + filenameLength > text.length) return null;
+            const filename = text.substring(index, index + filenameLength);
+            index += filenameLength;
+            
+            // 读取数据长度
+            if (index + 2 > text.length) return null;
+            const dataLengthStr = text.substring(index, index + 2);
+            const dataLength = decode32BitInteger(dataLengthStr);
+            index += 2;
+            
+            // 读取Base64数据
+            if (index + dataLength > text.length) return null;
+            const base64Data = text.substring(index, index + dataLength);
+            
+            // 计算原始数据大小（Base64解码后）
+            const originalSize = Math.floor(base64Data.length * 3 / 4);
+            
+            return {
+                filename: filename,
+                base64Data: base64Data,
+                data: base64ToArrayBuffer(base64Data),
+                size: originalSize
+            };
         }
         
         // ============== 下载解码文件 ==============
         function downloadDecodedFile() {
-            if (!decodedBase64Text || !metadata) {
+            if (!decodedFileInfo) {
                 showNotification('没有可下载的文件', 'error');
                 return;
             }
             
             try {
-                // 将Base64文本转换回二进制数据
-                const arrayBuffer = base64ToArrayBuffer(decodedBase64Text);
-                const blob = new Blob([arrayBuffer]);
+                const blob = new Blob([decodedFileInfo.data]);
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 
                 a.href = url;
-                a.download = metadata.filename;
+                a.download = decodedFileInfo.filename;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
-                showNotification(`文件下载成功：${metadata.filename}`, 'success');
+                showNotification(`文件下载成功：${decodedFileInfo.filename}`, 'success');
             } catch (error) {
                 showNotification(`下载失败：${error.message}`, 'error');
             }
         }
         
-        // ============== 图像预览 ==============
-        function previewImage(canvas, title) {
-            if (!canvas || canvas.width === 0) {
-                showNotification('没有可预览的图像', 'error');
-                return;
+        // ============== 显示/隐藏加载指示器 ==============
+        function showLoading(show) {
+            if (show) {
+                loadingIndicator.classList.add('active');
+                encodeBtn.disabled = true;
+                decodeBtn.disabled = true;
+            } else {
+                loadingIndicator.classList.remove('active');
+                encodeBtn.disabled = !currentFile;
+                decodeBtn.disabled = !imageInput.files.length;
             }
-            
-            // 复制图像到模态框canvas
-            modalCanvas.width = canvas.width;
-            modalCanvas.height = canvas.height;
-            const ctx = modalCanvas.getContext('2d');
-            ctx.drawImage(canvas, 0, 0);
-            
-            // 更新信息
-            modalInfo.textContent = `${title} | ${canvas.width}×${canvas.height}像素`;
-            
-            // 显示模态框
-            imageModal.style.display = 'flex';
         }
         
-        function closeImageModal() {
-            imageModal.style.display = 'none';
-        }
-        
-        // ============== 清空所有 ==============
-        function clearAll() {
-            currentFile = null;
-            fileData = null;
-            base64Text = null;
-            encodedImageData = null;
-            encodedCanvasData = null;
-            decodedImageData = null;
-            decodedBase64Text = null;
-            metadata = null;
+        // ============== 显示通知 ==============
+        function showNotification(message, type = 'info') {
+            notificationMessage.textContent = message;
+            notification.className = 'notification';
+            notification.classList.add(type);
             
-            // 重置UI
-            fileInfo.style.display = 'none';
-            decodeInfo.style.display = 'none';
-            encodingInfo.style.display = 'none';
-            textPreviewContainer.style.display = 'none';
-            decodedTextContainer.style.display = 'none';
-            imageValidation.style.display = 'none';
-            encodeBtn.disabled = true;
-            decodeBtn.disabled = true;
-            downloadImageBtn.disabled = true;
-            downloadFileBtn.disabled = true;
+            let iconClass = 'fas fa-info-circle';
+            if (type === 'success') iconClass = 'fas fa-check-circle';
+            else if (type === 'error') iconClass = 'fas fa-exclamation-circle';
+            else if (type === 'warning') iconClass = 'fas fa-exclamation-triangle';
             
-            // 清空预览
-            const encodedPlaceholder = encodedPreview.querySelector('.image-placeholder');
-            const decodedPlaceholder = decodedPreview.querySelector('.image-placeholder');
+            notificationIcon.className = iconClass;
             
-            encodedPlaceholder.style.display = 'flex';
-            decodedPlaceholder.style.display = 'flex';
-            encodedCanvas.style.display = 'none';
-            decodedCanvas.style.display = 'none';
+            notification.classList.add('show');
             
-            previewEncodedBtn.disabled = true;
-            previewDecodedBtn.disabled = true;
-            
-            fileInput.value = '';
-            imageInput.value = '';
-            
-            // 重置信息显示
-            encodedImageDimensions.textContent = '尺寸: 未生成';
-            encodedImageFormat.textContent = '格式: 未设置';
-            decodedImageDimensions.textContent = '尺寸: 未加载';
-            decodedImageType.textContent = '类型: 未识别';
-            
-            showNotification('已清空所有内容', 'info');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
         }
         
         // ============== 辅助函数 ==============
-        function updateProgress(percentage) {
-            progressFill.style.width = `${percentage}%`;
-            progressText.textContent = `${Math.round(percentage)}%`;
-        }
-        
-        function calculateChecksum(text) {
-            let sum = 0;
-            for (let i = 0; i < text.length; i++) {
-                sum = (sum + text.charCodeAt(i)) & 0xFFFFFFFF;
-            }
-            return sum;
-        }
-        
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 B';
             const k = 1024;
@@ -2030,50 +1738,40 @@
             return ext ? ext.toUpperCase() + ' 文件' : '未知类型';
         }
         
-        function showLoading(show) {
-            if (show) {
-                loadingIndicator.classList.add('active');
-                encodeBtn.disabled = true;
-                decodeBtn.disabled = true;
-            } else {
-                loadingIndicator.classList.remove('active');
-                encodeBtn.disabled = !currentFile;
-            }
-        }
-        
-        function showNotification(message, type = 'info') {
-            notificationMessage.textContent = message;
-            notification.className = 'notification';
-            notification.classList.add(type);
-            
-            let iconClass = 'fas fa-info-circle';
-            if (type === 'success') iconClass = 'fas fa-check-circle';
-            else if (type === 'error') iconClass = 'fas fa-exclamation-circle';
-            else if (type === 'warning') iconClass = 'fas fa-exclamation-triangle';
-            
-            notificationIcon.className = iconClass;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
+        // ============== 键盘快捷键 ==============
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+E 编码
+                if (e.ctrlKey && e.key === 'e') {
+                    if (!encodeBtn.disabled) {
+                        encodeFileToImage();
+                        e.preventDefault();
+                    }
+                }
+                
+                // Ctrl+D 解码
+                if (e.ctrlKey && e.key === 'd') {
+                    if (!decodeBtn.disabled) {
+                        decodeImageToFile();
+                        e.preventDefault();
+                    }
+                }
+            });
         }
         
         // ============== 控制台信息 ==============
-        console.log('%c📁 文件↔图像转换器（Base64编码）v3.0 %c已加载', 
-            'color: #ff6b9d; font-size: 18px; font-weight: bold;', 
-            'color: #40a4df; font-size: 16px;');
-        console.log('%c✨ 新功能：', 'color: #4caf50; font-weight: bold;');
-        console.log('1. 使用Base64编码文件内容');
-        console.log('2. 每个字符固定16位编码（支持Unicode、中文、emoji等）');
-        console.log('3. 1位黑白模式（每像素1位）');
-        console.log('4. 4位彩色模式（每像素4位，16级灰度）');
-        console.log('5. 完整的元数据和校验和验证系统');
-        console.log('%c⚠️ 注意：', 'color: #ff9800; font-weight: bold;');
-        console.log('1. Base64编码会增加约33%的文件大小');
-        console.log('2. 每个字符使用16位编码，确保支持所有Unicode字符');
-        console.log('3. 编码图像为黑白或灰度图，便于准确解码');
-        console.log('4. 魔术头："FIMG2023"，分隔符："|||"');
+        console.log('%c🔐 文件↔图像转换器（黑白Unicode编码）v1.0 %c已加载完成！', 
+            'color: #6c63ff; font-size: 16px; font-weight: bold;', 
+            'color: #4caf50; font-size: 14px;');
+        console.log('%c📋 功能特性:', 'color: #2196f3; font-weight: bold;');
+        console.log('- 支持任意文件类型编码为黑白图像');
+        console.log('- Unicode编码，每个字符21位二进制');
+        console.log('- 每个像素1位（0=白色，1=黑色）');
+        console.log('- 自动保存文件名和文件内容');
+        console.log('- 无验证，直接提取和恢复文件');
+        console.log('%c⌨️ 快捷键:', 'color: #ff9800; font-weight: bold;');
+        console.log('Ctrl+E: 编码文件');
+        console.log('Ctrl+D: 解码图像');
     </script>
 </body>
 </html>
