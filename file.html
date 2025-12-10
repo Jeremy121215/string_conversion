@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文件↔图像转换器（黑白/彩色编码版）</title>
+    <title>文件↔图像转换器</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -417,16 +417,6 @@
             color: #2196f3;
         }
         
-        .bw-badge {
-            background: rgba(158, 158, 158, 0.2);
-            color: #9e9e9e;
-        }
-        
-        .color-badge {
-            background: rgba(255, 152, 0, 0.2);
-            color: #ff9800;
-        }
-        
         footer {
             text-align: center;
             margin-top: 40px;
@@ -589,95 +579,6 @@
             font-size: 0.8rem;
         }
         
-        /* 编码模式选择 */
-        .encoding-mode-selector {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .encoding-mode {
-            flex: 1;
-            padding: 12px;
-            background: rgba(30, 30, 60, 0.7);
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .encoding-mode:hover {
-            background: rgba(40, 40, 80, 0.8);
-        }
-        
-        .encoding-mode.active {
-            border-color: #6c63ff;
-            background: rgba(108, 99, 255, 0.1);
-        }
-        
-        .encoding-mode-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        
-        .encoding-mode-desc {
-            font-size: 0.85rem;
-            color: #a0a0c0;
-        }
-        
-        /* 内存信息 */
-        .memory-info {
-            background: rgba(30, 30, 60, 0.7);
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-            border-left: 3px solid #4caf50;
-        }
-        
-        .memory-info.warning {
-            border-left: 3px solid #ff9800;
-        }
-        
-        .memory-info.danger {
-            border-left: 3px solid #ff5252;
-        }
-        
-        .memory-info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-        
-        .memory-info-row:last-child {
-            margin-bottom: 0;
-        }
-        
-        /* 颜色映射表 */
-        .color-map {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 5px;
-            margin-top: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .color-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 0.7rem;
-        }
-        
-        .color-box {
-            width: 20px;
-            height: 20px;
-            border-radius: 3px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 2px;
-        }
-        
         @media (max-width: 768px) {
             .stats {
                 flex-direction: column;
@@ -688,25 +589,17 @@
                 flex-direction: column;
                 align-items: stretch;
             }
-            
-            .encoding-mode-selector {
-                flex-direction: column;
-            }
-            
-            .color-map {
-                grid-template-columns: repeat(4, 1fr);
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-file-image"></i> 文件↔图像转换器（黑白/彩色编码版）</h1>
-            <p class="subtitle">将任意文件编码为黑白或彩色图像，支持Unicode编码</p>
+            <h1><i class="fas fa-file-image"></i> 文件↔图像转换器（黑白Unicode编码）</h1>
+            <p class="subtitle">将任意文件编码为黑白图像，支持Unicode编码（21位/字符）</p>
             <div class="stats">
-                <div class="stat-box">黑白模式: 21位/字符</div>
-                <div class="stat-box">彩色模式: 6位十六进制/字符</div>
+                <div class="stat-box">编码模式: Unicode 21位/字符</div>
+                <div class="stat-box">像素类型: 黑白（1位/像素）</div>
                 <div class="stat-box">支持文件: 任意类型</div>
             </div>
         </header>
@@ -716,27 +609,10 @@
             <div class="card">
                 <h2 class="card-title"><i class="fas fa-lock"></i> 编码文件到图像</h2>
                 
-                <!-- 编码模式选择 -->
-                <div class="encoding-mode-selector">
-                    <div class="encoding-mode" id="bwMode" data-mode="bw">
-                        <div class="encoding-mode-title">黑白模式</div>
-                        <div class="encoding-mode-desc">每个字符21位，1位/像素</div>
-                    </div>
-                    <div class="encoding-mode" id="colorMode" data-mode="color">
-                        <div class="encoding-mode-title">彩色模式</div>
-                        <div class="encoding-mode-desc">6位十六进制/字符，2像素/字符</div>
-                    </div>
-                </div>
-                
-                <!-- 颜色映射表（彩色模式显示） -->
-                <div id="colorMapContainer" class="color-map" style="display: none;">
-                    <!-- 颜色映射将通过JS动态生成 -->
-                </div>
-                
                 <!-- 编码信息 -->
-                <div class="encoding-info" id="encodingInfo">
+                <div class="encoding-info">
                     <i class="fas fa-info-circle"></i> 
-                    <span id="encodingDescription">黑白编码模式：每个字符使用21位二进制编码，每个像素1位（0=白色，1=黑色）</span>
+                    Unicode编码模式：每个字符使用21位二进制编码，支持所有Unicode字符和任意文件类型
                 </div>
                 
                 <!-- 文件上传区域 -->
@@ -765,28 +641,17 @@
                     </div>
                     <div class="file-info-row">
                         <span class="file-info-label">数据头部：</span>
-                        <span id="fileHeader" class="file-info-value">FIMG|</span>
+                        <span id="fileHeader" class="file-info-value">待生成</span>
                     </div>
                 </div>
                 
-                <!-- 内存信息 -->
-                <div id="memoryInfo" class="memory-info">
-                    <div class="memory-info-row">
-                        <span><i class="fas fa-memory"></i> 最大可用内存：</span>
-                        <span id="maxMemory">约 1 GB</span>
+                <!-- 字节预览 -->
+                <div id="bytesPreviewContainer" class="preview-text">
+                    <div class="preview-header">
+                        <span>文件字节预览（前1000字节）：</span>
+                        <span id="bytesPreviewLength">0 字节</span>
                     </div>
-                    <div class="memory-info-row">
-                        <span><i class="fas fa-file"></i> 文件内存：</span>
-                        <span id="fileMemory">0 MB</span>
-                    </div>
-                    <div class="memory-info-row">
-                        <span><i class="fas fa-image"></i> 图像内存：</span>
-                        <span id="imageMemory">0 MB</span>
-                    </div>
-                    <div class="memory-info-row">
-                        <span><i class="fas fa-tachometer-alt"></i> 总内存使用：</span>
-                        <span id="totalMemory">0 MB</span>
-                    </div>
+                    <div id="bytesPreview"></div>
                 </div>
                 
                 <!-- 自动尺寸切换 -->
@@ -796,7 +661,7 @@
                         <span class="toggle-switch"></span>
                         <span>自动调整图像尺寸</span>
                     </label>
-                    <span id="toggleStatus" class="size-badge bw-badge">已启用</span>
+                    <span id="toggleStatus" class="size-badge unicode-badge">已启用</span>
                 </div>
                 
                 <!-- 图像尺寸控制 -->
@@ -821,7 +686,7 @@
                 <!-- 字符计数和位信息 -->
                 <div class="char-count" id="charCount">总字符数: 0 (0像素)</div>
                 <div id="bitsInfo" class="bits-info" style="display: none;">
-                    <i class="fas fa-microchip"></i> 总位数: <span id="totalBits">0</span> 位 | 像素需求: <span id="pixelsNeeded">0</span> 像素
+                    <i class="fas fa-microchip"></i> 总位数: <span id="totalBits">0</span> 位 | 每个字符: <span id="bitsPerChar">21</span> 位
                 </div>
                 
                 <!-- 按钮组 -->
@@ -846,7 +711,7 @@
                 <div class="image-info">
                     <div id="imageDimensions">图像尺寸: 未生成</div>
                     <div id="imageSize">文件大小: 未生成</div>
-                    <div id="encodingModeIndicator">编码模式: 黑白</div>
+                    <div id="encodingModeIndicator">编码模式: Unicode</div>
                 </div>
                 
                 <button id="downloadBtn" class="btn btn-success" disabled style="margin-top: 10px;">
@@ -857,18 +722,6 @@
             <!-- 解码部分 -->
             <div class="card">
                 <h2 class="card-title"><i class="fas fa-unlock"></i> 从图像解码文件</h2>
-                
-                <!-- 解码模式选择 -->
-                <div class="encoding-mode-selector">
-                    <div class="encoding-mode active" id="decodeBwMode" data-mode="bw">
-                        <div class="encoding-mode-title">黑白解码</div>
-                        <div class="encoding-mode-desc">从黑白图像解码</div>
-                    </div>
-                    <div class="encoding-mode" id="decodeColorMode" data-mode="color">
-                        <div class="encoding-mode-title">彩色解码</div>
-                        <div class="encoding-mode-desc">从彩色图像解码</div>
-                    </div>
-                </div>
                 
                 <div class="encoding-info">
                     <i class="fas fa-info-circle"></i> 
@@ -900,10 +753,6 @@
                     <div class="file-info-row">
                         <span class="file-info-label">图像尺寸：</span>
                         <span id="detectedImageSize" class="file-info-value">0×0 像素</span>
-                    </div>
-                    <div class="file-info-row">
-                        <span class="file-info-label">编码模式：</span>
-                        <span id="detectedEncodingMode" class="file-info-value">未识别</span>
                     </div>
                 </div>
                 
@@ -954,26 +803,26 @@
                             <li>文件数据：原始二进制字节数据</li>
                         </ul>
                     </li>
-                    <li><strong>黑白编码</strong>：
+                    <li><strong>编码过程</strong>：
                         <ul>
-                            <li>每个字符转换为21位二进制（Unicode编码）</li>
-                            <li>每个二进制位对应一个像素（0=白色，1=黑色）</li>
-                            <li>每个字符需要21个像素</li>
+                            <li>1. 读取文件的原始二进制数据</li>
+                            <li>2. 构建完整数据：头部 + 文件名长度 + 文件名 + 数据长度 + 原始数据</li>
+                            <li>3. 每个字符转换为21位二进制（Unicode编码）</li>
+                            <li>4. 每个二进制位对应一个像素（0=白色，1=黑色）</li>
                         </ul>
                     </li>
-                    <li><strong>彩色编码</strong>：
+                    <li><strong>解码过程</strong>：
                         <ul>
-                            <li>每个字符转换为6位十六进制（24位二进制）</li>
-                            <li>每2位十六进制对应一个像素的RGB值</li>
-                            <li>十六进制到RGB映射：0=0, 1=17, 2=34, ..., f=255</li>
-                            <li>每个字符需要2个像素</li>
-                            <li>例如：字符"0078fa" → 像素1(0,0,119), 像素2(136,255,170)</li>
+                            <li>1. 从图像中读取黑白像素，转换为二进制位</li>
+                            <li>2. 每21位转换为一个Unicode字符</li>
+                            <li>3. 识别头部标识，提取文件名和文件数据</li>
+                            <li>4. 将二进制数据转换回原始文件</li>
                         </ul>
                     </li>
                     <li><strong>技术参数</strong>：
                         <ul>
-                            <li>黑白模式：21位/字符，1像素/位</li>
-                            <li>彩色模式：24位/字符，2像素/字符</li>
+                            <li>每个字符：21位二进制编码</li>
+                            <li>每个像素：1位（黑白）</li>
                             <li>支持最大Unicode码点：0x10FFFF</li>
                             <li>图像宽高比：接近A4比例（1:1.414）</li>
                             <li>直接使用原始二进制数据，无Base64转换</li>
@@ -990,7 +839,7 @@
         </div>
         
         <footer>
-            <p>文件↔图像转换器（黑白/彩色编码版） | 支持任意文件类型 | 黑白/彩色双模式 | 内存优化处理</p>
+            <p>文件↔图像转换器（黑白Unicode编码） | 支持任意文件类型 | 每个字符21位 | 黑白像素编码 | 直接二进制处理</p>
             <p>© 2023 文件图像转换工具 | 基于Unicode编码标准</p>
         </footer>
     </div>
@@ -1043,14 +892,13 @@
         
         const bitsInfo = document.getElementById('bitsInfo');
         const totalBits = document.getElementById('totalBits');
-        const pixelsNeeded = document.getElementById('pixelsNeeded');
+        const bitsPerChar = document.getElementById('bitsPerChar');
         
         const decodeInfo = document.getElementById('decodeInfo');
         const detectedFileName = document.getElementById('detectedFileName');
         const detectedFileSize = document.getElementById('detectedFileSize');
         const detectedHeader = document.getElementById('detectedHeader');
         const detectedImageSize = document.getElementById('detectedImageSize');
-        const detectedEncodingMode = document.getElementById('detectedEncodingMode');
         
         const decodedImagePlaceholder = document.getElementById('decodedImagePlaceholder');
         const decodedCanvas = document.getElementById('decodedCanvas');
@@ -1058,67 +906,15 @@
         const decodedBytesPreview = document.getElementById('decodedBytesPreview');
         const decodedBytesLength = document.getElementById('decodedBytesLength');
         
-        // 编码模式相关元素
-        const bwMode = document.getElementById('bwMode');
-        const colorMode = document.getElementById('colorMode');
-        const encodingInfo = document.getElementById('encodingInfo');
-        const encodingDescription = document.getElementById('encodingDescription');
-        const colorMapContainer = document.getElementById('colorMapContainer');
-        
-        // 解码模式相关元素
-        const decodeBwMode = document.getElementById('decodeBwMode');
-        const decodeColorMode = document.getElementById('decodeColorMode');
-        
-        // 内存信息元素
-        const memoryInfo = document.getElementById('memoryInfo');
-        const maxMemory = document.getElementById('maxMemory');
-        const fileMemory = document.getElementById('fileMemory');
-        const imageMemory = document.getElementById('imageMemory');
-        const totalMemory = document.getElementById('totalMemory');
-        
         // ============== 常量定义 ==============
         const HEADER_MARKER = 'FIMG|'; // 头部标识
-        const BITS_PER_CHAR_BW = 21; // 黑白模式每个字符21位
-        const BITS_PER_CHAR_COLOR = 24; // 彩色模式每个字符24位（6位十六进制）
+        const BITS_PER_CHAR = 21; // Unicode编码每个字符21位
         const MAX_UNICODE = 0x10FFFF; // Unicode最大码点
         const MIN_WIDTH = 100;
         const MIN_HEIGHT = 142;
         const MAX_WIDTH = 10000;
         const MAX_HEIGHT = 14140;
         const ASPECT_RATIO = 1.414; // A4比例
-        
-        // 十六进制到RGB的映射（增加容错版本）
-        const HEX_TO_RGB = {
-            '0': 0, '1': 17, '2': 34, '3': 51,
-            '4': 68, '5': 85, '6': 102, '7': 119,
-            '8': 136, '9': 153, 'a': 170, 'b': 187,
-            'c': 204, 'd': 221, 'e': 238, 'f': 255
-        };
-        
-        // 反向映射：RGB到HEX（带容错）
-        const RGB_TO_HEX_TOLERANT = {};
-        for (let i = 0; i <= 255; i++) {
-            // 找到最接近的标准值
-            let minDiff = Infinity;
-            let closestHex = '0';
-            
-            for (const [hex, rgb] of Object.entries(HEX_TO_RGB)) {
-                const diff = Math.abs(i - rgb);
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    closestHex = hex;
-                }
-            }
-            RGB_TO_HEX_TOLERANT[i] = closestHex;
-        }
-        
-        const RGB_TO_HEX = {};
-        for (const [hex, rgb] of Object.entries(HEX_TO_RGB)) {
-            RGB_TO_HEX[rgb] = hex;
-        }
-        
-        // 内存限制（假设最大可用内存为1GB）
-        const MAX_MEMORY_BYTES = 1 * 1024 * 1024 * 1024; // 1GB
         
         // ============== 状态变量 ==============
         let currentFile = null;
@@ -1127,8 +923,6 @@
         let currentWidth = 980;
         let currentHeight = 1400;
         let decodedFileInfo = null;
-        let encodingMode = 'bw'; // 'bw' 或 'color'
-        let decodeMode = 'bw'; // 解码模式
         
         // ============== 初始化 ==============
         document.addEventListener('DOMContentLoaded', function() {
@@ -1138,8 +932,6 @@
         function initializePage() {
             setupEventListeners();
             updateAspectRatio();
-            updateColorMap();
-            updateMaxMemoryInfo();
             
             // 初始化canvas样式
             encodedCanvas.style.display = 'none';
@@ -1147,42 +939,8 @@
             
             // 显示欢迎信息
             setTimeout(() => {
-                showNotification('文件↔图像转换器已加载！支持黑白和彩色两种编码模式。', 'info');
+                showNotification('文件↔图像转换器已加载！支持任意文件类型的黑白Unicode编码。', 'info');
             }, 1000);
-        }
-        
-        // ============== 更新最大内存信息 ==============
-        function updateMaxMemoryInfo() {
-            const maxMemoryMB = (MAX_MEMORY_BYTES / (1024 * 1024)).toFixed(0);
-            maxMemory.textContent = `约 ${maxMemoryMB} MB`;
-        }
-        
-        // ============== 更新颜色映射表 ==============
-        function updateColorMap() {
-            colorMapContainer.innerHTML = '';
-            
-            for (const [hex, rgb] of Object.entries(HEX_TO_RGB)) {
-                const colorItem = document.createElement('div');
-                colorItem.className = 'color-item';
-                
-                const colorBox = document.createElement('div');
-                colorBox.className = 'color-box';
-                colorBox.style.backgroundColor = `rgb(${rgb}, ${rgb}, ${rgb})`;
-                
-                const hexLabel = document.createElement('div');
-                hexLabel.textContent = hex;
-                
-                const rgbLabel = document.createElement('div');
-                rgbLabel.textContent = rgb;
-                rgbLabel.style.fontSize = '0.6rem';
-                rgbLabel.style.color = '#888';
-                
-                colorItem.appendChild(colorBox);
-                colorItem.appendChild(hexLabel);
-                colorItem.appendChild(rgbLabel);
-                
-                colorMapContainer.appendChild(colorItem);
-            }
         }
         
         // ============== 事件监听器设置 ==============
@@ -1225,24 +983,6 @@
                 if (this.files.length > 0) {
                     previewEncodedImage(this.files[0]);
                 }
-            });
-            
-            // 编码模式选择
-            bwMode.addEventListener('click', () => {
-                setEncodingMode('bw');
-            });
-            
-            colorMode.addEventListener('click', () => {
-                setEncodingMode('color');
-            });
-            
-            // 解码模式选择
-            decodeBwMode.addEventListener('click', () => {
-                setDecodeMode('bw');
-            });
-            
-            decodeColorMode.addEventListener('click', () => {
-                setDecodeMode('color');
             });
             
             // 自动尺寸切换
@@ -1317,55 +1057,13 @@
             setupKeyboardShortcuts();
         }
         
-        // ============== 设置编码模式 ==============
-        function setEncodingMode(mode) {
-            encodingMode = mode;
-            
-            // 更新UI
-            bwMode.classList.remove('active');
-            colorMode.classList.remove('active');
-            
-            if (mode === 'bw') {
-                bwMode.classList.add('active');
-                encodingDescription.textContent = '黑白编码模式：每个字符使用21位二进制编码，每个像素1位（0=白色，1=黑色）';
-                colorMapContainer.style.display = 'none';
-                toggleStatus.className = 'size-badge bw-badge';
-                toggleStatus.textContent = autoSizeEnabled ? '已启用' : '已禁用';
-            } else {
-                colorMode.classList.add('active');
-                encodingDescription.textContent = '彩色编码模式：每个字符转换为6位十六进制，每2位十六进制对应一个像素的RGB值';
-                colorMapContainer.style.display = 'grid';
-                toggleStatus.className = 'size-badge color-badge';
-                toggleStatus.textContent = autoSizeEnabled ? '已启用' : '已禁用';
-            }
-            
-            updateFileInfo();
-            showNotification(`已切换到${mode === 'bw' ? '黑白' : '彩色'}编码模式`, 'info');
-        }
-        
-        // ============== 设置解码模式 ==============
-        function setDecodeMode(mode) {
-            decodeMode = mode;
-            
-            // 更新UI
-            decodeBwMode.classList.remove('active');
-            decodeColorMode.classList.remove('active');
-            
-            if (mode === 'bw') {
-                decodeBwMode.classList.add('active');
-            } else {
-                decodeColorMode.classList.add('active');
-            }
-            
-            showNotification(`已切换到${mode === 'bw' ? '黑白' : '彩色'}解码模式`, 'info');
-        }
-        
         // ============== 清空编码器 ==============
         function clearEncoder() {
             currentFile = null;
             fileData = null;
             fileInput.value = '';
             fileInfo.style.display = 'none';
+            bytesPreviewContainer.style.display = 'none';
             imageOutput.style.display = 'flex';
             encodedCanvas.style.display = 'none';
             encodeBtn.disabled = true;
@@ -1374,10 +1072,6 @@
             charCount.textContent = '总字符数: 0 (0像素)';
             imageDimensions.textContent = '图像尺寸: 未生成';
             imageSize.textContent = '文件大小: 未生成';
-            encodingModeIndicator.textContent = `编码模式: ${encodingMode === 'bw' ? '黑白' : '彩色'}`;
-            
-            // 重置内存信息
-            updateMemoryInfo(0, 0, 0);
         }
         
         // ============== 清空解码器 ==============
@@ -1410,6 +1104,9 @@
             reader.onload = function(e) {
                 fileData = e.target.result;
                 
+                // 显示字节预览
+                showBytesPreview(new Uint8Array(fileData));
+                
                 // 更新文件信息
                 updateFileInfo();
                 
@@ -1426,100 +1123,51 @@
             showNotification(`已选择文件：${file.name}`, 'success');
         }
         
+        // ============== 显示字节预览 ==============
+        function showBytesPreview(bytes) {
+            bytesPreviewContainer.style.display = 'block';
+            const previewCount = Math.min(bytes.length, 1000);
+            bytesPreviewLength.textContent = `${previewCount} 字节 / 总共 ${bytes.length} 字节`;
+            
+            let previewText = '';
+            for (let i = 0; i < previewCount; i++) {
+                const byte = bytes[i];
+                previewText += byte.toString(16).padStart(2, '0').toUpperCase() + ' ';
+                if ((i + 1) % 16 === 0) previewText += '\n';
+            }
+            
+            bytesPreview.textContent = previewText;
+        }
+        
         // ============== 更新文件信息 ==============
         function updateFileInfo() {
             if (!currentFile || !fileData) return;
             
             const bytes = new Uint8Array(fileData);
             const totalChars = calculateTotalChars(currentFile.name, bytes);
-            
-            // 根据编码模式计算像素需求
-            let pixelsRequired = 0;
-            let bitsPerChar = 0;
-            
-            if (encodingMode === 'bw') {
-                bitsPerChar = BITS_PER_CHAR_BW;
-                pixelsRequired = totalChars * bitsPerChar; // 黑白模式：每个字符需要21个像素
-            } else {
-                bitsPerChar = BITS_PER_CHAR_COLOR;
-                pixelsRequired = totalChars * 2; // 彩色模式：每个字符需要2个像素
-            }
-            
-            // 更新字符计数和位信息
-            totalBits.textContent = (totalChars * bitsPerChar).toLocaleString();
-            pixelsNeeded.textContent = pixelsRequired.toLocaleString();
-            bitsInfo.style.display = 'block';
+            const pixelsNeeded = totalChars * BITS_PER_CHAR;
             
             if (autoSizeEnabled) {
-                // 计算最佳图像尺寸
-                const calculated = calculateOptimalDimensions(pixelsRequired);
-                currentWidth = calculated.width;
-                currentHeight = calculated.height;
-                
-                charCount.textContent = `总字符数: ${totalChars.toLocaleString()} (${pixelsRequired.toLocaleString()}像素)`;
+                calculateAutoDimensions(pixelsNeeded);
+                charCount.textContent = `总字符数: ${totalChars.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
                 charCount.textContent += ` | 图像尺寸: ${currentWidth}×${currentHeight}`;
-                charCount.classList.remove('warning', 'error');
             } else {
                 currentWidth = parseInt(imageWidthInput.value) || MIN_WIDTH;
                 currentHeight = parseInt(imageHeightInput.value) || MIN_HEIGHT;
                 const maxPixels = currentWidth * currentHeight;
+                const maxChars = Math.floor(maxPixels / BITS_PER_CHAR);
                 
-                charCount.textContent = `总字符数: ${totalChars.toLocaleString()} (${pixelsRequired.toLocaleString()}像素)`;
-                
-                if (pixelsRequired > maxPixels) {
-                    charCount.classList.add('error');
-                    const neededHeight = Math.ceil(pixelsRequired / currentWidth);
-                    charCount.textContent += ` (错误: 需要至少 ${neededHeight} 像素高度)`;
+                charCount.textContent = `总字符数: ${totalChars.toLocaleString()} (${pixelsNeeded.toLocaleString()}像素)`;
+                if (pixelsNeeded > maxPixels) {
+                    charCount.classList.add('warning');
+                    charCount.textContent += ` (警告: 需要 ${maxChars.toLocaleString()} 字符以内)`;
                 } else {
-                    charCount.classList.remove('warning', 'error');
+                    charCount.classList.remove('warning');
                 }
             }
             
-            // 更新内存信息
-            updateMemoryInfo(bytes.length, currentWidth, currentHeight);
-            
-            // 更新编码模式指示器
-            encodingModeIndicator.textContent = `编码模式: ${encodingMode === 'bw' ? '黑白' : '彩色'}`;
-        }
-        
-        // ============== 计算最佳图像尺寸 ==============
-        function calculateOptimalDimensions(pixelsNeeded) {
-            if (pixelsNeeded <= 0) {
-                return { width: MIN_WIDTH, height: MIN_HEIGHT };
-            }
-            
-            // 首先尝试正方形
-            let width = Math.ceil(Math.sqrt(pixelsNeeded));
-            let height = Math.ceil(pixelsNeeded / width);
-            
-            // 调整到接近A4比例
-            const targetRatio = ASPECT_RATIO;
-            const currentRatio = height / width;
-            
-            if (currentRatio > targetRatio * 1.2) {
-                // 太窄了，增加宽度
-                width = Math.ceil(Math.sqrt(pixelsNeeded / targetRatio));
-                height = Math.ceil(pixelsNeeded / width);
-            } else if (currentRatio < targetRatio / 1.2) {
-                // 太宽了，增加高度
-                height = Math.ceil(Math.sqrt(pixelsNeeded * targetRatio));
-                width = Math.ceil(pixelsNeeded / height);
-            }
-            
-            // 确保在最小和最大范围内
-            width = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
-            height = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, height));
-            
-            // 最终检查是否能容纳所有像素
-            if (width * height < pixelsNeeded) {
-                // 如果不能，增加高度
-                height = Math.min(Math.ceil(pixelsNeeded / width), MAX_HEIGHT);
-            }
-            
-            return {
-                width: Math.floor(width),
-                height: Math.floor(height)
-            };
+            // 更新位信息
+            updateBitsInfo(totalChars);
         }
         
         // ============== 计算总字符数 ==============
@@ -1538,41 +1186,124 @@
             // 数据长度（32位整数，需要2个Unicode字符）
             total += 2;
             
-            // 文件数据（每个字节作为一个字符）
+            // 文件数据（每个字节转换为一个字符）
             total += bytes.length;
             
             return total;
         }
         
-        // ============== 更新内存信息 ==============
-        function updateMemoryInfo(fileSizeBytes, imageWidth, imageHeight) {
-            // 文件内存
-            const fileMemoryMB = fileSizeBytes / (1024 * 1024);
-            fileMemory.textContent = `${fileMemoryMB.toFixed(2)} MB`;
+        // ============== 更新位信息 ==============
+        function updateBitsInfo(totalChars) {
+            const totalBitsValue = totalChars * BITS_PER_CHAR;
             
-            // 图像内存（RGBA，每个像素4字节）
-            const imageMemoryBytes = imageWidth * imageHeight * 4;
-            const imageMemoryMB = imageMemoryBytes / (1024 * 1024);
-            imageMemory.textContent = `${imageMemoryMB.toFixed(2)} MB`;
+            totalBits.textContent = totalBitsValue.toLocaleString();
+            bitsPerChar.textContent = BITS_PER_CHAR;
             
-            // 总内存（加上一些处理开销）
-            const totalMemoryBytes = fileSizeBytes + imageMemoryBytes + (10 * 1024 * 1024); // 加上10MB处理开销
-            const totalMemoryMB = totalMemoryBytes / (1024 * 1024);
-            totalMemory.textContent = `${totalMemoryMB.toFixed(2)} MB`;
+            // 显示位信息
+            bitsInfo.style.display = totalChars > 0 ? 'block' : 'none';
+        }
+        
+        // ============== Unicode编码函数 ==============
+        function encodeUnicodeToBinary(text) {
+            // 将字符串中的每个字符编码为21位二进制
+            const binaryArray = [];
             
-            // 检查是否超过内存限制
-            if (totalMemoryBytes > MAX_MEMORY_BYTES) {
-                memoryInfo.className = 'memory-info danger';
-                charCount.classList.add('error');
-                charCount.textContent += ` (错误: 预计内存使用 ${totalMemoryMB.toFixed(2)} MB，超过 ${(MAX_MEMORY_BYTES / (1024 * 1024)).toFixed(0)} MB 限制)`;
-                encodeBtn.disabled = true;
-            } else if (totalMemoryBytes > MAX_MEMORY_BYTES * 0.8) {
-                memoryInfo.className = 'memory-info warning';
-                encodeBtn.disabled = false;
-            } else {
-                memoryInfo.className = 'memory-info';
-                encodeBtn.disabled = false;
+            for (let i = 0; i < text.length; i++) {
+                const charCode = text.codePointAt(i);
+                
+                // 处理代理对（UTF-16代理对）
+                if (charCode >= 0xD800 && charCode <= 0xDFFF) {
+                    // 跳过代理对的低代理项
+                    continue;
+                }
+                
+                // 确保码点在有效范围内
+                if (charCode > MAX_UNICODE) {
+                    throw new Error(`字符码点 ${charCode} 超出Unicode范围 (最大: ${MAX_UNICODE})`);
+                }
+                
+                // 转换为21位二进制
+                let binary = charCode.toString(2);
+                
+                // 填充到21位
+                while (binary.length < BITS_PER_CHAR) {
+                    binary = '0' + binary;
+                }
+                
+                // 添加到数组
+                for (let bit = 0; bit < BITS_PER_CHAR; bit++) {
+                    binaryArray.push(parseInt(binary[bit]));
+                }
             }
+            
+            return binaryArray;
+        }
+        
+        function decodeBinaryToUnicode(binaryArray) {
+            // 将21位二进制数组解码为字符串
+            let text = '';
+            
+            for (let i = 0; i < binaryArray.length; i += BITS_PER_CHAR) {
+                if (i + BITS_PER_CHAR > binaryArray.length) break;
+                
+                // 提取21位二进制
+                let binary = '';
+                for (let j = 0; j < BITS_PER_CHAR; j++) {
+                    binary += binaryArray[i + j] || '0';
+                }
+                
+                // 转换为字符代码
+                const charCode = parseInt(binary, 2);
+                
+                // 添加到字符串
+                text += String.fromCodePoint(charCode);
+            }
+            
+            return text;
+        }
+        
+        // ============== 计算自动尺寸 ==============
+        function calculateAutoDimensions(pixelsNeeded) {
+            if (pixelsNeeded <= 0) {
+                currentWidth = MIN_WIDTH;
+                currentHeight = MIN_HEIGHT;
+                return;
+            }
+            
+            // 根据A4比例计算宽度：width = sqrt(pixels / aspectRatio)
+            let width = Math.sqrt(pixelsNeeded / ASPECT_RATIO);
+            
+            // 确保在最小和最大范围内
+            width = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
+            
+            // 计算高度，保持A4比例
+            let height = Math.round(width * ASPECT_RATIO);
+            
+            // 调整高度确保能容纳所有像素
+            const totalPixels = width * height;
+            if (totalPixels < pixelsNeeded) {
+                height = Math.ceil(pixelsNeeded / width);
+            }
+            
+            // 确保高度也在范围内
+            height = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, height));
+            
+            // 再次检查宽度是否需要调整
+            if (width * height < pixelsNeeded) {
+                width = Math.ceil(pixelsNeeded / height);
+                width = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, width));
+            }
+            
+            currentWidth = Math.floor(width);
+            currentHeight = Math.floor(height);
+        }
+        
+        // ============== 更新宽高比显示 ==============
+        function updateAspectRatio() {
+            const width = parseInt(imageWidthInput.value) || MIN_WIDTH;
+            const height = parseInt(imageHeightInput.value) || MIN_HEIGHT;
+            const ratio = (height / width).toFixed(3);
+            aspectRatioInput.value = `1:${ratio}`;
         }
         
         // ============== 编码文件为图像 ==============
@@ -1595,13 +1326,10 @@
                     
                     // 计算图像尺寸
                     const totalChars = fullData.length;
+                    const pixelsNeeded = totalChars * BITS_PER_CHAR;
                     
                     if (autoSizeEnabled) {
-                        // 重新计算最佳尺寸
-                        const pixelsRequired = encodingMode === 'bw' ? totalChars * BITS_PER_CHAR_BW : totalChars * 2;
-                        const calculated = calculateOptimalDimensions(pixelsRequired);
-                        currentWidth = calculated.width;
-                        currentHeight = calculated.height;
+                        calculateAutoDimensions(pixelsNeeded);
                     } else {
                         currentWidth = parseInt(imageWidthInput.value) || MIN_WIDTH;
                         currentHeight = parseInt(imageHeightInput.value) || MIN_HEIGHT;
@@ -1609,31 +1337,24 @@
                     
                     // 检查是否能容纳所有数据
                     const totalPixels = currentWidth * currentHeight;
-                    let pixelsRequired = 0;
-                    
-                    if (encodingMode === 'bw') {
-                        pixelsRequired = totalChars * BITS_PER_CHAR_BW;
-                    } else {
-                        pixelsRequired = totalChars * 2; // 彩色模式每个字符2个像素
-                    }
-                    
-                    if (pixelsRequired > totalPixels) {
-                        const neededHeight = Math.ceil(pixelsRequired / currentWidth);
-                        throw new Error(`图像太小，无法容纳所有数据。需要至少 ${neededHeight} 像素高度（当前 ${currentHeight}）。`);
+                    if (pixelsNeeded > totalPixels) {
+                        throw new Error(`图像太小，无法容纳所有数据。需要至少 ${Math.ceil(pixelsNeeded / currentWidth)} 像素高度。`);
                     }
                     
                     // 设置画布尺寸
                     encodedCanvas.width = currentWidth;
                     encodedCanvas.height = currentHeight;
                     
-                    // 根据编码模式创建图像
-                    if (encodingMode === 'bw') {
-                        // 黑白编码
-                        createBwImage(fullData);
-                    } else {
-                        // 彩色编码
-                        createColorImage(fullData);
+                    // 将完整数据转换为二进制
+                    const binaryArray = encodeUnicodeToBinary(fullData);
+                    
+                    // 填充剩余的像素为白色
+                    while (binaryArray.length < totalPixels) {
+                        binaryArray.push(0);
                     }
+                    
+                    // 创建黑白图像
+                    createBinaryImage(binaryArray);
                     
                     // 显示图像
                     displayEncodedImage();
@@ -1645,7 +1366,7 @@
                     downloadBtn.disabled = false;
                     
                     // 显示编码成功信息
-                    const successMessage = `编码成功！文件 "${currentFile.name}" 已编码为 ${currentWidth}×${currentHeight} 像素的${encodingMode === 'bw' ? '黑白' : '彩色'}图像`;
+                    const successMessage = `编码成功！文件 "${currentFile.name}" 已编码为 ${currentWidth}×${currentHeight} 像素的黑白图像`;
                     showNotification(successMessage, 'success');
                 } catch (error) {
                     console.error('编码错误:', error);
@@ -1704,8 +1425,8 @@
             return (high << 21) | low;
         }
         
-        // ============== 创建黑白图像 ==============
-        function createBwImage(fullData) {
+        // ============== 创建二进制图像 ==============
+        function createBinaryImage(binaryArray) {
             const ctx = encodedCanvas.getContext('2d');
             const imageData = ctx.createImageData(currentWidth, currentHeight);
             const data = imageData.data;
@@ -1718,89 +1439,15 @@
                 data[i+3] = 255;   // A
             }
             
-            // 将数据编码为二进制并设置像素
-            let pixelIndex = 0;
-            
-            for (let i = 0; i < fullData.length; i++) {
-                const charCode = fullData.codePointAt(i);
+            // 根据二进制数组设置像素颜色
+            for (let i = 0; i < binaryArray.length && i < currentWidth * currentHeight; i++) {
+                const bit = binaryArray[i];
+                const pixelIndex = i * 4;
                 
-                // 将字符编码为21位二进制
-                let binary = charCode.toString(2);
-                
-                // 填充到21位
-                while (binary.length < BITS_PER_CHAR_BW) {
-                    binary = '0' + binary;
-                }
-                
-                // 设置像素
-                for (let bit = 0; bit < binary.length; bit++) {
-                    if (pixelIndex >= currentWidth * currentHeight) break;
-                    
-                    const baseIndex = pixelIndex * 4;
-                    const bitValue = binary[bit];
-                    
-                    if (bitValue === '1') {
-                        data[baseIndex] = 0;     // R
-                        data[baseIndex+1] = 0;   // G
-                        data[baseIndex+2] = 0;   // B
-                    }
-                    
-                    pixelIndex++;
-                }
-            }
-            
-            ctx.putImageData(imageData, 0, 0);
-        }
-        
-        // ============== 创建彩色图像 ==============
-        function createColorImage(fullData) {
-            const ctx = encodedCanvas.getContext('2d');
-            const imageData = ctx.createImageData(currentWidth, currentHeight);
-            const data = imageData.data;
-            
-            // 用白色填充整个画布
-            for (let i = 0; i < data.length; i += 4) {
-                data[i] = 255;     // R
-                data[i+1] = 255;   // G
-                data[i+2] = 255;   // B
-                data[i+3] = 255;   // A
-            }
-            
-            // 将数据编码为十六进制并设置像素
-            let pixelIndex = 0;
-            
-            for (let i = 0; i < fullData.length; i++) {
-                const charCode = fullData.codePointAt(i);
-                
-                // 将字符编码为6位十六进制（24位）
-                let hex = charCode.toString(16);
-                
-                // 填充到6位十六进制
-                while (hex.length < 6) {
-                    hex = '0' + hex;
-                }
-                
-                // 每2位十六进制对应一个像素
-                for (let j = 0; j < 6; j += 3) {
-                    if (pixelIndex >= currentWidth * currentHeight) break;
-                    
-                    const baseIndex = pixelIndex * 4;
-                    
-                    // 提取RGB值
-                    const rHex = hex[j];
-                    const gHex = hex[j+1];
-                    const bHex = hex[j+2];
-                    
-                    // 转换为RGB值
-                    const r = HEX_TO_RGB[rHex.toLowerCase()] || 0;
-                    const g = HEX_TO_RGB[gHex.toLowerCase()] || 0;
-                    const b = HEX_TO_RGB[bHex.toLowerCase()] || 0;
-                    
-                    data[baseIndex] = r;     // R
-                    data[baseIndex+1] = g;   // G
-                    data[baseIndex+2] = b;   // B
-                    
-                    pixelIndex++;
+                if (bit === 1) {
+                    data[pixelIndex] = 0;     // R
+                    data[pixelIndex+1] = 0;   // G
+                    data[pixelIndex+2] = 0;   // B
                 }
             }
             
@@ -1819,7 +1466,7 @@
             imageDimensions.textContent = `图像尺寸: ${currentWidth}×${currentHeight} 像素`;
             
             // 估计文件大小（PNG格式）
-            const estimatedSizeKB = Math.round((currentWidth * currentHeight * (encodingMode === 'bw' ? 0.1 : 0.3)) / 1024);
+            const estimatedSizeKB = Math.round((currentWidth * currentHeight * 0.1) / 1024);
             imageSize.textContent = `文件大小: ~${estimatedSizeKB} KB`;
         }
         
@@ -1828,8 +1475,7 @@
             const link = document.createElement('a');
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             
-            const modeSuffix = encodingMode === 'bw' ? 'bw' : 'color';
-            link.download = `encoded-${modeSuffix}-${currentFile.name.replace(/\.[^/.]+$/, "")}-${timestamp}.png`;
+            link.download = `encoded-${currentFile.name.replace(/\.[^/.]+$/, "")}-${timestamp}.png`;
             link.href = encodedCanvas.toDataURL('image/png');
             link.click();
             showNotification('图像下载成功！', 'success');
@@ -1870,7 +1516,7 @@
             reader.readAsDataURL(file);
         }
         
-        // ============== 解码图像为文件（优化版） ==============
+        // ============== 解码图像为文件 ==============
         function decodeImageToFile() {
             const file = imageInput.files[0];
             if (!file) {
@@ -1878,8 +1524,7 @@
                 return;
             }
             
-            // 显示增强的加载指示器
-            showLoading(true, '正在加载并分析图像...');
+            showLoading(true);
             
             const reader = new FileReader();
             
@@ -1887,78 +1532,54 @@
                 const img = new Image();
                 img.onload = function() {
                     try {
-                        // 创建临时canvas（优化性能）
+                        // 创建临时canvas
                         const tempCanvas = document.createElement('canvas');
                         tempCanvas.width = img.width;
                         tempCanvas.height = img.height;
-                        const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+                        const tempCtx = tempCanvas.getContext('2d');
                         
                         // 绘制图像
                         tempCtx.drawImage(img, 0, 0);
                         
-                        // 自动检测编码模式
-                        const detectedMode = autoDetectEncodingMode(tempCtx, img.width, img.height);
-                        if (detectedMode) {
-                            setDecodeMode(detectedMode);
-                            showNotification(`自动检测到${detectedMode === 'bw' ? '黑白' : '彩色'}编码模式`, 'info');
+                        // 获取像素数据
+                        const imageData = tempCtx.getImageData(0, 0, img.width, img.height);
+                        const data = imageData.data;
+                        
+                        // 提取二进制字符串
+                        const binaryArray = extractBinaryFromImage(data, img.width, img.height);
+                        
+                        // 将二进制数组转换为文本
+                        const text = decodeBinaryToUnicode(binaryArray);
+                        
+                        // 解析文件数据
+                        const fileInfo = parseFileData(text);
+                        
+                        if (!fileInfo) {
+                            throw new Error('无法识别文件数据格式');
                         }
                         
-                        // 获取像素数据（使用更高效的方式）
-                        showLoading(true, `正在提取${decodeMode === 'bw' ? '黑白' : '彩色'}像素数据...`);
+                        // 保存解码信息
+                        decodedFileInfo = fileInfo;
                         
-                        setTimeout(() => {
-                            try {
-                                const imageData = tempCtx.getImageData(0, 0, img.width, img.height);
-                                const data = imageData.data;
-                                
-                                // 根据解码模式提取数据
-                                let text = '';
-                                
-                                if (decodeMode === 'bw') {
-                                    showLoading(true, '正在解码黑白图像...', img.width * img.height);
-                                    text = decodeBwImage(data, img.width, img.height);
-                                } else {
-                                    showLoading(true, '正在解码彩色图像...', img.width * img.height);
-                                    text = decodeColorImage(data, img.width, img.height);
-                                }
-                                
-                                // 解析文件数据
-                                const fileInfo = parseFileData(text);
-                                
-                                if (!fileInfo) {
-                                    // 尝试另一种解码方式
-                                    showNotification('标准解码失败，尝试容错解码...', 'warning');
-                                    const altText = decodeWithTolerance(tempCtx, img.width, img.height);
-                                    decodedFileInfo = parseFileData(altText);
-                                    
-                                    if (!decodedFileInfo) {
-                                        throw new Error('无法识别文件数据格式，请确认图像未损坏且编码正确');
-                                    }
-                                } else {
-                                    decodedFileInfo = fileInfo;
-                                }
-                                
-                                // 显示解码信息
-                                displayDecodedInfo(img, decodedFileInfo);
-                                
-                                // 显示解码字节预览
-                                showBytesPreviewForDecoded(decodedFileInfo.data);
-                                
-                                // 启用下载文件按钮
-                                downloadFileBtn.disabled = false;
-                                
-                                showNotification(`解码成功！检测到文件: ${decodedFileInfo.filename}`, 'success');
-                            } catch (error) {
-                                console.error('解码错误:', error);
-                                showNotification('解码失败: ' + error.message, 'error');
-                            } finally {
-                                showLoading(false);
-                            }
-                        }, 100);
+                        // 显示解码信息
+                        detectedFileName.textContent = fileInfo.filename;
+                        detectedFileSize.textContent = formatFileSize(fileInfo.data.length);
+                        detectedHeader.textContent = HEADER_MARKER;
+                        decodeInfo.style.display = 'block';
                         
+                        // 显示解码字节预览
+                        decodedBytesContainer.style.display = 'block';
+                        decodedBytesLength.textContent = `${fileInfo.data.length} 字节`;
+                        showBytesPreviewForDecoded(fileInfo.data);
+                        
+                        // 启用下载文件按钮
+                        downloadFileBtn.disabled = false;
+                        
+                        showNotification(`解码成功！检测到文件: ${fileInfo.filename}`, 'success');
                     } catch (error) {
-                        console.error('图像处理错误:', error);
-                        showNotification('图像处理失败: ' + error.message, 'error');
+                        console.error('解码错误:', error);
+                        showNotification('解码过程中发生错误: ' + error.message, 'error');
+                    } finally {
                         showLoading(false);
                     }
                 };
@@ -1979,110 +1600,6 @@
             reader.readAsDataURL(file);
         }
         
-        // ============== 解码黑白图像 ==============
-        function decodeBwImage(data, width, height) {
-            let text = '';
-            const totalPixels = width * height;
-            
-            // 存储所有二进制位
-            let binaryBits = '';
-            
-            for (let i = 0; i < totalPixels; i++) {
-                const pixelIndex = i * 4;
-                const r = data[pixelIndex];
-                const g = data[pixelIndex + 1];
-                const b = data[pixelIndex + 2];
-                
-                // 判断是黑(1)还是白(0)
-                const isBlack = (r < 128 && g < 128 && b < 128);
-                binaryBits += isBlack ? '1' : '0';
-            }
-            
-            // 每21位转换为一个字符
-            for (let i = 0; i < binaryBits.length; i += BITS_PER_CHAR_BW) {
-                if (i + BITS_PER_CHAR_BW > binaryBits.length) break;
-                
-                const binaryChunk = binaryBits.substring(i, i + BITS_PER_CHAR_BW);
-                const charCode = parseInt(binaryChunk, 2);
-                
-                // 跳过无效字符
-                if (charCode === 0 && text.length > 0 && !text.endsWith(HEADER_MARKER)) {
-                    continue;
-                }
-                
-                text += String.fromCodePoint(charCode);
-            }
-            
-            return text;
-        }
-        
-        // ============== 解码彩色图像 ==============
-        function decodeColorImage(data, width, height) {
-            let text = '';
-            const totalPixels = width * height;
-            
-            // 颜色误差容错范围（0-255）
-            const TOLERANCE = 8;
-            
-            // RGB到十六进制的容错转换函数
-            function rgbToHexWithTolerance(rgbValue) {
-                // 将RGB值近似到最近的17的倍数（0,17,34,...,255）
-                const normalized = Math.round(rgbValue / 17) * 17;
-                // 确保在0-255范围内
-                const clamped = Math.max(0, Math.min(255, normalized));
-                // 转换回十六进制
-                const hexValue = Math.round(clamped / 17);
-                return hexValue.toString(16);
-            }
-            
-            showLoading(true, '正在解码彩色图像...', totalPixels);
-            
-            // 每2个像素对应一个字符（6位十六进制）
-            for (let i = 0; i < totalPixels; i += 2) {
-                if (i + 1 >= totalPixels) break;
-                
-                // 更新进度
-                if (i % 1000 === 0) {
-                    updateDecodeProgress(i, totalPixels, '彩色');
-                }
-                
-                // 获取第一个像素
-                const pixelIndex1 = i * 4;
-                const r1 = data[pixelIndex1];
-                const g1 = data[pixelIndex1 + 1];
-                const b1 = data[pixelIndex1 + 2];
-                
-                // 获取第二个像素
-                const pixelIndex2 = (i + 1) * 4;
-                const r2 = data[pixelIndex2];
-                const g2 = data[pixelIndex2 + 1];
-                const b2 = data[pixelIndex2 + 2];
-                
-                // 使用容错转换
-                const hex1 = rgbToHexWithTolerance(r1);
-                const hex2 = rgbToHexWithTolerance(g1);
-                const hex3 = rgbToHexWithTolerance(b1);
-                const hex4 = rgbToHexWithTolerance(r2);
-                const hex5 = rgbToHexWithTolerance(g2);
-                const hex6 = rgbToHexWithTolerance(b2);
-                
-                // 组合成6位十六进制
-                const hex = hex1 + hex2 + hex3 + hex4 + hex5 + hex6;
-                
-                // 转换为字符代码
-                const charCode = parseInt(hex, 16);
-                
-                // 有效性检查
-                if (charCode <= MAX_UNICODE) {
-                    text += String.fromCodePoint(charCode);
-                }
-            }
-            
-            return text;
-        }
-
-        
-        
         // ============== 显示解码字节预览 ==============
         function showBytesPreviewForDecoded(bytes) {
             const previewCount = Math.min(bytes.length, 1000);
@@ -2093,6 +1610,25 @@
                 if ((i + 1) % 16 === 0) previewText += '\n';
             }
             decodedBytesPreview.textContent = previewText;
+        }
+        
+        // ============== 从图像数据提取二进制数组 ==============
+        function extractBinaryFromImage(data, width, height) {
+            const binaryArray = [];
+            const totalPixels = width * height;
+            
+            for (let i = 0; i < totalPixels && i * 4 < data.length; i++) {
+                const pixelIndex = i * 4;
+                const r = data[pixelIndex];
+                const g = data[pixelIndex + 1];
+                const b = data[pixelIndex + 2];
+                
+                // 阈值判断（黑白图像）
+                const isBlack = (r < 128 && g < 128 && b < 128);
+                binaryArray.push(isBlack ? 1 : 0);
+            }
+            
+            return binaryArray;
         }
         
         // ============== 解析文件数据 ==============
@@ -2194,84 +1730,6 @@
                 notification.classList.remove('show');
             }, 3000);
         }
-
-        // ============== 更新解码进度 ==============
-        let decodeStartTime = 0;
-        let lastProgressUpdate = 0;
-        
-        function updateDecodeProgress(current, total, mode) {
-            const now = Date.now();
-            // 限制更新频率（每500ms更新一次）
-            if (now - lastProgressUpdate < 500) return;
-            
-            lastProgressUpdate = now;
-            
-            const percent = Math.round((current / total) * 100);
-            const elapsed = (now - decodeStartTime) / 1000;
-            
-            // 计算剩余时间
-            let remaining = '计算中...';
-            if (current > 100) {
-                const rate = current / elapsed;
-                remaining = Math.round((total - current) / rate) + '秒';
-            }
-            
-            // 更新加载指示器
-            const progressText = `${mode}解码进度: ${percent}% | 剩余时间: ${remaining}`;
-            updateLoadingMessage(progressText);
-        }
-        
-        // ============== 更新加载消息 ==============
-        function updateLoadingMessage(message) {
-            const loadingText = document.querySelector('#loadingIndicator p');
-            if (loadingText) {
-                loadingText.textContent = message;
-            }
-        }
-        
-        // ============== 增强的显示加载函数 ==============
-        function showLoading(show, message = '正在处理中，请稍候...', totalItems = 0) {
-            if (show) {
-                loadingIndicator.classList.add('active');
-                encodeBtn.disabled = true;
-                decodeBtn.disabled = true;
-                
-                // 记录开始时间
-                decodeStartTime = Date.now();
-                lastProgressUpdate = 0;
-                
-                // 更新消息
-                updateLoadingMessage(message);
-                
-                // 添加进度条（如果不存在）
-                if (!document.getElementById('progressBar')) {
-                    const progressHTML = `
-                        <div style="width: 80%; margin: 10px auto; background: #333; border-radius: 10px; overflow: hidden;">
-                            <div id="progressBar" style="height: 10px; background: #6c63ff; width: 0%; transition: width 0.3s;"></div>
-                        </div>
-                        <div id="progressText" style="font-size: 0.9rem; color: #a0a0c0;"></div>
-                    `;
-                    loadingIndicator.innerHTML += progressHTML;
-                }
-            } else {
-                loadingIndicator.classList.remove('active');
-                encodeBtn.disabled = !currentFile;
-                decodeBtn.disabled = !imageInput.files.length;
-            }
-        }
-        
-        // ============== 更新进度条 ==============
-        function updateProgressBar(percent, text) {
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
-            
-            if (progressBar) {
-                progressBar.style.width = percent + '%';
-            }
-            if (progressText) {
-                progressText.textContent = text;
-            }
-        }
         
         // ============== 辅助函数 ==============
         function formatFileSize(bytes) {
@@ -2285,14 +1743,6 @@
         function getFileExtension(filename) {
             const ext = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
             return ext ? ext.toUpperCase() + ' 文件' : '未知类型';
-        }
-        
-        // ============== 更新宽高比显示 ==============
-        function updateAspectRatio() {
-            const width = parseInt(imageWidthInput.value) || MIN_WIDTH;
-            const height = parseInt(imageHeightInput.value) || MIN_HEIGHT;
-            const ratio = (height / width).toFixed(3);
-            aspectRatioInput.value = `1:${ratio}`;
         }
         
         // ============== 键盘快捷键 ==============
@@ -2313,36 +1763,22 @@
                         e.preventDefault();
                     }
                 }
-                
-                // Ctrl+B 切换到黑白模式
-                if (e.ctrlKey && e.key === 'b') {
-                    setEncodingMode('bw');
-                    e.preventDefault();
-                }
-                
-                // Ctrl+C 切换到彩色模式
-                if (e.ctrlKey && e.key === 'c') {
-                    setEncodingMode('color');
-                    e.preventDefault();
-                }
             });
         }
         
         // ============== 控制台信息 ==============
-        console.log('%c🔐 文件↔图像转换器（黑白/彩色编码版）v2.0 %c已加载完成！', 
+        console.log('%c🔐 文件↔图像转换器（黑白Unicode编码）v1.0 %c已加载完成！', 
             'color: #6c63ff; font-size: 16px; font-weight: bold;', 
             'color: #4caf50; font-size: 14px;');
         console.log('%c📋 功能特性:', 'color: #2196f3; font-weight: bold;');
-        console.log('- 支持黑白和彩色两种编码模式');
-        console.log('- 黑白模式：21位/字符，1像素/位');
-        console.log('- 彩色模式：6位十六进制/字符，2像素/字符');
-        console.log('- 自动调整图像尺寸，修复了尺寸计算问题');
-        console.log('- 内存使用监控和提示');
+        console.log('- 支持任意文件类型编码为黑白图像');
+        console.log('- Unicode编码，每个字符21位二进制');
+        console.log('- 每个像素1位（0=白色，1=黑色）');
+        console.log('- 自动保存文件名和文件内容');
+        console.log('- 直接使用原始二进制数据，无Base64转换');
         console.log('%c⌨️ 快捷键:', 'color: #ff9800; font-weight: bold;');
         console.log('Ctrl+E: 编码文件');
         console.log('Ctrl+D: 解码图像');
-        console.log('Ctrl+B: 黑白模式');
-        console.log('Ctrl+C: 彩色模式');
     </script>
 </body>
 </html>
