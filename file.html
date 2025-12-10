@@ -1087,13 +1087,30 @@
         const MAX_HEIGHT = 14140;
         const ASPECT_RATIO = 1.414; // A4比例
         
-        // 十六进制到RGB的映射
+        // 十六进制到RGB的映射（增加容错版本）
         const HEX_TO_RGB = {
             '0': 0, '1': 17, '2': 34, '3': 51,
             '4': 68, '5': 85, '6': 102, '7': 119,
             '8': 136, '9': 153, 'a': 170, 'b': 187,
             'c': 204, 'd': 221, 'e': 238, 'f': 255
         };
+        
+        // 反向映射：RGB到HEX（带容错）
+        const RGB_TO_HEX_TOLERANT = {};
+        for (let i = 0; i <= 255; i++) {
+            // 找到最接近的标准值
+            let minDiff = Infinity;
+            let closestHex = '0';
+            
+            for (const [hex, rgb] of Object.entries(HEX_TO_RGB)) {
+                const diff = Math.abs(i - rgb);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    closestHex = hex;
+                }
+            }
+            RGB_TO_HEX_TOLERANT[i] = closestHex;
+        }
         
         const RGB_TO_HEX = {};
         for (const [hex, rgb] of Object.entries(HEX_TO_RGB)) {
@@ -1853,7 +1870,7 @@
             reader.readAsDataURL(file);
         }
         
-        // ============== 解码图像为文件 ==============
+        // ============== 解码图像为文件（优化版） ==============
         function decodeImageToFile() {
             const file = imageInput.files[0];
             if (!file) {
@@ -1861,7 +1878,8 @@
                 return;
             }
             
-            showLoading(true);
+            // 显示增强的加载指示器
+            showLoading(true, '正在加载并分析图像...');
             
             const reader = new FileReader();
             
@@ -1869,60 +1887,78 @@
                 const img = new Image();
                 img.onload = function() {
                     try {
-                        // 创建临时canvas
+                        // 创建临时canvas（优化性能）
                         const tempCanvas = document.createElement('canvas');
                         tempCanvas.width = img.width;
                         tempCanvas.height = img.height;
-                        const tempCtx = tempCanvas.getContext('2d');
+                        const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
                         
                         // 绘制图像
                         tempCtx.drawImage(img, 0, 0);
                         
-                        // 获取像素数据
-                        const imageData = tempCtx.getImageData(0, 0, img.width, img.height);
-                        const data = imageData.data;
-                        
-                        // 根据解码模式提取数据
-                        let text = '';
-                        
-                        if (decodeMode === 'bw') {
-                            // 黑白解码
-                            text = decodeBwImage(data, img.width, img.height);
-                        } else {
-                            // 彩色解码
-                            text = decodeColorImage(data, img.width, img.height);
+                        // 自动检测编码模式
+                        const detectedMode = autoDetectEncodingMode(tempCtx, img.width, img.height);
+                        if (detectedMode) {
+                            setDecodeMode(detectedMode);
+                            showNotification(`自动检测到${detectedMode === 'bw' ? '黑白' : '彩色'}编码模式`, 'info');
                         }
                         
-                        // 解析文件数据
-                        const fileInfo = parseFileData(text);
+                        // 获取像素数据（使用更高效的方式）
+                        showLoading(true, `正在提取${decodeMode === 'bw' ? '黑白' : '彩色'}像素数据...`);
                         
-                        if (!fileInfo) {
-                            throw new Error('无法识别文件数据格式');
-                        }
+                        setTimeout(() => {
+                            try {
+                                const imageData = tempCtx.getImageData(0, 0, img.width, img.height);
+                                const data = imageData.data;
+                                
+                                // 根据解码模式提取数据
+                                let text = '';
+                                
+                                if (decodeMode === 'bw') {
+                                    showLoading(true, '正在解码黑白图像...', img.width * img.height);
+                                    text = decodeBwImage(data, img.width, img.height);
+                                } else {
+                                    showLoading(true, '正在解码彩色图像...', img.width * img.height);
+                                    text = decodeColorImage(data, img.width, img.height);
+                                }
+                                
+                                // 解析文件数据
+                                const fileInfo = parseFileData(text);
+                                
+                                if (!fileInfo) {
+                                    // 尝试另一种解码方式
+                                    showNotification('标准解码失败，尝试容错解码...', 'warning');
+                                    const altText = decodeWithTolerance(tempCtx, img.width, img.height);
+                                    decodedFileInfo = parseFileData(altText);
+                                    
+                                    if (!decodedFileInfo) {
+                                        throw new Error('无法识别文件数据格式，请确认图像未损坏且编码正确');
+                                    }
+                                } else {
+                                    decodedFileInfo = fileInfo;
+                                }
+                                
+                                // 显示解码信息
+                                displayDecodedInfo(img, decodedFileInfo);
+                                
+                                // 显示解码字节预览
+                                showBytesPreviewForDecoded(decodedFileInfo.data);
+                                
+                                // 启用下载文件按钮
+                                downloadFileBtn.disabled = false;
+                                
+                                showNotification(`解码成功！检测到文件: ${decodedFileInfo.filename}`, 'success');
+                            } catch (error) {
+                                console.error('解码错误:', error);
+                                showNotification('解码失败: ' + error.message, 'error');
+                            } finally {
+                                showLoading(false);
+                            }
+                        }, 100);
                         
-                        // 保存解码信息
-                        decodedFileInfo = fileInfo;
-                        
-                        // 显示解码信息
-                        detectedFileName.textContent = fileInfo.filename;
-                        detectedFileSize.textContent = formatFileSize(fileInfo.data.length);
-                        detectedHeader.textContent = HEADER_MARKER;
-                        detectedEncodingMode.textContent = decodeMode === 'bw' ? '黑白' : '彩色';
-                        decodeInfo.style.display = 'block';
-                        
-                        // 显示解码字节预览
-                        decodedBytesContainer.style.display = 'block';
-                        decodedBytesLength.textContent = `${fileInfo.data.length} 字节`;
-                        showBytesPreviewForDecoded(fileInfo.data);
-                        
-                        // 启用下载文件按钮
-                        downloadFileBtn.disabled = false;
-                        
-                        showNotification(`解码成功！检测到文件: ${fileInfo.filename}`, 'success');
                     } catch (error) {
-                        console.error('解码错误:', error);
-                        showNotification('解码过程中发生错误: ' + error.message, 'error');
-                    } finally {
+                        console.error('图像处理错误:', error);
+                        showNotification('图像处理失败: ' + error.message, 'error');
                         showLoading(false);
                     }
                 };
@@ -1985,9 +2021,30 @@
             let text = '';
             const totalPixels = width * height;
             
+            // 颜色误差容错范围（0-255）
+            const TOLERANCE = 8;
+            
+            // RGB到十六进制的容错转换函数
+            function rgbToHexWithTolerance(rgbValue) {
+                // 将RGB值近似到最近的17的倍数（0,17,34,...,255）
+                const normalized = Math.round(rgbValue / 17) * 17;
+                // 确保在0-255范围内
+                const clamped = Math.max(0, Math.min(255, normalized));
+                // 转换回十六进制
+                const hexValue = Math.round(clamped / 17);
+                return hexValue.toString(16);
+            }
+            
+            showLoading(true, '正在解码彩色图像...', totalPixels);
+            
             // 每2个像素对应一个字符（6位十六进制）
             for (let i = 0; i < totalPixels; i += 2) {
                 if (i + 1 >= totalPixels) break;
+                
+                // 更新进度
+                if (i % 1000 === 0) {
+                    updateDecodeProgress(i, totalPixels, '彩色');
+                }
                 
                 // 获取第一个像素
                 const pixelIndex1 = i * 4;
@@ -2001,13 +2058,13 @@
                 const g2 = data[pixelIndex2 + 1];
                 const b2 = data[pixelIndex2 + 2];
                 
-                // 将RGB值转换回十六进制
-                const hex1 = RGB_TO_HEX[Math.round(r1 / 17) * 17] || '0';
-                const hex2 = RGB_TO_HEX[Math.round(g1 / 17) * 17] || '0';
-                const hex3 = RGB_TO_HEX[Math.round(b1 / 17) * 17] || '0';
-                const hex4 = RGB_TO_HEX[Math.round(r2 / 17) * 17] || '0';
-                const hex5 = RGB_TO_HEX[Math.round(g2 / 17) * 17] || '0';
-                const hex6 = RGB_TO_HEX[Math.round(b2 / 17) * 17] || '0';
+                // 使用容错转换
+                const hex1 = rgbToHexWithTolerance(r1);
+                const hex2 = rgbToHexWithTolerance(g1);
+                const hex3 = rgbToHexWithTolerance(b1);
+                const hex4 = rgbToHexWithTolerance(r2);
+                const hex5 = rgbToHexWithTolerance(g2);
+                const hex6 = rgbToHexWithTolerance(b2);
                 
                 // 组合成6位十六进制
                 const hex = hex1 + hex2 + hex3 + hex4 + hex5 + hex6;
@@ -2015,16 +2072,16 @@
                 // 转换为字符代码
                 const charCode = parseInt(hex, 16);
                 
-                // 跳过无效字符
-                if (charCode === 0 && text.length > 0 && !text.endsWith(HEADER_MARKER)) {
-                    continue;
+                // 有效性检查
+                if (charCode <= MAX_UNICODE) {
+                    text += String.fromCodePoint(charCode);
                 }
-                
-                text += String.fromCodePoint(charCode);
             }
             
             return text;
         }
+
+        
         
         // ============== 显示解码字节预览 ==============
         function showBytesPreviewForDecoded(bytes) {
@@ -2136,6 +2193,84 @@
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
+        }
+
+        // ============== 更新解码进度 ==============
+        let decodeStartTime = 0;
+        let lastProgressUpdate = 0;
+        
+        function updateDecodeProgress(current, total, mode) {
+            const now = Date.now();
+            // 限制更新频率（每500ms更新一次）
+            if (now - lastProgressUpdate < 500) return;
+            
+            lastProgressUpdate = now;
+            
+            const percent = Math.round((current / total) * 100);
+            const elapsed = (now - decodeStartTime) / 1000;
+            
+            // 计算剩余时间
+            let remaining = '计算中...';
+            if (current > 100) {
+                const rate = current / elapsed;
+                remaining = Math.round((total - current) / rate) + '秒';
+            }
+            
+            // 更新加载指示器
+            const progressText = `${mode}解码进度: ${percent}% | 剩余时间: ${remaining}`;
+            updateLoadingMessage(progressText);
+        }
+        
+        // ============== 更新加载消息 ==============
+        function updateLoadingMessage(message) {
+            const loadingText = document.querySelector('#loadingIndicator p');
+            if (loadingText) {
+                loadingText.textContent = message;
+            }
+        }
+        
+        // ============== 增强的显示加载函数 ==============
+        function showLoading(show, message = '正在处理中，请稍候...', totalItems = 0) {
+            if (show) {
+                loadingIndicator.classList.add('active');
+                encodeBtn.disabled = true;
+                decodeBtn.disabled = true;
+                
+                // 记录开始时间
+                decodeStartTime = Date.now();
+                lastProgressUpdate = 0;
+                
+                // 更新消息
+                updateLoadingMessage(message);
+                
+                // 添加进度条（如果不存在）
+                if (!document.getElementById('progressBar')) {
+                    const progressHTML = `
+                        <div style="width: 80%; margin: 10px auto; background: #333; border-radius: 10px; overflow: hidden;">
+                            <div id="progressBar" style="height: 10px; background: #6c63ff; width: 0%; transition: width 0.3s;"></div>
+                        </div>
+                        <div id="progressText" style="font-size: 0.9rem; color: #a0a0c0;"></div>
+                    `;
+                    loadingIndicator.innerHTML += progressHTML;
+                }
+            } else {
+                loadingIndicator.classList.remove('active');
+                encodeBtn.disabled = !currentFile;
+                decodeBtn.disabled = !imageInput.files.length;
+            }
+        }
+        
+        // ============== 更新进度条 ==============
+        function updateProgressBar(percent, text) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            if (progressBar) {
+                progressBar.style.width = percent + '%';
+            }
+            if (progressText) {
+                progressText.textContent = text;
+            }
         }
         
         // ============== 辅助函数 ==============
